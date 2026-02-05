@@ -8,7 +8,7 @@ Must-Haves:
     Menü (in Deutsch):
         - Rezeptauswahl
             - Unterkategorien (z.B. Pasta, schnell, Fisch,...)
-        - KI Beratung (Rezepte Vorschlagen)
+        - KI Beratung (Rezepte Vorschlagen, wenn Zutaten angegeben werden)
         - Rezepte selbsständig hinzufügen
         - Zurück / Menü Button
         - Programm Beenden
@@ -19,6 +19,4 @@ Nice-To-Haves:
     - Suchefunktion (Suche filtern)
     - Zufallsrezept ausgabe
     
-
-    test123
     
