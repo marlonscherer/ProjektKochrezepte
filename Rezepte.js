@@ -1,29 +1,28 @@
 import { question } from "readline-sync";
 
-//Rezept: Sushi Maki Rollen   
-//Zutaten:
-//- 80g Sushi-Reis  
-//- 1 Nori-Blätter  
-//- 25g frischer Lachs (Sushi-Qualität)  
-//- 1/4 Avocado  
-//- 1/4 Gurke  
-//- Sojasauce, Wasabi und eingelegter Ingwer zum Servieren
-//
-//Zubereitung:
-//1. Sushi-Reis nach Packungsanleitung zubereiten und abkühlen lassen.
-//2. Lachs, Avocado und Gurke in dünne Streifen schneiden.
-//3. Ein Nori-Blatt auf eine Bambusmatte legen und eine dünne Schicht Reis darauf verteilen, dabei am oberen Rand einen kleinen Rand frei lassen.
-//4. In der Mitte des Reises Lachs, Avocado und Gurke platzieren.
-//5. Mit Hilfe der Bambusmatte das Nori-Blatt fest aufrollen, dabei den freien Rand mit etwas Wasser befeuchten, um die Rolle zu verschließen.
-//6. Die Rolle in etwa 2 cm dicke Scheiben schneiden.
-//7. Mit Sojasauce, Wasabi und eingelegtem Ingwer servieren.
-//
-//Guten Appetit!
-//
-//const recipeChoice = question("Möchtest du das Rezept für Sushi Maki Rollen sehen? (ja/nein): ");
-//
-//if (recipeChoice.toLowerCase() === "ja") {
-//  console.log(`Rezept: Sushi Maki Rollen   
-//Zutaten:
-//- 200g Sushi-Reis  
-//- 4 Nori-Blätter            
+
+const recipeChoice = question("Möchtest du das Rezept für Sushi Maki Rollen sehen? (ja/nein): ");
+
+if (recipeChoice.toLowerCase() === "ja") {
+    console.log("Hier ist das Rezept für Sushi Maki Rollen:");
+    console.log("Zutaten:");
+    console.log("- 2 Tassen Sushi-Reis");
+    console.log("- 2 1/2 Tassen Wasser");
+    console.log("- 1/4 Tasse Reisessig");
+    console.log("- 1 EL Zucker");
+    console.log("- 1 TL Salz");
+    console.log("- Nori-Blätter");
+    console.log("- Füllungen nach Wahl (z.B. Gurke, Avocado, Lachs, Thunfisch)");
+    console.log("- Sojasauce, Wasabi und eingelegter Ingwer zum Servieren");
+
+    console.log("\nAnleitung:");
+    console.log("\n1. Den Sushi-Reis gründlich waschen, bis das Wasser klar ist.");
+    console.log("\n2. Den Reis mit Wasser in einem Topf zum Kochen bringen, dann die Hitze reduzieren und zugedeckt etwa 15 Minuten köcheln lassen, bis der Reis weich ist.");
+    console.log("\n3. In einer kleinen Schüssel Reisessig, Zucker und Salz vermischen, bis sich der Zucker aufgelöst hat.");
+    console.log("\n4. Den gekochten Reis in eine große Schüssel geben und die Essigmischung gleichmäßig darüber verteilen. Den Reis vorsichtig mit einem Holzlöffel mischen und abkühlen lassen.");
+    console.log("\n5. Ein Nori-Blatt auf eine Bambusmatte legen, eine dünne Schicht Reis darauf verteilen, dabei am oberen Rand einen kleinen Rand frei lassen.");
+    console.log("\n6. Die gewünschten Füllungen in einer Linie auf den Reis legen.");
+    console.log("\n7. Mit Hilfe der Bambusmatte das Nori-Blatt fest aufrollen, dabei die Füllungen einschließen.");
+    console.log("\n8. Die Rolle mit einem scharfen Messer in mundgerechte Stücke schneiden.");
+    console.log("\n9. Mit Sojasauce, Wasabi und eingelegtem Ingwer servieren und genießen!");
+}
