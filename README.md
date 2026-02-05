@@ -16,5 +16,6 @@ Nice-To-Haves:
     - Personenanzahl einstellen
     - Gerichte favoritisieren
     - Suchefunktion (Suche filtern)
+    - Zufallsrezept ausgabe
     
     
