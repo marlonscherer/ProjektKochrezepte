@@ -1,0 +1,78 @@
+[
+  {
+    "id": 1770730983365,
+    "name": "Spaghetti Aglio e Olio",
+    "schwierigkeitsgrad": "Leicht",
+    "zeitaufwand": "15 Minuten",
+    "kategorien": [
+      "Pasta",
+      "Italienisch",
+      "Vegan"
+    ],
+    "zutaten": [
+      {
+        "name": "Spaghetti",
+        "menge": "400g"
+      },
+      {
+        "name": "Knoblauch",
+        "menge": "4 Zehen"
+      },
+      {
+        "name": "Olivenöl",
+        "menge": "100ml"
+      },
+      {
+        "name": "Chili",
+        "menge": "1 Prise"
+      }
+    ],
+    "arbeitsschritte": [
+      "Wasser zum Kochen bringen",
+      "Spaghetti kochen",
+      "Knoblauch in Olivenöl braten",
+      "Gekochte Pasta mit Öl vermischen",
+      "Mit Chili abschmecken"
+    ]
+  },
+  {
+    "id": 1770730983368,
+    "name": "Gebratenes Lachsfilet",
+    "schwierigkeitsgrad": "Leicht",
+    "zeitaufwand": "25 Minuten",
+    "kategorien": [
+      "Fischgericht",
+      "Abendessen",
+      "Gesund"
+    ],
+    "zutaten": [
+      {
+        "name": "Lachsfilet",
+        "menge": "400g"
+      },
+      {
+        "name": "Zitrone",
+        "menge": "1 Stück"
+      },
+      {
+        "name": "Dill",
+        "menge": "1 Bund"
+      },
+      {
+        "name": "Butter",
+        "menge": "50g"
+      },
+      {
+        "name": "Salz & Pfeffer",
+        "menge": "nach Geschmack"
+      }
+    ],
+    "arbeitsschritte": [
+      "Lachs mit Salz und Pfeffer würzen",
+      "Butter in einer Pfanne schmelzen",
+      "Lachs mit Hautseite nach unten braten (4 Min)",
+      "Wenden und weitere 3-4 Minuten braten",
+      "Mit Zitrone und Dill servieren"
+    ]
+  }
+]
