@@ -9,9 +9,8 @@ Must-Haves:
         - Rezeptauswahl
             - Unterkategorien (z.B. Pasta, schnell, Fisch,...)
         - KI Beratung (Rezepte Vorschlagen, wenn Zutaten angegeben werden)
-        - Rezepte selbsständig hinzufügen
         - Zurück / Menü Button
-        -Bearbeiten/Löschen von Rezepten oder Kategorien
+        -Bearbeiten, Löschen und Hinzufügen von Rezepten oder Kategorien
         - Programm Beenden
         
 
