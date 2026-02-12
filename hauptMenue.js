@@ -1,4 +1,4 @@
-//TO DO: Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen 
+//TO DO: Wichtig! ICH IDIOT HABE DEN ZURÜCKKNOPF BEIM LÖSCHEN VERGESSEN, Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen, Beim Rezept details hat die Überschrift Abstand
 import {question, questionInt} from "readline-sync";
 import fs from "fs";
 import { fileURLToPath } from "url";
@@ -105,7 +105,7 @@ function rezepteBearbeitenMenue() {
 
 function rezeptLoeschenMenue() {
     process.stdout.write('\x1Bc');
-    console.log("===========Rezept Löschen===========\n")
+    console.log("===========Rezept Löschen===========")
     const rezepte = ladeRezepte();
     if (rezepte.length === 0) {
         console.log("Keine Rezepte zum Löschen gefunden");
