@@ -41,7 +41,7 @@ hauptMenue();
 function rezeptAuswahlMenue() {
     process.stdout.write('\x1Bc'); //cleared das Terminal
     console.log(
-        "===========Rezept Auswahl===========\n"
+        "===========Rezept Auswahl==========="
     );
 
     // Lade alle Rezepte für die Kategorienauswahl
@@ -61,17 +61,17 @@ function rezeptAuswahlMenue() {
     });
 
     // Auswahl der Kategorie mit Validierung
-    const auswahl = frageGanzzahl(1, menuEintraege.length, "Wähle eine Kategorie:\n");
-    const istZurueck = auswahl === menuEintraege.length;
+    const menueSteuerung = frageGanzzahl(1, menuEintraege.length, "\nWähle eine Kategorie:\n");
+    const istZurueck = menueSteuerung === menuEintraege.length;
     if (istZurueck) {
         return hauptMenue();
     }
 
-    if (auswahl === 1) {
+    if (menueSteuerung === 1) {
         return rezeptListeMenue(rezepte, "Alle Rezepte");
     }
 
-    const gewaehlteKategorie = kategorien[auswahl - 2];
+    const gewaehlteKategorie = kategorien[menueSteuerung - 2];
     const gefiltert = rezepte.filter((rezept) =>
         Array.isArray(rezept.kategorien) && rezept.kategorien.includes(gewaehlteKategorie)
     );
@@ -85,26 +85,22 @@ function rezepteBearbeitenMenue() {
         "[1] Rezept Hinzufügen\n",
         "[2] Rezept Löschen\n",
         "[3] Rezept Bearbeiten\n",
-        "[4] Zurück\n",
-        "[5] Beenden\n"
+        "[4] Zurück\n"
     );
 
     //Eingabe für Menüsteuerung mit Fehlerprüfung
-    const bearbeitenSteuerung = frageGanzzahl(1, 5, "Was möchtest du tun?\n");
+    const menueSteuerung = frageGanzzahl(1, 4, "Was möchtest du tun?\n");
 
     //Aufrufen des nächsten Untermenüs
-    if (bearbeitenSteuerung === 1) {
+    if (menueSteuerung === 1) {
         rezeptHinzufuegenMenue();
-    } else if (bearbeitenSteuerung === 2) {
+    } else if (menueSteuerung === 2) {
         rezeptLoeschenMenue();
-    } else if (bearbeitenSteuerung === 3) {
+    } else if (menueSteuerung === 3) {
         rezeptBearbeitenEinzelnMenue();
-    } else if (bearbeitenSteuerung === 4) {
+    } else if (menueSteuerung === 4) {
         hauptMenue();
-    } else if (bearbeitenSteuerung === 5) {
-        console.log("Das Programm wird beendet. Auf wiedersehen!");
-        process.exit(0);
-    }
+    } 
 }
 
 function rezeptLoeschenMenue() {
@@ -175,7 +171,7 @@ function frageGanzzahl(min, max, prompt) {
 
 function rezeptListeMenue(rezepte, titel) {
     process.stdout.write('\x1Bc');
-    console.log(`===========${titel}===========\n`);
+    console.log(`===========${titel}===========`);
 
     // Kategorie ohne Treffer behandeln
     if (!rezepte || rezepte.length === 0) {
@@ -190,14 +186,14 @@ function rezeptListeMenue(rezepte, titel) {
     console.log(`[${rezepte.length + 1}] Zurück`);
 
     // Rezeptauswahl mit Rücksprung
-    const auswahl = frageGanzzahl(1, rezepte.length + 1, "Wähle ein Rezept:\n");
-    if (auswahl === rezepte.length + 1) {
+    const menueSteuerung = frageGanzzahl(1, rezepte.length + 1, "\nWähle ein Rezept:\n");
+    if (menueSteuerung === rezepte.length + 1) {
         return rezeptAuswahlMenue();
     }
 
-    const rezept = rezepte[auswahl - 1];
+    const rezept = rezepte[menueSteuerung - 1];
     zeigeRezeptDetails(rezept);
-    question("Drücke Enter um zur Rezeptliste zurückzukehren");
+    question("\nDrücke Enter um zur Rezeptliste zurückzukehren");
     return rezeptListeMenue(rezepte, titel);
 }
 
