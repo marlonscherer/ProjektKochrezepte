@@ -1,5 +1,4 @@
-//TO DO: Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, Bei Rezepte bearbeiten Menü die beenden foption umändern
-
+//TO DO: Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen 
 import {question, questionInt} from "readline-sync";
 import fs from "fs";
 
@@ -84,7 +83,7 @@ function rezepteBearbeitenMenue() {
         "===========Rezepte Bearbeiten===========\n",
         "[1] Rezept Hinzufügen\n",
         "[2] Rezept Löschen\n",
-        "[3] Rezept Bearbeiten\n",
+        "[3] Rezept Verändern\n",
         "[4] Zurück\n"
     );
 
@@ -97,21 +96,42 @@ function rezepteBearbeitenMenue() {
     } else if (menueSteuerung === 2) {
         rezeptLoeschenMenue();
     } else if (menueSteuerung === 3) {
-        rezeptBearbeitenEinzelnMenue();
+        rezeptVerändernEinzelnMenue();
     } else if (menueSteuerung === 4) {
         hauptMenue();
     } 
 }
 
 function rezeptLoeschenMenue() {
-    console.log("Dummy: Rezept löschen-Menü (noch nicht implementiert)");
+    process.stdout.write('\x1Bc');
+    console.log("===========Rezept Löschen===========\n")
+    const rezepte = ladeRezepte();
+    if (rezepte.length === 0) {
+        console.log("Keine Rezepte zum Löschen gefunden");
+        question("Drücke Enter um zum Bearbeitungsmenü zurückzukehren");
+        return rezepteBearbeitenMenue();
+    }   
+    rezepte.forEach((rezept, index) => {
+        console.log(`[${index + 1}] ${rezept.name}`);
+    });
+    const menueSteuerung = frageGanzzahl(1, rezepte.length, "\nWelches Rezept möchtest du löschen?\n");
+    rezepte.splice(menueSteuerung - 1, 1); //Entfernt das ausgewählte Rezept aus dem Array
+   try {
+       fs.writeFileSync(rezepteDatei, JSON.stringify(rezepte, null, 2), "utf-8"); //Aktualisiert die JSON-Datei mit den Änderungen
+       console.log("Rezept erfolgreich gelöscht!");
+   } catch (error) {
+       console.log("Fehler beim Speichern der Änderungen");
+   }
+    question("Drücke Enter um zum Bearbeitungsmenü zurückzukehren");
+    return rezepteBearbeitenMenue();
+
 }
 
 function rezeptHinzufuegenMenue() {
     console.log("Dummy: Rezept hinzufügen-Menü (noch nicht implementiert)");
 }
 
-function rezeptBearbeitenEinzelnMenue() {
+function rezeptVerändernEinzelnMenue() {
     console.log("Dummy: Rezept bearbeiten-Menü (noch nicht implementiert)");
 }
 
