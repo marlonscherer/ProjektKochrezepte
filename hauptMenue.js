@@ -1,8 +1,9 @@
 //TO DO: Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen 
 import {question, questionInt} from "readline-sync";
 import fs from "fs";
+import { fileURLToPath } from "url";
 
-const rezepteDatei = new URL("./rezepte.json", import.meta.url);
+const rezepteDatei = fileURLToPath(new URL("./rezepte.json", import.meta.url));
 
 
 //Erstellt das Hauptmenü
@@ -72,7 +73,7 @@ function rezeptAuswahlMenue() {
 
     const gewaehlteKategorie = kategorien[menueSteuerung - 2];
     const gefiltert = rezepte.filter((rezept) =>
-        Array.isArray(rezept.kategorien) && rezept.kategorien.includes(gewaehlteKategorie)
+        Array.isArray(rezept.kategorien) && rezept.kategorien.some(k => k.toLowerCase() === gewaehlteKategorie.toLowerCase()) // Zum vergleichen wird Kategorie in Kleinbuchstaben umgewandelt
     );
     return rezeptListeMenue(gefiltert, `Kategorie: ${gewaehlteKategorie}`);
 }
@@ -115,12 +116,23 @@ function rezeptLoeschenMenue() {
         console.log(`[${index + 1}] ${rezept.name}`);
     });
     const menueSteuerung = frageGanzzahl(1, rezepte.length, "\nWelches Rezept möchtest du löschen?\n");
+    
+    // Lösch-Bestätigung
+    const rezeptName = rezepte[menueSteuerung - 1].name;
+    const bestaetigung = question(`\nMöchtest du "${rezeptName}" wirklich löschen? (j/n): `);
+    if (bestaetigung.toLowerCase() !== "j") {
+        console.log("Löschvorgang abgebrochen");
+        question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
+        return rezepteBearbeitenMenue();
+    }
+    
     rezepte.splice(menueSteuerung - 1, 1); //Entfernt das ausgewählte Rezept aus dem Array
    try {
+        //Änderung Speichern
        fs.writeFileSync(rezepteDatei, JSON.stringify(rezepte, null, 2), "utf-8"); //Aktualisiert die JSON-Datei mit den Änderungen
-       console.log("Rezept erfolgreich gelöscht!");
+       console.log("\n✓ Rezept erfolgreich gelöscht!");
    } catch (error) {
-       console.log("Fehler beim Speichern der Änderungen");
+       console.log("\n✗ Fehler beim Speichern der Änderungen!");
    }
     question("Drücke Enter um zum Bearbeitungsmenü zurückzukehren");
     return rezepteBearbeitenMenue();
@@ -175,8 +187,8 @@ function holeKategorien(rezepte) {
 function frageGanzzahl(min, max, prompt) {
     while (true) {
         const input = question(prompt);
-        // Prüfe, ob die Eingabe nur Ziffern (und optional Minus für negative Zahlen) enthält
-        if (!/^-?\d+$/.test(input)) {
+        // Prüfe, ob die Eingabe nur Ziffern enthält (keine negativen Zahlen)
+        if (!/^\d+$/.test(input)) {
             console.log("Fehler: Bitte geben Sie eine gültige Zahl ein");
             continue;
         }
