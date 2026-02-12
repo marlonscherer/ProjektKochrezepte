@@ -19,5 +19,6 @@ Nice-To-Haves:
     - Gerichte favoritisieren
     - Suchefunktion (Suche filtern)
     - Zufallsrezept ausgabe
+    -Rezept bewerten
     
     
