@@ -1,4 +1,4 @@
-//TO DO: Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, Funktionen auslagern in andere Dateien
+//TO DO: Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, Bei Rezepte bearbeiten Menü die beenden foption umändern
 
 import {question, questionInt} from "readline-sync";
 import fs from "fs";
@@ -20,24 +20,7 @@ console.log(
 
 
 //Eingabe für Menüsteuerung mit Fehlerprüfung
-let menueSteuerung;
-while (true) {
-    // Frage den Benutzer nach Eingabe
-    const input = question("Was möchtest du tun?\n");
-    // Versuche, die Eingabe in eine Zahl umzuwandeln
-    const num = parseFloat(input);
-    // Prüfe, ob die Eingabe keine gültige Zahl ist (z.B. Buchstaben)
-    if (isNaN(num)) {
-        console.log("Fehler: Bitte geben Sie eine gültige Zahl ein!");
-    // Prüfe, ob es eine Dezimalzahl ist oder außerhalb 1-5 liegt
-    } else if (num % 1 !== 0 || num < 1 || num > 4) {
-        console.log("Fehler: Bitte wählen sie eine der oben genannten Optionen!");
-    } else {
-        // Eingabe ist gültig – speichere sie und beende die Schleife
-        menueSteuerung = num;
-        break;
-    }
-}
+const menueSteuerung = frageGanzzahl(1, 4, "Was möchtest du tun?\n");
 
 //Aufrufen des nächsten Untermenüs (mit Funktionen um es übersichtlicher zu halten)
 if (menueSteuerung === 1) {
@@ -107,24 +90,7 @@ function rezepteBearbeitenMenue() {
     );
 
     //Eingabe für Menüsteuerung mit Fehlerprüfung
-    let bearbeitenSteuerung;
-    while (true) {
-        // Frage den Benutzer nach Eingabe
-        const input = question("Was möchtest du tun?\n");
-        // Versuche, die Eingabe in eine Zahl umzuwandeln
-        const num = parseFloat(input);
-        // Prüfe, ob die Eingabe keine gültige Zahl ist (z.B. Buchstaben)
-        if (isNaN(num)) {
-            console.log("Fehler: Bitte geben Sie eine gültige Zahl ein!");
-        // Prüfe, ob es eine Dezimalzahl ist oder außerhalb 1-5 liegt
-        } else if (num % 1 !== 0 || num < 1 || num > 5) {
-            console.log("Fehler: Bitte wählen sie eine der oben genannten Optionen!");
-        } else {
-            // Eingabe ist gültig – speichere sie und beende die Schleife
-            bearbeitenSteuerung = num;
-            break;
-        }
-    }
+    const bearbeitenSteuerung = frageGanzzahl(1, 5, "Was möchtest du tun?\n");
 
     //Aufrufen des nächsten Untermenüs
     if (bearbeitenSteuerung === 1) {
