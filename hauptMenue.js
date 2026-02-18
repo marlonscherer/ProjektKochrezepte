@@ -1,4 +1,4 @@
-//Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen, Beim Rezept details hat die Überschrift Abstand
+//WICHTIG DAS MENÜ REZEPT HINZUFÜGEN NOCHMALS GRÜNDLICH AUF FEHLER TESTEN, HABE VIELLEICHT WAS ÜBERSEHEN, Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen, Beim Rezept details hat die Überschrift Abstand
 import {question, questionInt} from "readline-sync";
 import fs from "fs";
 import { fileURLToPath } from "url";
@@ -146,7 +146,142 @@ function rezeptLoeschenMenue() {
 }
 
 function rezeptHinzufuegenMenue() {
-    console.log("Dummy: Rezept hinzufügen-Menü (noch nicht implementiert)");
+    process.stdout.write('\x1Bc');
+    console.log("===========Rezept Hinzufügen===========\n");
+    
+    const rezepte = ladeRezepte();
+    
+    // Rezeptnamen abfragen und überprüfen
+    let rezeptName = "";
+    let nameIstEinzigartig = false;
+    
+    while (!nameIstEinzigartig) {
+        rezeptName = question("Gib den Namen des neuen Rezepts ein: ").trim();
+        
+        if (rezeptName === "") {
+            console.log("Der Name darf nicht leer sein!");
+            continue;
+        }
+        
+        // Prüfe, ob Name bereits existiert (case-insensitive)
+        const nameBereitsVorhanden = rezepte.some(rezept => rezept.name.toLowerCase() === rezeptName.toLowerCase());
+        
+        if (nameBereitsVorhanden) {
+            console.log(`Ein Rezept mit dem Namen "${rezeptName}" existiert bereits!`);
+            continue;
+        }
+        
+        nameIstEinzigartig = true;
+    }
+    
+    // Schwierigkeitsgrad abfragen
+    const schwierigkeitsgrade = ["Leicht", "Mittel", "Schwer"];
+    console.log("\nSchwierigkeitsgrad:");
+    schwierigkeitsgrade.forEach((grad, index) => {
+        console.log(`[${index + 1}] ${grad}`);
+    });
+    const schwierigkeitIndex = frageGanzzahl(1, schwierigkeitsgrade.length, "Wähle den Schwierigkeitsgrad: ");
+    const schwierigkeitsgrad = schwierigkeitsgrade[schwierigkeitIndex - 1];
+    
+    // Zeitaufwand abfragen
+    let zeitaufwand = "";
+    while (zeitaufwand === "") {
+        zeitaufwand = question("\nGib den Zeitaufwand ein (z.B. '30 Minuten'): ").trim();
+        if (zeitaufwand === "") {
+            console.log("Der Zeitaufwand darf nicht leer sein!");
+        }
+    }
+    
+    // Kategorien abfragen
+    console.log("\nGib Kategorien ein (getrennt durch Kommas, z.B. 'Pasta, Italienisch, Vegetarisch'):");
+    const kategorienInput = question("Kategorien: ").trim();
+    const kategorien = kategorienInput
+        .split(",") //Eingabe aufteilen
+        .map(kategorie => kategorie.trim()) //Leerzeichen entfernen
+        .filter(kategorie => kategorie !== ""); //Leere Einträge entfernen
+    
+    // Zutaten abfragen
+    console.log("\nZutaten hinzufügen (gib 'fertig' ein, um zu stoppen):");
+    const zutaten = [];
+    let zutatIndex = 1;
+    
+    while (true) {
+        let zutatName = "";
+        while (zutatName === "") {
+            zutatName = question(`\nZutat ${zutatIndex} Name (oder 'fertig'): `).trim();
+            if (zutatName === "") {
+                console.log("Der Name der Zutat darf nicht leer sein!");
+            }
+        }
+        
+        if (zutatName.toLowerCase() === "fertig") {
+            if (zutaten.length === 0) {
+                console.log("Mindestens eine Zutat ist erforderlich!");
+                continue;
+            }
+            break;
+        }
+        
+        let zutatMenge = "";
+        while (zutatMenge === "") {
+            zutatMenge = question(`Zutat ${zutatIndex} Menge: `).trim();
+            if (zutatMenge === "") {
+                console.log("Die Menge darf nicht leer sein!");
+            }
+        }
+        
+        zutaten.push({ name: zutatName, menge: zutatMenge });
+        zutatIndex = zutatIndex + 1;
+    }
+    
+    // Arbeitsschritte abfragen
+    console.log("\nArbeitsschritte hinzufügen (gib 'fertig' ein, um zu stoppen):");
+    const arbeitsschritte = [];
+    let schrittIndex = 1;
+    
+    while (true) {
+        let schritt = "";
+        while (schritt === "") {
+            schritt = question(`\nSchritt ${schrittIndex} (oder 'fertig'): `).trim();
+            if (schritt === "") {
+                console.log("Der Arbeitsschritt darf nicht leer sein!");
+            }
+        }
+        
+        if (schritt.toLowerCase() === "fertig") {
+            if (arbeitsschritte.length === 0) {
+                console.log("Mindestens ein Arbeitsschritt ist erforderlich!");
+                continue;
+            }
+            break;
+        }
+        
+        arbeitsschritte.push(schritt);
+        schrittIndex = schrittIndex + 1;
+    }
+    
+    // Neues Rezept erstellen
+    const neuesRezept = {
+        id: Date.now(),
+        name: rezeptName,
+        schwierigkeitsgrad: schwierigkeitsgrad,
+        zeitaufwand: zeitaufwand,
+        kategorien: kategorien,
+        zutaten: zutaten,
+        arbeitsschritte: arbeitsschritte
+    };
+    
+    // Rezept speichern
+    rezepte.push(neuesRezept);
+    try {
+        fs.writeFileSync(rezepteDatei, JSON.stringify(rezepte, null, 2), "utf-8");
+        console.log(`\n✓ Rezept "${rezeptName}" erfolgreich hinzugefügt!`);
+    } catch (error) {
+        console.log("\n✗ Fehler beim Speichern des Rezepts!");
+    }
+    
+    question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
+    return rezepteBearbeitenMenue();
 }
 
 function rezeptVerändernEinzelnMenue() {
