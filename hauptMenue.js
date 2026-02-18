@@ -1,4 +1,4 @@
-//TO DO: Wichtig! ICH IDIOT HABE DEN ZURÜCKKNOPF BEIM LÖSCHEN VERGESSEN, Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen, Beim Rezept details hat die Überschrift Abstand
+//Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen, Beim Rezept details hat die Überschrift Abstand
 import {question, questionInt} from "readline-sync";
 import fs from "fs";
 import { fileURLToPath } from "url";
@@ -115,7 +115,13 @@ function rezeptLoeschenMenue() {
     rezepte.forEach((rezept, index) => {
         console.log(`[${index + 1}] ${rezept.name}`);
     });
-    const menueSteuerung = frageGanzzahl(1, rezepte.length, "\nWelches Rezept möchtest du löschen?\n");
+    console.log(`[${rezepte.length + 1}] Zurück`);
+    const menueSteuerung = frageGanzzahl(1, rezepte.length + 1, "\nWelches Rezept möchtest du löschen?\n");
+    
+    // Zurück-Option
+    if (menueSteuerung === rezepte.length + 1) {
+        return rezepteBearbeitenMenue();
+    }
     
     // Lösch-Bestätigung
     const rezeptName = rezepte[menueSteuerung - 1].name;
