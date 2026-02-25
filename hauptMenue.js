@@ -275,9 +275,9 @@ function rezeptHinzufuegenMenue() {
     rezepte.push(neuesRezept);
     try {
         fs.writeFileSync(rezepteDatei, JSON.stringify(rezepte, null, 2), "utf-8");
-        console.log(`\n✓ Rezept "${rezeptName}" erfolgreich hinzugefügt!`);
+        console.log(`\nRezept "${rezeptName}" erfolgreich hinzugefügt!`);
     } catch (error) {
-        console.log("\n✗ Fehler beim Speichern des Rezepts!");
+        console.log("\nFehler beim Speichern des Rezepts!");
     }
     
     question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
@@ -372,7 +372,7 @@ function rezeptListeMenue(rezepte, titel) {
 
 function zeigeRezeptDetails(rezept) {
     process.stdout.write('\x1Bc');
-    console.log(`===========${rezept.name}===========\n`);
+    console.log(`===========${rezept.name}===========`);
     console.log(`Schwierigkeitsgrad: ${rezept.schwierigkeitsgrad || "-"}`);
     console.log(`Zeitaufwand: ${rezept.zeitaufwand || "-"}`);
     console.log(`Kategorien: ${(rezept.kategorien || []).join(", ") || "-"}`);
