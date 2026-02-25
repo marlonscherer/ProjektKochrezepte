@@ -285,7 +285,34 @@ function rezeptHinzufuegenMenue() {
 }
 
 function rezeptVerändernEinzelnMenue() {
-    console.log("Dummy: Rezept bearbeiten-Menü (noch nicht implementiert)");
+    process.stdout.write('\x1Bc');
+    console.log("===========Rezept Verändern===========\n",
+        "[1] Rezeptname ändern\n",
+        "[2] Schwierigkeitsgrad ändern\n",
+        "[3] Zeitaufwand ändern\n",
+        "[4] Kategorien ändern\n",
+        "[5] Zutaten ändern\n",
+        "[6] Arbeitsschritte ändern\n",
+        "[7] Zurück\n"
+    );
+
+    const menueSteuerung = frageGanzzahl(1, 7, "Was möchtest du tun?\n");
+
+   if (menueSteuerung === 1) {
+        console.log("Dummy: Rezeptname ändern (noch nicht implementiert)");
+    } else if (menueSteuerung === 2) {
+        console.log("Dummy: Schwierigkeitsgrad ändern (noch nicht implementiert)");
+    } else if (menueSteuerung === 3) {
+        console.log("Dummy: Zeitaufwand ändern (noch nicht implementiert)");
+    } else if (menueSteuerung === 4) {
+        console.log("Dummy: Kategorien ändern (noch nicht implementiert)");
+    } else if (menueSteuerung === 5) {
+        console.log("Dummy: Zutaten ändern (noch nicht implementiert)");
+    } else if (menueSteuerung === 6) {
+        console.log("Dummy: Arbeitsschritte ändern (noch nicht implementiert)");
+    } else if (menueSteuerung === 7) {
+        return rezepteBearbeitenMenue();
+    }
 }
 
 function kiBeratungMenue() {
