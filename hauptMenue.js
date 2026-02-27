@@ -320,37 +320,131 @@ function rezeptHinzufuegenMenue() {
 
 function rezeptVerändernEinzelnMenue() {
     process.stdout.write('\x1Bc');
-    console.log("===========Rezept Verändern===========\n",
-        "[1] Rezeptname ändern\n",
-        "[2] Schwierigkeitsgrad ändern\n",
-        "[3] Zeitaufwand ändern\n",
-        "[4] Kategorien ändern\n",
-        "[5] Zutaten ändern\n",
-        "[6] Arbeitsschritte ändern\n",
-        "[7] Zurück\n"
-    );
-
-    const menueSteuerung = frageGanzzahl(1, 7, "Was möchtest du tun?\n");
-
-   if (menueSteuerung === 1) {
-        console.log("Dummy: Rezeptname ändern (noch nicht implementiert)");
-    } else if (menueSteuerung === 2) {
-        console.log("Dummy: Schwierigkeitsgrad ändern (noch nicht implementiert)");
-    } else if (menueSteuerung === 3) {
-        console.log("Dummy: Zeitaufwand ändern (noch nicht implementiert)");
-    } else if (menueSteuerung === 4) {
-        console.log("Dummy: Kategorien ändern (noch nicht implementiert)");
-    } else if (menueSteuerung === 5) {
-        console.log("Dummy: Zutaten ändern (noch nicht implementiert)");
-    } else if (menueSteuerung === 6) {
-        console.log("Dummy: Arbeitsschritte ändern (noch nicht implementiert)");
-    } else if (menueSteuerung === 7) {
+    console.log("===========Rezept Verändern===========");
+    
+    const rezepte = ladeRezepte();
+    if (rezepte.length === 0) {
+        console.log("Keine Rezepte zum Bearbeiten gefunden");
+        question("Drücke Enter um zum Bearbeitungsmenü zurückzukehren");
         return rezepteBearbeitenMenue();
+    }
+    
+    rezepte.forEach((rezept, index) => {
+        console.log(`[${index + 1}] ${rezept.name}`);
+    });
+    console.log(`[${rezepte.length + 1}] Zurück`);
+    
+    const menueSteuerung = frageGanzzahl(1, rezepte.length + 1, "\nWelches Rezept möchtest du bearbeiten?\n");
+    
+    // Zurück-Option
+    if (menueSteuerung === rezepte.length + 1) {
+        return rezepteBearbeitenMenue();
+    }
+    
+    const rezept = rezepte[menueSteuerung - 1];
+    return rezeptEditierMenue(rezept, rezepte);
+}
+
+function rezeptEditierMenue(rezept, rezepte) {
+    while (true) {
+        process.stdout.write('\x1Bc');
+        console.log(`===========Bearbeite: ${rezept.name}===========\n`,
+            "[1] Rezeptname ändern\n",
+            "[2] Schwierigkeitsgrad ändern\n",
+            "[3] Zeitaufwand ändern\n",
+            "[4] Kategorien ändern\n",
+            "[5] Zutaten ändern\n",
+            "[6] Arbeitsschritte ändern\n",
+            "[7] Zurück\n"
+        );
+
+        const menueSteuerung = frageGanzzahl(1, 7, "Was möchtest du ändern?\n");
+
+        if (menueSteuerung === 1) {
+            rezept = bearbeiteRezeptName(rezept);
+        } else if (menueSteuerung === 2) {
+            rezept = bearbeiteSchwierigkeitsgrad(rezept);
+        } else if (menueSteuerung === 3) {
+            rezept = bearbeiteZeitaufwand(rezept);
+        } else if (menueSteuerung === 4) {
+            rezept = bearbeiteKategorien(rezept);
+        } else if (menueSteuerung === 5) {
+            rezept = bearbeiteZutaten(rezept);
+        } else if (menueSteuerung === 6) {
+            rezept = bearbeiteArbeitsschritte(rezept);
+        } else if (menueSteuerung === 7) {
+            return rezeptVerändernEinzelnMenue();
+        }
+
+        // Änderungen speichern
+        try {
+            fs.writeFileSync(rezepteDatei, JSON.stringify(rezepte, null, 2), "utf-8");
+            console.log("Änderungen gespeichert!");
+        } catch (error) {
+            console.log("Fehler beim Speichern der Änderungen!");
+        }
+        
+        question("Drücke Enter um fortzufahren");
     }
 }
 
 function kiBeratungMenue() {
     console.log("Dummy: KI Beratung-Menü (noch nicht implementiert)");
+}
+
+// Dummy-Funktionen für Rezept-Bearbeitung
+function bearbeiteRezeptName(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Rezeptname ändern===========");
+    console.log(`Aktueller Name: ${rezept.name}`);
+    console.log("\nDummy: Logik zum Ändern des Rezeptnamens wird hier implementiert");
+    return rezept;
+}
+
+function bearbeiteSchwierigkeitsgrad(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Schwierigkeitsgrad ändern===========");
+    console.log(`Aktueller Schwierigkeitsgrad: ${rezept.schwierigkeitsgrad}`);
+    console.log("\nDummy: Logik zum Ändern des Schwierigkeitsgrades wird hier implementiert");
+    return rezept;
+}
+
+function bearbeiteZeitaufwand(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Zeitaufwand ändern===========");
+    console.log(`Aktueller Zeitaufwand: ${rezept.zeitaufwand}`);
+    console.log("\nDummy: Logik zum Ändern des Zeitaufwands wird hier implementiert");
+    return rezept;
+}
+
+function bearbeiteKategorien(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Kategorien ändern===========");
+    console.log(`Aktuelle Kategorien: ${(rezept.kategorien || []).join(", ")}`);
+    console.log("\nDummy: Logik zum Ändern der Kategorien wird hier implementiert");
+    return rezept;
+}
+
+function bearbeiteZutaten(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Zutaten ändern===========");
+    console.log("Aktuelle Zutaten:");
+    (rezept.zutaten || []).forEach((zutat, index) => {
+        console.log(`${index + 1}. ${zutat.name} (${zutat.menge})`);
+    });
+    console.log("\nDummy: Logik zum Ändern der Zutaten wird hier implementiert");
+    return rezept;
+}
+
+function bearbeiteArbeitsschritte(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Arbeitsschritte ändern===========");
+    console.log("Aktuelle Arbeitsschritte:");
+    (rezept.arbeitsschritte || []).forEach((schritt, index) => {
+        console.log(`${index + 1}. ${schritt}`);
+    });
+    console.log("\nDummy: Logik zum Ändern der Arbeitsschritte wird hier implementiert");
+    return rezept;
 }
 
 function ladeRezepte() {
