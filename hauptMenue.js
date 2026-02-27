@@ -1,4 +1,4 @@
-//WICHTIG DAS MENÜ REZEPT HINZUFÜGEN NOCHMALS GRÜNDLICH AUF FEHLER TESTEN, HABE VIELLEICHT WAS ÜBERSEHEN, Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen, Beim Rezept details hat die Überschrift Abstand
+//ABBRECHEN BEI REZEPT ERSTELLEN, Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus und gibt diese auch falsch an die json weiter, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen
 import {question, questionInt} from "readline-sync";
 import fs from "fs";
 import { fileURLToPath } from "url";
@@ -147,7 +147,9 @@ function rezeptLoeschenMenue() {
 
 function rezeptHinzufuegenMenue() {
     process.stdout.write('\x1Bc');
-    console.log("===========Rezept Hinzufügen===========\n");
+    console.log("===========Rezept Hinzufügen===========\n",
+        "'abbrechen' eingeben, um den Vorgang abzubrechen\n"
+    );
     
     const rezepte = ladeRezepte();
     
@@ -158,10 +160,14 @@ function rezeptHinzufuegenMenue() {
     while (!nameIstEinzigartig) {
         rezeptName = question("Gib den Namen des neuen Rezepts ein: ").trim();
         
-        if (rezeptName === "") {
-            console.log("Der Name darf nicht leer sein!");
-            continue;
-        }
+        if (rezeptName.toLowerCase() === "abbrechen") {
+            console.log("Rezepterstellung abgebrochen.");
+            question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
+            return rezepteBearbeitenMenue();
+        } else if (rezeptName === "") {
+                console.log("Der Name darf nicht leer sein!");
+                continue;
+            }
         
         // Prüfe, ob Name bereits existiert (case-insensitive)
         const nameBereitsVorhanden = rezepte.some(rezept => rezept.name.toLowerCase() === rezeptName.toLowerCase());
@@ -180,28 +186,44 @@ function rezeptHinzufuegenMenue() {
     schwierigkeitsgrade.forEach((grad, index) => {
         console.log(`[${index + 1}] ${grad}`);
     });
-    const schwierigkeitIndex = frageGanzzahl(1, schwierigkeitsgrade.length, "Wähle den Schwierigkeitsgrad: ");
+    console.log(`[${schwierigkeitsgrade.length + 1}] Abbrechen`);
+    const schwierigkeitIndex = frageGanzzahl(1, schwierigkeitsgrade.length + 1, "Wähle den Schwierigkeitsgrad: ");
+    if (schwierigkeitIndex === schwierigkeitsgrade.length + 1) {
+        console.log("Rezepterstellung abgebrochen.");
+        question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
+        return rezepteBearbeitenMenue();
+    }
     const schwierigkeitsgrad = schwierigkeitsgrade[schwierigkeitIndex - 1];
     
     // Zeitaufwand abfragen
     let zeitaufwand = "";
     while (zeitaufwand === "") {
         zeitaufwand = question("\nGib den Zeitaufwand ein (z.B. '30 Minuten'): ").trim();
-        if (zeitaufwand === "") {
-            console.log("Der Zeitaufwand darf nicht leer sein!");
+        if (zeitaufwand.toLowerCase() === "abbrechen") {
+            console.log("Rezepterstellung abgebrochen.");
+            question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
+            return rezepteBearbeitenMenue();
+        } else if (zeitaufwand === "") {
+                console.log("Der Zeitaufwand darf nicht leer sein!");
         }
     }
     
     // Kategorien abfragen
-    console.log("\nGib Kategorien ein (getrennt durch Kommas, z.B. 'Pasta, Italienisch, Vegetarisch'):");
+    console.log("\nGib Kategorien ein (getrennt durch Kommas, z.B. 'Pasta, Italienisch, Vegetarisch')");
     const kategorienInput = question("Kategorien: ").trim();
+    
+    if (kategorienInput.toLowerCase() === "abbrechen") {
+        console.log("Rezepterstellung abgebrochen.");
+        question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
+        return rezepteBearbeitenMenue();
+    }
     const kategorien = kategorienInput
         .split(",") //Eingabe aufteilen
         .map(kategorie => kategorie.trim()) //Leerzeichen entfernen
         .filter(kategorie => kategorie !== ""); //Leere Einträge entfernen
     
     // Zutaten abfragen
-    console.log("\nZutaten hinzufügen (gib 'fertig' ein, um zu stoppen):");
+    console.log("\nZutaten hinzufügen (gib 'fertig' ein, um zu stoppen)");
     const zutaten = [];
     let zutatIndex = 1;
     
@@ -209,9 +231,13 @@ function rezeptHinzufuegenMenue() {
         let zutatName = "";
         while (zutatName === "") {
             zutatName = question(`\nZutat ${zutatIndex} Name (oder 'fertig'): `).trim();
-            if (zutatName === "") {
-                console.log("Der Name der Zutat darf nicht leer sein!");
-            }
+            if (zutatName.toLowerCase() === "abbrechen") {
+                console.log("Rezepterstellung abgebrochen.");
+                question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
+                return rezepteBearbeitenMenue();
+            } else if (zutatName === "") {
+                    console.log("Der Name der Zutat darf nicht leer sein!");
+                }
         }
         
         if (zutatName.toLowerCase() === "fertig") {
@@ -225,7 +251,11 @@ function rezeptHinzufuegenMenue() {
         let zutatMenge = "";
         while (zutatMenge === "") {
             zutatMenge = question(`Zutat ${zutatIndex} Menge: `).trim();
-            if (zutatMenge === "") {
+            if (zutatMenge.toLowerCase() === "abbrechen") {
+                console.log("Rezepterstellung abgebrochen.");
+                question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
+                return rezepteBearbeitenMenue();
+            } else if (zutatMenge === "") {
                 console.log("Die Menge darf nicht leer sein!");
             }
         }
@@ -243,7 +273,11 @@ function rezeptHinzufuegenMenue() {
         let schritt = "";
         while (schritt === "") {
             schritt = question(`\nSchritt ${schrittIndex} (oder 'fertig'): `).trim();
-            if (schritt === "") {
+            if (schritt.toLowerCase() === "abbrechen") {
+                console.log("Rezepterstellung abgebrochen.");
+                question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
+                return rezepteBearbeitenMenue();
+            } else if (schritt === "") {
                 console.log("Der Arbeitsschritt darf nicht leer sein!");
             }
         }
