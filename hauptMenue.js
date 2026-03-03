@@ -498,17 +498,54 @@ function bearbeiteKategorien(rezept) {
 
     let menueSteuerung = frageGanzzahl(1, 5, "Was möchtest du tun?\n");
 
+    let bearbeitetesRezept = null;
     if (menueSteuerung === 1) {
-       kategorieHinzufuegen(rezept);
+       bearbeitetesRezept = kategorieHinzufuegen(rezept);
     } else if (menueSteuerung === 2) {
-        kategorieEntfernen(rezept);
+        bearbeitetesRezept = kategorieEntfernen(rezept);
     } else if (menueSteuerung === 3) {
-        kategorieUmbenennen(rezept);
+        bearbeitetesRezept = kategorieUmbenennen(rezept);
     } else if (menueSteuerung === 4) {
-        kategorienErsetzen(rezept);
+        bearbeitetesRezept = kategorienErsetzen(rezept);
     } else if (menueSteuerung === 5) {
-        return rezeptEditierMenue(rezept, ladeRezepte());
+        return null;
     }
+
+    return bearbeitetesRezept;
+}
+
+function kategorieHinzufuegen(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Kategorie hinzufügen===========");
+    console.log(`Aktuelle Kategorien: ${(rezept.kategorien || []).join(", ")}`);
+
+    let neueKategorie = "";
+    let kategorieIstEinzigartig = false;
+
+    while (!kategorieIstEinzigartig) {
+        neueKategorie = question("Gib die neue Kategorie ein (oder 'abbrechen'): ").trim();
+        if (neueKategorie === "") {
+            console.log("Die Kategorie darf nicht leer sein!");
+            continue;
+        } else if (neueKategorie.toLowerCase() === "abbrechen") {
+            console.log("Kategorie hinzufügen abgebrochen.");
+            return null;
+        }
+
+        // Prüfe, ob Kategorie bereits existiert
+        const kategorieBereitsVorhanden = (rezept.kategorien || []).some(kategorie => kategorie.toLowerCase() === neueKategorie.toLowerCase());
+
+        if (kategorieBereitsVorhanden) {
+            console.log(`Die Kategorie "${neueKategorie}" existiert bereits!`);
+            continue;
+        } else {
+            kategorieIstEinzigartig = true;
+        }
+    }
+
+    rezept.kategorien.push(neueKategorie);
+    console.log(`Kategorie "${neueKategorie}" hinzugefügt!`);
+    return rezept;
 }
 
 function bearbeiteZutaten(rezept) {
