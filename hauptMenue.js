@@ -360,34 +360,40 @@ function rezeptEditierMenue(rezept, rezepte) {
 
         const menueSteuerung = frageGanzzahl(1, 7, "Was möchtest du ändern?\n");
 
+        let bearbeitetesRezept = null;
         if (menueSteuerung === 1) {
-            rezept = bearbeiteRezeptName(rezept, rezepte);
+            bearbeitetesRezept = bearbeiteRezeptName(rezept, rezepte);
         } else if (menueSteuerung === 2) {
-            rezept = bearbeiteSchwierigkeitsgrad(rezept);
+            bearbeitetesRezept = bearbeiteSchwierigkeitsgrad(rezept);
         } else if (menueSteuerung === 3) {
-            rezept = bearbeiteZeitaufwand(rezept);
+            bearbeitetesRezept = bearbeiteZeitaufwand(rezept);
         } else if (menueSteuerung === 4) {
-            rezept = bearbeiteKategorien(rezept);
+            bearbeitetesRezept = bearbeiteKategorien(rezept);
         } else if (menueSteuerung === 5) {
-            rezept = bearbeiteZutaten(rezept);
+            bearbeitetesRezept = bearbeiteZutaten(rezept);
         } else if (menueSteuerung === 6) {
-            rezept = bearbeiteArbeitsschritte(rezept);
+            bearbeitetesRezept = bearbeiteArbeitsschritte(rezept);
         } else if (menueSteuerung === 7) {
             return rezeptVerändernEinzelnMenue();
         }
 
-        // Bearbeitetes Rezept sicher zurück in die Liste schreiben
-        const rezeptIndex = rezepte.findIndex((eintrag) => eintrag.id === rezept.id);
-        if (rezeptIndex !== -1) {
-            rezepte[rezeptIndex] = rezept;
-        }
+        // Nur speichern wenn tatsächlich eine Änderung gemacht wurde (nicht abgebrochen)
+        if (bearbeitetesRezept !== null) {
+            rezept = bearbeitetesRezept;
+            
+            // Bearbeitetes Rezept sicher zurück in die Liste schreiben
+            const rezeptIndex = rezepte.findIndex((eintrag) => eintrag.id === rezept.id); //Sucht das Rezept mithilfe der ID
+            if (rezeptIndex !== -1) {
+                rezepte[rezeptIndex] = rezept; //Aktualisiert das Array mit der Änderung
+            }
 
-        // Änderungen speichern
-        try {
-            fs.writeFileSync(rezepteDatei, JSON.stringify(rezepte, null, 2), "utf-8");
-            console.log("Änderungen gespeichert!");
-        } catch (error) {
-            console.log("Fehler beim Speichern der Änderungen!");
+            // Änderungen speichern
+            try {
+                fs.writeFileSync(rezepteDatei, JSON.stringify(rezepte, null, 2), "utf-8");
+                console.log("Änderungen gespeichert!");
+            } catch (error) {
+                console.log("Fehler beim Speichern der Änderungen!");
+            }
         }
         
         question("Drücke Enter um fortzufahren");
@@ -398,7 +404,7 @@ function kiBeratungMenue() {
     console.log("Dummy: KI Beratung-Menü (noch nicht implementiert)");
 }
 
-// Funktionen für die Bearbeitung der Rezeptdetails (Platzhalter, um die Struktur zu zeigen, Logik muss noch implementiert werden)
+// Funktionen für die Bearbeitung der Rezeptdetails (Logik wird gerade noch implementiert)
 function bearbeiteRezeptName(rezept, rezepte) {
     process.stdout.write('\x1Bc');
     console.log("===========Rezeptname ändern===========");
@@ -414,7 +420,7 @@ function bearbeiteRezeptName(rezept, rezepte) {
             continue;
         } else if (neuerName.toLowerCase() === "abbrechen") {
             console.log("Namensänderung abgebrochen.");
-            return rezeptEditierMenue(rezept, rezepte);
+            return null;
         }
 
         // Prüfe, ob Name bereits existiert, außer beim aktuellen Rezept
@@ -431,7 +437,7 @@ function bearbeiteRezeptName(rezept, rezepte) {
         }
     }
 
-    rezept.name = neuerName;
+    rezept.name = neuerName; // Name aktualisieren
     return rezept;
 }
 
@@ -439,7 +445,22 @@ function bearbeiteSchwierigkeitsgrad(rezept) {
     process.stdout.write('\x1Bc');
     console.log("===========Schwierigkeitsgrad ändern===========");
     console.log(`Aktueller Schwierigkeitsgrad: ${rezept.schwierigkeitsgrad}`);
-    console.log("\nDummy: Logik zum Ändern des Schwierigkeitsgrades wird hier implementiert");
+    
+    const schwierigkeitsgrade = ["Leicht", "Mittel", "Schwer"];
+    console.log("\nSchwierigkeitsgrad:");
+    schwierigkeitsgrade.forEach((grad, index) => {
+        console.log(`[${index + 1}] ${grad}`);
+    });
+    console.log(`[${schwierigkeitsgrade.length + 1}] Abbrechen`);
+    
+    const schwierigkeitIndex = frageGanzzahl(1, schwierigkeitsgrade.length + 1, "Wähle den Schwierigkeitsgrad: ");
+    
+    if (schwierigkeitIndex === schwierigkeitsgrade.length + 1) {
+        console.log("Änderung abgebrochen.");
+        return null;
+    }
+    
+    rezept.schwierigkeitsgrad = schwierigkeitsgrade[schwierigkeitIndex - 1];
     return rezept;
 }
 
