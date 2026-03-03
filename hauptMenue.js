@@ -1,4 +1,4 @@
-//ABBRECHEN BEI REZEPT ERSTELLEN, Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus und gibt diese auch falsch an die json weiter, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen
+//Eingabe für Zeitaufwand prüfen, Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus und gibt diese auch falsch an die json weiter, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen
 import {question, questionInt} from "readline-sync";
 import fs from "fs";
 import { fileURLToPath } from "url";
@@ -480,7 +480,7 @@ function bearbeiteZeitaufwand(rezept) {
             console.log("Der Zeitaufwand darf nicht leer sein!");
         }
     }
-    
+
     rezept.zeitaufwand = neuerZeitaufwand;
     return rezept;
 }
@@ -489,8 +489,26 @@ function bearbeiteKategorien(rezept) {
     process.stdout.write('\x1Bc');
     console.log("===========Kategorien ändern===========");
     console.log(`Aktuelle Kategorien: ${(rezept.kategorien || []).join(", ")}`);
-    console.log("\nDummy: Logik zum Ändern der Kategorien wird hier implementiert");
-    return rezept;
+    console.log("[1] Kategorie hinzufügen",
+        "\n[2] Kategorie entfernen",
+        "\n[3] Katrgorie umbenennen",
+        "\n[4] Alle Kategorien ersetzen",
+        "\n[5] Zurück"
+    );
+
+    let menueSteuerung = frageGanzzahl(1, 5, "Was möchtest du tun?\n");
+
+    if (menueSteuerung === 1) {
+       kategorieHinzufuegen(rezept);
+    } else if (menueSteuerung === 2) {
+        kategorieEntfernen(rezept);
+    } else if (menueSteuerung === 3) {
+        kategorieUmbenennen(rezept);
+    } else if (menueSteuerung === 4) {
+        kategorienErsetzen(rezept);
+    } else if (menueSteuerung === 5) {
+        return rezeptEditierMenue(rezept, ladeRezepte());
+    }
 }
 
 function bearbeiteZutaten(rezept) {
