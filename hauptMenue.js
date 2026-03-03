@@ -361,7 +361,7 @@ function rezeptEditierMenue(rezept, rezepte) {
         const menueSteuerung = frageGanzzahl(1, 7, "Was möchtest du ändern?\n");
 
         if (menueSteuerung === 1) {
-            rezept = bearbeiteRezeptName(rezept);
+            rezept = bearbeiteRezeptName(rezept, rezepte);
         } else if (menueSteuerung === 2) {
             rezept = bearbeiteSchwierigkeitsgrad(rezept);
         } else if (menueSteuerung === 3) {
@@ -374,6 +374,12 @@ function rezeptEditierMenue(rezept, rezepte) {
             rezept = bearbeiteArbeitsschritte(rezept);
         } else if (menueSteuerung === 7) {
             return rezeptVerändernEinzelnMenue();
+        }
+
+        // Bearbeitetes Rezept sicher zurück in die Liste schreiben
+        const rezeptIndex = rezepte.findIndex((eintrag) => eintrag.id === rezept.id);
+        if (rezeptIndex !== -1) {
+            rezepte[rezeptIndex] = rezept;
         }
 
         // Änderungen speichern
@@ -392,12 +398,36 @@ function kiBeratungMenue() {
     console.log("Dummy: KI Beratung-Menü (noch nicht implementiert)");
 }
 
-// Dummy-Funktionen für Rezept-Bearbeitung
-function bearbeiteRezeptName(rezept) {
+// Funktionen für die Bearbeitung der Rezeptdetails (Platzhalter, um die Struktur zu zeigen, Logik muss noch implementiert werden)
+function bearbeiteRezeptName(rezept, rezepte) {
     process.stdout.write('\x1Bc');
     console.log("===========Rezeptname ändern===========");
     console.log(`Aktueller Name: ${rezept.name}`);
-    console.log("\nDummy: Logik zum Ändern des Rezeptnamens wird hier implementiert");
+
+    let neuerName = "";
+    let nameIstEinzigartig = false;
+
+    while (!nameIstEinzigartig) {
+        neuerName = question("Gib den neuen Namen ein: ").trim();
+        if (neuerName === "") {
+            console.log("Der Name darf nicht leer sein!");
+            continue;
+        }
+
+        const nameBereitsVorhanden = rezepte.some((vorhandenesRezept) => {
+            const istAktuellesRezept = vorhandenesRezept === rezept || vorhandenesRezept.id === rezept.id;
+            return !istAktuellesRezept && vorhandenesRezept.name.toLowerCase() === neuerName.toLowerCase();
+        });
+        
+        if (nameBereitsVorhanden) {
+            console.log(`Ein Rezept mit dem Namen "${neuerName}" existiert bereits!`);
+            continue;
+        } else {
+            nameIstEinzigartig = true;
+        }
+    }
+
+    rezept.name = neuerName;
     return rezept;
 }
 
