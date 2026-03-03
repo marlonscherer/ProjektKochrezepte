@@ -408,12 +408,16 @@ function bearbeiteRezeptName(rezept, rezepte) {
     let nameIstEinzigartig = false;
 
     while (!nameIstEinzigartig) {
-        neuerName = question("Gib den neuen Namen ein: ").trim();
+        neuerName = question("Gib den neuen Namen ein (oder 'abbrechen'): ").trim();
         if (neuerName === "") {
             console.log("Der Name darf nicht leer sein!");
             continue;
+        } else if (neuerName.toLowerCase() === "abbrechen") {
+            console.log("Namensänderung abgebrochen.");
+            return rezeptEditierMenue(rezept, rezepte);
         }
 
+        // Prüfe, ob Name bereits existiert, außer beim aktuellen Rezept
         const nameBereitsVorhanden = rezepte.some((vorhandenesRezept) => {
             const istAktuellesRezept = vorhandenesRezept === rezept || vorhandenesRezept.id === rezept.id;
             return !istAktuellesRezept && vorhandenesRezept.name.toLowerCase() === neuerName.toLowerCase();
