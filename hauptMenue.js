@@ -548,6 +548,43 @@ function kategorieHinzufuegen(rezept) {
     return rezept;
 }
 
+function kategorieEntfernen(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Kategorie entfernen===========");
+    
+    if (!rezept.kategorien || rezept.kategorien.length === 0) {
+        console.log("Keine Kategorien zum Entfernen vorhanden.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+    
+    // Überprüfen, ob nur eine Kategorie vorhanden ist
+    if (rezept.kategorien.length === 1) {
+        console.log("Es muss mindestens eine Kategorie erhalten bleiben!");
+        console.log(`Aktuelle Kategorie: ${rezept.kategorien[0]}`);
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+    
+    console.log("Aktuelle Kategorien:");
+    rezept.kategorien.forEach((kategorie, index) => {
+        console.log(`[${index + 1}] ${kategorie}`);
+    });
+    console.log(`[${rezept.kategorien.length + 1}] Abbrechen`);
+    
+    const menueSteuerung = frageGanzzahl(1, rezept.kategorien.length + 1, "\nWelche Kategorie möchtest du entfernen?\n");
+    
+    if (menueSteuerung === rezept.kategorien.length + 1) {
+        console.log("Kategorie entfernen abgebrochen.");
+        return null;
+    }
+    
+    const entfernteKategorie = rezept.kategorien[menueSteuerung - 1];
+    rezept.kategorien.splice(menueSteuerung - 1, 1);
+    console.log(`Kategorie "${entfernteKategorie}" entfernt!`);
+    return rezept;
+}
+
 function bearbeiteZutaten(rezept) {
     process.stdout.write('\x1Bc');
     console.log("===========Zutaten ändern===========");
