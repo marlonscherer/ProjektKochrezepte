@@ -468,7 +468,20 @@ function bearbeiteZeitaufwand(rezept) {
     process.stdout.write('\x1Bc');
     console.log("===========Zeitaufwand ändern===========");
     console.log(`Aktueller Zeitaufwand: ${rezept.zeitaufwand}`);
-    console.log("\nDummy: Logik zum Ändern des Zeitaufwands wird hier implementiert");
+
+    let neuerZeitaufwand = "";
+
+    while (neuerZeitaufwand === "") {
+        neuerZeitaufwand = question("Gib den neuen Zeitaufwand ein (oder 'abbrechen'): ").trim();
+        if (neuerZeitaufwand.toLowerCase() === "abbrechen") {
+            console.log("Zeitaufwandänderung abgebrochen.");
+            return null;
+        } else if (neuerZeitaufwand === "") {
+            console.log("Der Zeitaufwand darf nicht leer sein!");
+        }
+    }
+    
+    rezept.zeitaufwand = neuerZeitaufwand;
     return rezept;
 }
 
