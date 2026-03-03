@@ -585,6 +585,20 @@ function kategorieEntfernen(rezept) {
     return rezept;
 }
 
+function kategorieUmbenennen(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Kategorie umbenennen===========");
+    console.log("Dummy-Funktion, noch keine Logik implementiert");
+    return rezept;
+}
+
+function kategorienErsetzen(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Alle Kategorien ersetzen===========");
+    console.log("Dummy-Funktion, noch keine Logik implementiert");
+    return rezept;
+}
+
 function bearbeiteZutaten(rezept) {
     process.stdout.write('\x1Bc');
     console.log("===========Zutaten ändern===========");
