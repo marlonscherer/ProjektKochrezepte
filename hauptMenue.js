@@ -1,4 +1,4 @@
-//Eingabe für Zeitaufwand prüfen, Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus und gibt diese auch falsch an die json weiter, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen
+//Wenn man Karegorie bearbeitet kommt man 2 menüs zurück, Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus und gibt diese auch falsch an die json weiter, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen
 import {question, questionInt} from "readline-sync";
 import fs from "fs";
 import { fileURLToPath } from "url";
@@ -394,9 +394,9 @@ function rezeptEditierMenue(rezept, rezepte) {
             } catch (error) {
                 console.log("Fehler beim Speichern der Änderungen!");
             }
+            
+            question("Drücke Enter um fortzufahren");
         }
-        
-        question("Drücke Enter um fortzufahren");
     }
 }
 
@@ -420,6 +420,7 @@ function bearbeiteRezeptName(rezept, rezepte) {
             continue;
         } else if (neuerName.toLowerCase() === "abbrechen") {
             console.log("Namensänderung abgebrochen.");
+            question("\nDrücke Enter um fortzufahren");
             return null;
         }
 
@@ -457,6 +458,7 @@ function bearbeiteSchwierigkeitsgrad(rezept) {
     
     if (schwierigkeitIndex === schwierigkeitsgrade.length + 1) {
         console.log("Änderung abgebrochen.");
+        question("\nDrücke Enter um fortzufahren");
         return null;
     }
     
@@ -475,6 +477,7 @@ function bearbeiteZeitaufwand(rezept) {
         neuerZeitaufwand = question("Gib den neuen Zeitaufwand ein (oder 'abbrechen'): ").trim();
         if (neuerZeitaufwand.toLowerCase() === "abbrechen") {
             console.log("Zeitaufwandänderung abgebrochen.");
+            question("\nDrücke Enter um fortzufahren");
             return null;
         } else if (neuerZeitaufwand === "") {
             console.log("Der Zeitaufwand darf nicht leer sein!");
@@ -529,6 +532,7 @@ function kategorieHinzufuegen(rezept) {
             continue;
         } else if (neueKategorie.toLowerCase() === "abbrechen") {
             console.log("Kategorie hinzufügen abgebrochen.");
+            question("\nDrücke Enter um fortzufahren");
             return null;
         }
 
@@ -576,6 +580,7 @@ function kategorieEntfernen(rezept) {
     
     if (menueSteuerung === rezept.kategorien.length + 1) {
         console.log("Kategorie entfernen abgebrochen.");
+        question("\nDrücke Enter um fortzufahren");
         return null;
     }
     
@@ -588,7 +593,59 @@ function kategorieEntfernen(rezept) {
 function kategorieUmbenennen(rezept) {
     process.stdout.write('\x1Bc');
     console.log("===========Kategorie umbenennen===========");
-    console.log("Dummy-Funktion, noch keine Logik implementiert");
+    
+    if (!rezept.kategorien || rezept.kategorien.length === 0) {
+        console.log("Keine Kategorien zum Umbenennen vorhanden.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+    
+    console.log("Aktuelle Kategorien:");
+    rezept.kategorien.forEach((kategorie, index) => {
+        console.log(`[${index + 1}] ${kategorie}`);
+    });
+    console.log(`[${rezept.kategorien.length + 1}] Abbrechen`);
+    
+    const menueSteuerung = frageGanzzahl(1, rezept.kategorien.length + 1, "\nWelche Kategorie möchtest du umbenennen?\n");
+    
+    if (menueSteuerung === rezept.kategorien.length + 1) {
+        console.log("Kategorie umbenennen abgebrochen.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+    
+    const alteKategorie = rezept.kategorien[menueSteuerung - 1];
+    console.log(`\nAlte Kategorie: ${alteKategorie}`);
+    
+    let neueKategorie = "";
+    let kategorieIstEinzigartig = false;
+    
+    while (!kategorieIstEinzigartig) {
+        neueKategorie = question("Gib den neuen Namen ein (oder 'abbrechen'): ").trim();
+        if (neueKategorie === "") {
+            console.log("Der Kategoriename darf nicht leer sein!");
+            continue;
+        } else if (neueKategorie.toLowerCase() === "abbrechen") {
+            console.log("Kategorie umbenennen abgebrochen.");
+            question("\nDrücke Enter um fortzufahren");
+            return null;
+        }
+        
+        // Prüfe, ob neue Kategorie bereits existiert (außer der aktuellen)
+        const kategorieBereitsVorhanden = rezept.kategorien.some((kategorie, index) => {
+            return index !== (menueSteuerung - 1) && kategorie.toLowerCase() === neueKategorie.toLowerCase(); // Prüft ob Kategorie bereits vorhanden (außer die die umbenannt werden soll)
+        });
+        
+        if (kategorieBereitsVorhanden) {
+            console.log(`Die Kategorie "${neueKategorie}" existiert bereits!`);
+            continue;
+        } else {
+            kategorieIstEinzigartig = true;
+        }
+    }
+    
+    rezept.kategorien[menueSteuerung - 1] = neueKategorie;
+    console.log(`Kategorie "${alteKategorie}" zu "${neueKategorie}" umbenannt!`);
     return rezept;
 }
 
