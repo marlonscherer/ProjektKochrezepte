@@ -136,9 +136,9 @@ function rezeptLoeschenMenue() {
    try {
         //Änderung Speichern
        fs.writeFileSync(rezepteDatei, JSON.stringify(rezepte, null, 2), "utf-8"); //Aktualisiert die JSON-Datei mit den Änderungen
-       console.log("\n✓ Rezept erfolgreich gelöscht!");
+       console.log("\nRezept erfolgreich gelöscht!");
    } catch (error) {
-       console.log("\n✗ Fehler beim Speichern der Änderungen!");
+       console.log("\nFehler beim Speichern der Änderungen!");
    }
     question("Drücke Enter um zum Bearbeitungsmenü zurückzukehren");
     return rezepteBearbeitenMenue();
@@ -454,7 +454,7 @@ function bearbeiteSchwierigkeitsgrad(rezept) {
     });
     console.log(`[${schwierigkeitsgrade.length + 1}] Abbrechen`);
     
-    const schwierigkeitIndex = frageGanzzahl(1, schwierigkeitsgrade.length + 1, "Wähle den Schwierigkeitsgrad: ");
+    const schwierigkeitIndex = frageGanzzahl(1, schwierigkeitsgrade.length + 1, "\nWähle den Schwierigkeitsgrad: ");
     
     if (schwierigkeitIndex === schwierigkeitsgrade.length + 1) {
         console.log("Änderung abgebrochen.");
@@ -489,32 +489,38 @@ function bearbeiteZeitaufwand(rezept) {
 }
 
 function bearbeiteKategorien(rezept) {
-    process.stdout.write('\x1Bc');
-    console.log("===========Kategorien ändern===========");
-    console.log(`Aktuelle Kategorien: ${(rezept.kategorien || []).join(", ")}`);
-    console.log("[1] Kategorie hinzufügen",
-        "\n[2] Kategorie entfernen",
-        "\n[3] Katrgorie umbenennen",
-        "\n[4] Alle Kategorien ersetzen",
-        "\n[5] Zurück"
-    );
+    while (true) {
+        process.stdout.write('\x1Bc');
+        console.log("===========Kategorien ändern===========");
+        console.log(`Aktuelle Kategorien: ${(rezept.kategorien || []).join(", ")}`);
+        console.log("[1] Kategorie hinzufügen",
+            "\n[2] Kategorie entfernen",
+            "\n[3] Kategorie umbenennen",
+            "\n[4] Alle Kategorien ersetzen",
+            "\n[5] Zurück\n"
+        );
 
-    let menueSteuerung = frageGanzzahl(1, 5, "Was möchtest du tun?\n");
+        let menueSteuerung = frageGanzzahl(1, 5, "\nWas möchtest du tun?\n");
 
-    let bearbeitetesRezept = null;
-    if (menueSteuerung === 1) {
-       bearbeitetesRezept = kategorieHinzufuegen(rezept);
-    } else if (menueSteuerung === 2) {
-        bearbeitetesRezept = kategorieEntfernen(rezept);
-    } else if (menueSteuerung === 3) {
-        bearbeitetesRezept = kategorieUmbenennen(rezept);
-    } else if (menueSteuerung === 4) {
-        bearbeitetesRezept = kategorienErsetzen(rezept);
-    } else if (menueSteuerung === 5) {
-        return null;
+        let bearbeitetesRezept = null;
+        if (menueSteuerung === 1) {
+           bearbeitetesRezept = kategorieHinzufuegen(rezept);
+        } else if (menueSteuerung === 2) {
+            bearbeitetesRezept = kategorieEntfernen(rezept);
+        } else if (menueSteuerung === 3) {
+            bearbeitetesRezept = kategorieUmbenennen(rezept);
+        } else if (menueSteuerung === 4) {
+            bearbeitetesRezept = kategorienErsetzen(rezept);
+        } else if (menueSteuerung === 5) {
+            return null;
+        }
+
+        // Nur zurück wenn erfolgreich geändert, sonst bleibt man im Kategorien-Menü
+        if (bearbeitetesRezept !== null) {
+            rezept = bearbeitetesRezept;
+            return rezept;
+        }
     }
-
-    return bearbeitetesRezept;
 }
 
 function kategorieHinzufuegen(rezept) {
