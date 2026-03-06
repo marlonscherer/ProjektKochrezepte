@@ -652,7 +652,30 @@ function kategorieUmbenennen(rezept) {
 function kategorienErsetzen(rezept) {
     process.stdout.write('\x1Bc');
     console.log("===========Alle Kategorien ersetzen===========");
-    console.log("Dummy-Funktion, noch keine Logik implementiert");
+    console.log(`Aktuelle Kategorien: ${(rezept.kategorien || []).join(", ")}`);
+    
+    console.log("\nGib neue Kategorien ein (getrennt durch Kommas, z.B. 'Pasta, Italienisch, Vegetarisch')");
+    const kategorienInput = question("Kategorien (oder 'abbrechen'): ").trim();
+    
+    if (kategorienInput.toLowerCase() === "abbrechen") {
+        console.log("Kategorien ersetzen abgebrochen.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+    
+    if (kategorienInput === "") {
+        console.log("Mindestens eine Kategorie ist erforderlich!");
+        question("\nDrücke Enter um fortzufahren");
+        return kategorienErsetzen(rezept);
+    }
+    
+    const neueKategorien = kategorienInput
+        .split(",") //Eingabe aufteilen
+        .map(kategorie => kategorie.trim()) //Leerzeichen entfernen
+        .filter(kategorie => kategorie !== ""); //Leere Einträge entfernen
+    
+    rezept.kategorien = neueKategorien;
+    console.log(`Kategorien erfolgreich aktualisiert: ${neueKategorien.join(", ")}`);
     return rezept;
 }
 
