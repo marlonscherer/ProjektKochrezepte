@@ -971,14 +971,40 @@ function zutatenErsetzen(rezept) {
 }
 
 function bearbeiteArbeitsschritte(rezept) {
-    process.stdout.write('\x1Bc');
-    console.log("===========Arbeitsschritte ändern===========");
-    console.log("Aktuelle Arbeitsschritte:");
-    (rezept.arbeitsschritte || []).forEach((schritt, index) => {
-        console.log(`${index + 1}. ${schritt}`);
-    });
-    console.log("\nDummy: Logik zum Ändern der Arbeitsschritte wird hier implementiert");
-    return rezept;
+    while (true) {
+        process.stdout.write('\x1Bc');
+        console.log("===========Arbeitsschritte ändern===========");
+        console.log("Aktuelle Arbeitsschritte:");
+        (rezept.arbeitsschritte || []).forEach((schritt, index) => {
+            console.log(`${index + 1}. ${schritt}`);
+        });
+
+        console.log(
+            "\n[1] Arbeitsschritt hinzufügen",
+            "\n[2] Arbeitsschritt löschen",
+            "\n[3] Arbeitsschritt verändern",
+            "\n[4] Alle Arbeitsschritte neu schreiben",
+            "\n[5] Zurück"
+        );
+
+        const menueSteuerung = frageGanzzahl(1, 5, "\nWas möchtest du tun?\n");
+
+        if (menueSteuerung === 1) {
+            console.log("Diese Funktion wird als nächstes implementiert: Arbeitsschritt hinzufügen.");
+            question("\nDrücke Enter um fortzufahren");
+        } else if (menueSteuerung === 2) {
+            console.log("Diese Funktion wird als nächstes implementiert: Arbeitsschritt löschen.");
+            question("\nDrücke Enter um fortzufahren");
+        } else if (menueSteuerung === 3) {
+            console.log("Diese Funktion wird als nächstes implementiert: Arbeitsschritt verändern.");
+            question("\nDrücke Enter um fortzufahren");
+        } else if (menueSteuerung === 4) {
+            console.log("Diese Funktion wird als nächstes implementiert: Alle Arbeitsschritte neu schreiben.");
+            question("\nDrücke Enter um fortzufahren");
+        } else if (menueSteuerung === 5) {
+            return null;
+        }
+    }
 }
 
 function ladeRezepte() {
