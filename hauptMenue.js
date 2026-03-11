@@ -1008,8 +1008,11 @@ function bearbeiteArbeitsschritte(rezept) {
                 return rezept;
             }
         } else if (menueSteuerung === 4) {
-            console.log("Diese Funktion wird als nächstes implementiert: Alle Arbeitsschritte neu schreiben.");
-            question("\nDrücke Enter um fortzufahren");
+            const bearbeitetesRezept = arbeitsschritteErsetzen(rezept);
+            if (bearbeitetesRezept !== null) {
+                rezept = bearbeitetesRezept;
+                return rezept;
+            }
         } else if (menueSteuerung === 5) {
             return null;
         }
@@ -1164,6 +1167,48 @@ function arbeitsschrittVeraendern(rezept) {
 
     rezept.arbeitsschritte[index] = neuerArbeitsschritt;
     console.log(`Arbeitsschritt erfolgreich geändert zu: ${neuerArbeitsschritt}`);
+    return rezept;
+}
+
+function arbeitsschritteErsetzen(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Alle Arbeitsschritte neu schreiben===========");
+    console.log("Aktuelle Arbeitsschritte:");
+    (rezept.arbeitsschritte || []).forEach((schritt, index) => {
+        console.log(`${index + 1}. ${schritt}`);
+    });
+
+    console.log("\nGib neue Arbeitsschritte ein (gib 'fertig' ein, um zu stoppen):");
+    const neueArbeitsschritte = [];
+    let schrittIndex = 1;
+
+    while (true) {
+        let schritt = "";
+        while (schritt === "") {
+            schritt = question(`Schritt ${schrittIndex} (oder 'fertig'): `).trim();
+            if (schritt.toLowerCase() === "abbrechen") {
+                console.log("Arbeitsschritte ersetzen abgebrochen.");
+                question("\nDrücke Enter um fortzufahren");
+                return null;
+            } else if (schritt === "") {
+                console.log("Der Arbeitsschritt darf nicht leer sein!");
+            }
+        }
+
+        if (schritt.toLowerCase() === "fertig") {
+            if (neueArbeitsschritte.length === 0) {
+                console.log("Mindestens ein Arbeitsschritt ist erforderlich!");
+                continue;
+            }
+            break;
+        }
+
+        neueArbeitsschritte.push(schritt);
+        schrittIndex = schrittIndex + 1;
+    }
+
+    rezept.arbeitsschritte = neueArbeitsschritte;
+    console.log(`Arbeitsschritte erfolgreich aktualisiert (${neueArbeitsschritte.length} Schritte)`);
     return rezept;
 }
 
