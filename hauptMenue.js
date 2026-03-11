@@ -6,117 +6,229 @@ import { fileURLToPath } from "url";
 
 const rezepteDatei = fileURLToPath(new URL("./rezepte.json", import.meta.url));
 const rl = readline.createInterface({ input, output });
+const INPUT_GESCHLOSSEN = "INPUT_GESCHLOSSEN";
 
 async function question(promptText) {
-    return rl.question(promptText);
+    if (rl.closed) {
+        throw new Error(INPUT_GESCHLOSSEN);
+    }
+
+    return new Promise((resolve, reject) => {
+        let erledigt = false;
+
+        const cleanup = () => {
+            rl.off("close", onClose);
+            input.off("end", onEnd);
+        };
+
+        const finish = (handler) => (wert) => {
+            if (erledigt) {
+                return;
+            }
+
+            erledigt = true;
+            cleanup();
+            handler(wert);
+        };
+
+        const onClose = finish(() => reject(new Error(INPUT_GESCHLOSSEN)));
+        const onEnd = finish(() => {
+            if (!rl.closed) {
+                rl.close();
+            }
+            reject(new Error(INPUT_GESCHLOSSEN));
+        });
+
+        rl.once("close", onClose);
+        input.once("end", onEnd);
+        rl.question(promptText).then(finish(resolve)).catch(finish(reject));
+    });
+}
+
+function leereKonsole() {
+    process.stdout.write("\x1Bc");
+}
+
+async function warteAufEnter(promptText = "\nDrücke Enter um fortzufahren") {
+    await question(promptText);
+}
+
+async function wurdeAbgebrochen(eingabe, nachricht) {
+    if (typeof eingabe === "string" && eingabe.trim().toLowerCase() === "abbrechen") {
+        console.log(nachricht);
+        await warteAufEnter();
+        return true;
+    }
+
+    return false;
+}
+
+async function fragePflichtfeld(promptText, leereMeldung, abbruchNachricht) {
+    while (true) {
+        const eingabe = (await question(promptText)).trim();
+
+        if (await wurdeAbgebrochen(eingabe, abbruchNachricht)) {
+            return null;
+        }
+
+        if (eingabe === "") {
+            console.log(leereMeldung);
+            continue;
+        }
+
+        return eingabe;
+    }
+}
+
+function zeigeZutatenListe(rezept) {
+    console.log("Aktuelle Zutaten:");
+    (rezept.zutaten || []).forEach((zutat, index) => {
+        console.log(`${index + 1}. ${zutat.name} (${zutat.menge})`);
+    });
+}
+
+function zeigeArbeitsschritteListe(rezept) {
+    console.log("Aktuelle Arbeitsschritte:");
+    (rezept.arbeitsschritte || []).forEach((schritt, index) => {
+        console.log(`${index + 1}. ${schritt}`);
+    });
+}
+
+async function bearbeiteListenMenue(rezept, titel, zeigeEintraege, optionen) {
+    while (true) {
+        leereKonsole();
+        console.log(`===========${titel}===========`);
+        zeigeEintraege(rezept);
+
+        optionen.forEach((option, index) => {
+            console.log(`\n[${index + 1}] ${option.label}`);
+        });
+        console.log(`\n[${optionen.length + 1}] Zurück`);
+
+        const menueSteuerung = await frageGanzzahl(1, optionen.length + 1, "\nWas möchtest du tun?\n");
+        if (menueSteuerung === optionen.length + 1) {
+            return null;
+        }
+
+        const bearbeitetesRezept = await optionen[menueSteuerung - 1].aktion(rezept);
+        if (bearbeitetesRezept !== null) {
+            return bearbeitetesRezept;
+        }
+    }
 }
 
 
 //Erstellt das Hauptmenü
-export async function hauptMenue() {
-process.stdout.write('\x1Bc'); //cleared das Terminal
-console.log(
-    "===========Kochrezepte===========\n",
-    "[1] Rezeptauswahl\n",
-    "[2] Rezepte Bearbeiten\n",
-    "[3] KI Beratung\n",
-    "[4] Beenden\n"
+async function hauptMenue() {
+    while (true) {
+        leereKonsole();
+        console.log(
+            "===========Kochrezepte===========\n",
+            "[1] Rezeptauswahl\n",
+            "[2] Rezepte Bearbeiten\n",
+            "[3] KI Beratung\n",
+            "[4] Beenden\n"
+        );
 
-);
+        const menueSteuerung = await frageGanzzahl(1, 4, "Was möchtest du tun?\n");
 
-
-//Eingabe für Menüsteuerung mit Fehlerprüfung
-const menueSteuerung = await frageGanzzahl(1, 4, "Was möchtest du tun?\n");
-
-//Aufrufen des nächsten Untermenüs (mit Funktionen um es übersichtlicher zu halten)
-if (menueSteuerung === 1) {
-    await rezeptAuswahlMenue();
-} else if (menueSteuerung === 2) {
-    await rezepteBearbeitenMenue();
-} else if (menueSteuerung === 3) {
-   await kiBeratungMenue();
-} else if (menueSteuerung === 4) {
-    console.log("Das Programm wird beendet. Auf wiedersehen!");
-    process.exit(0); //Bricht das Programm ohne Fehlermeldung ab
-} 
+        if (menueSteuerung === 1) {
+            await rezeptAuswahlMenue();
+        } else if (menueSteuerung === 2) {
+            await rezepteBearbeitenMenue();
+        } else if (menueSteuerung === 3) {
+            await kiBeratungMenue();
+        } else if (menueSteuerung === 4) {
+            console.log("Das Programm wird beendet. Auf wiedersehen!");
+            rl.close();
+            return;
+        }
+    }
 }
 
-await hauptMenue();
+try {
+    await hauptMenue();
+} catch (error) {
+    if (error instanceof Error && error.message === INPUT_GESCHLOSSEN) {
+        if (!rl.closed) {
+            rl.close();
+        }
+    } else {
+        throw error;
+    }
+}
 
 //Dummy-Funktionen für die Untermenüs (nur Platzhalter, um Fehler zu vermeiden und um Hauptmenü zu testen)
 async function rezeptAuswahlMenue() {
-    process.stdout.write('\x1Bc'); //cleared das Terminal
-    console.log(
-        "===========Rezept Auswahl==========="
-    );
+    while (true) {
+        leereKonsole();
+        console.log("===========Rezept Auswahl===========");
 
-    // Lade alle Rezepte für die Kategorienauswahl
-    const rezepte = ladeRezepte();
-    if (rezepte.length === 0) {
-        console.log("Keine Rezepte gefunden");
-        await question("Drücke Enter um zum Hauptmenü zurückzukehren");
-        return await hauptMenue();
+        const rezepte = ladeRezepte();
+        if (rezepte.length === 0) {
+            console.log("Keine Rezepte gefunden");
+            await warteAufEnter("Drücke Enter um zum Hauptmenü zurückzukehren");
+            return;
+        }
+
+        const kategorien = holeKategorien(rezepte);
+        const menuEintraege = ["Alle Rezepte", ...kategorien, "Zurück"];
+
+        menuEintraege.forEach((eintrag, index) => {
+            console.log(`[${index + 1}] ${eintrag}`);
+        });
+
+        const menueSteuerung = await frageGanzzahl(1, menuEintraege.length, "\nWähle eine Kategorie:\n");
+        if (menueSteuerung === menuEintraege.length) {
+            return;
+        }
+
+        if (menueSteuerung === 1) {
+            await rezeptListeMenue(rezepte, "Alle Rezepte");
+            continue;
+        }
+
+        const gewaehlteKategorie = kategorien[menueSteuerung - 2];
+        const gefiltert = rezepte.filter((rezept) =>
+            Array.isArray(rezept.kategorien) && rezept.kategorien.some((kategorie) => kategorie.toLowerCase() === gewaehlteKategorie.toLowerCase())
+        );
+        await rezeptListeMenue(gefiltert, `Kategorie: ${gewaehlteKategorie}`);
     }
-
-    // Kategorien dynamisch aus Rezeptdaten ableiten
-    const kategorien = holeKategorien(rezepte);
-    const menuEintraege = ["Alle Rezepte", ...kategorien, "Zurück"];
-
-    menuEintraege.forEach((eintrag, index) => {
-        console.log(`[${index + 1}] ${eintrag}`);
-    });
-
-    // Auswahl der Kategorie mit Validierung
-    const menueSteuerung = await frageGanzzahl(1, menuEintraege.length, "\nWähle eine Kategorie:\n");
-    const istZurueck = menueSteuerung === menuEintraege.length;
-    if (istZurueck) {
-        return await hauptMenue();
-    }
-
-    if (menueSteuerung === 1) {
-        return await rezeptListeMenue(rezepte, "Alle Rezepte");
-    }
-
-    const gewaehlteKategorie = kategorien[menueSteuerung - 2];
-    const gefiltert = rezepte.filter((rezept) =>
-        Array.isArray(rezept.kategorien) && rezept.kategorien.some(k => k.toLowerCase() === gewaehlteKategorie.toLowerCase()) // Zum vergleichen wird Kategorie in Kleinbuchstaben umgewandelt
-    );
-    return await rezeptListeMenue(gefiltert, `Kategorie: ${gewaehlteKategorie}`);
 }
 
 async function rezepteBearbeitenMenue() {
-    process.stdout.write('\x1Bc'); //cleared das Terminal
-    console.log(
-        "===========Rezepte Bearbeiten===========\n",
-        "[1] Rezept Hinzufügen\n",
-        "[2] Rezept Löschen\n",
-        "[3] Rezept Verändern\n",
-        "[4] Zurück\n"
-    );
+    while (true) {
+        leereKonsole();
+        console.log(
+            "===========Rezepte Bearbeiten===========\n",
+            "[1] Rezept Hinzufügen\n",
+            "[2] Rezept Löschen\n",
+            "[3] Rezept Verändern\n",
+            "[4] Zurück\n"
+        );
 
-    //Eingabe für Menüsteuerung mit Fehlerprüfung
-    const menueSteuerung = await frageGanzzahl(1, 4, "Was möchtest du tun?\n");
+        const menueSteuerung = await frageGanzzahl(1, 4, "Was möchtest du tun?\n");
 
-    //Aufrufen des nächsten Untermenüs
-    if (menueSteuerung === 1) {
-        await rezeptHinzufuegenMenue();
-    } else if (menueSteuerung === 2) {
-        await rezeptLoeschenMenue();
-    } else if (menueSteuerung === 3) {
-        await rezeptVeraendernEinzelnMenue();
-    } else if (menueSteuerung === 4) {
-        await hauptMenue();
-    } 
+        if (menueSteuerung === 1) {
+            await rezeptHinzufuegenMenue();
+        } else if (menueSteuerung === 2) {
+            await rezeptLoeschenMenue();
+        } else if (menueSteuerung === 3) {
+            await rezeptVeraendernEinzelnMenue();
+        } else if (menueSteuerung === 4) {
+            return;
+        }
+    }
 }
 
 async function rezeptLoeschenMenue() {
-    process.stdout.write('\x1Bc');
+    leereKonsole();
     console.log("===========Rezept Löschen===========")
     const rezepte = ladeRezepte();
     if (rezepte.length === 0) {
         console.log("Keine Rezepte zum Löschen gefunden");
-        await question("Drücke Enter um zum Bearbeitungsmenü zurückzukehren");
-        return await rezepteBearbeitenMenue();
+        await warteAufEnter("Drücke Enter um zum Bearbeitungsmenü zurückzukehren");
+        return;
     }   
     rezepte.forEach((rezept, index) => {
         console.log(`[${index + 1}] ${rezept.name}`);
@@ -126,16 +238,23 @@ async function rezeptLoeschenMenue() {
     
     // Zurück-Option
     if (menueSteuerung === rezepte.length + 1) {
-        return await rezepteBearbeitenMenue();
+        return;
     }
     
     // Lösch-Bestätigung
     const rezeptName = rezepte[menueSteuerung - 1].name;
-    const bestaetigung = await question(`\nMöchtest du "${rezeptName}" wirklich löschen? (j/n): `);
-    if (bestaetigung.toLowerCase() !== "j") {
+    let bestaetigung = "";
+    while (bestaetigung !== "j" && bestaetigung !== "n") {
+        bestaetigung = (await question(`\nMöchtest du "${rezeptName}" wirklich löschen? (j/n): `)).trim().toLowerCase();
+        if (bestaetigung !== "j" && bestaetigung !== "n") {
+            console.log("Fehler: Bitte nur 'j' oder 'n' eingeben.");
+        }
+    }
+
+    if (bestaetigung === "n") {
         console.log("Löschvorgang abgebrochen");
-        await question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
-        return await rezepteBearbeitenMenue();
+        await warteAufEnter("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
+        return;
     }
     
     rezepte.splice(menueSteuerung - 1, 1); //Entfernt das ausgewählte Rezept aus dem Array
@@ -146,13 +265,12 @@ async function rezeptLoeschenMenue() {
    } catch (error) {
        console.log("\nFehler beim Speichern der Änderungen!");
    }
-    await question("Drücke Enter um zum Bearbeitungsmenü zurückzukehren");
-    return await rezepteBearbeitenMenue();
+    await warteAufEnter("Drücke Enter um zum Bearbeitungsmenü zurückzukehren");
 
 }
 
 async function rezeptHinzufuegenMenue() {
-    process.stdout.write('\x1Bc');
+    leereKonsole();
     console.log("===========Rezept Hinzufügen===========\n",
         "'abbrechen' eingeben, um den Vorgang abzubrechen\n"
     );
@@ -164,19 +282,17 @@ async function rezeptHinzufuegenMenue() {
     let nameIstEinzigartig = false;
     
     while (!nameIstEinzigartig) {
-        rezeptName = ((await question("Gib den Namen des neuen Rezepts ein: "))).trim();
-        
-        if (rezeptName.toLowerCase() === "abbrechen") {
-            console.log("Rezepterstellung abgebrochen.");
-            await question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
-            return await rezepteBearbeitenMenue();
-        } else if (rezeptName === "") {
-                console.log("Der Name darf nicht leer sein!");
-                continue;
-            }
+        rezeptName = await fragePflichtfeld(
+            "Gib den Namen des neuen Rezepts ein: ",
+            "Der Name darf nicht leer sein!",
+            "Rezepterstellung abgebrochen."
+        );
+        if (rezeptName === null) {
+            return;
+        }
         
         // Prüfe, ob Name bereits existiert (case-insensitive)
-        const nameBereitsVorhanden = rezepte.some(rezept => rezept.name.toLowerCase() === rezeptName.toLowerCase());
+        const nameBereitsVorhanden = rezepte.some((rezept) => rezept.name.toLowerCase() === rezeptName.toLowerCase());
         
         if (nameBereitsVorhanden) {
             console.log(`Ein Rezept mit dem Namen "${rezeptName}" existiert bereits!`);
@@ -196,32 +312,27 @@ async function rezeptHinzufuegenMenue() {
     const schwierigkeitIndex = await frageGanzzahl(1, schwierigkeitsgrade.length + 1, "Wähle den Schwierigkeitsgrad: ");
     if (schwierigkeitIndex === schwierigkeitsgrade.length + 1) {
         console.log("Rezepterstellung abgebrochen.");
-        await question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
-        return await rezepteBearbeitenMenue();
+        await warteAufEnter("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
+        return;
     }
     const schwierigkeitsgrad = schwierigkeitsgrade[schwierigkeitIndex - 1];
     
     // Zeitaufwand abfragen
-    let zeitaufwand = "";
-    while (zeitaufwand === "") {
-        zeitaufwand = (await question("\nGib den Zeitaufwand ein (z.B. '30 Minuten'): ")).trim();
-        if (zeitaufwand.toLowerCase() === "abbrechen") {
-            console.log("Rezepterstellung abgebrochen.");
-            await question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
-            return await rezepteBearbeitenMenue();
-        } else if (zeitaufwand === "") {
-                console.log("Der Zeitaufwand darf nicht leer sein!");
-        }
+    const zeitaufwand = await fragePflichtfeld(
+        "\nGib den Zeitaufwand ein (z.B. '30 Minuten'): ",
+        "Der Zeitaufwand darf nicht leer sein!",
+        "Rezepterstellung abgebrochen."
+    );
+    if (zeitaufwand === null) {
+        return;
     }
     
     // Kategorien abfragen
     console.log("\nGib Kategorien ein (getrennt durch Kommas, z.B. 'Pasta, Italienisch, Vegetarisch')");
     const kategorienInput = ((await question("Kategorien: "))).trim();
     
-    if (kategorienInput.toLowerCase() === "abbrechen") {
-        console.log("Rezepterstellung abgebrochen.");
-        await question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
-        return await rezepteBearbeitenMenue();
+    if (await wurdeAbgebrochen(kategorienInput, "Rezepterstellung abgebrochen.")) {
+        return;
     }
     const kategorien = kategorienInput
         .split(",") //Eingabe aufteilen
@@ -237,13 +348,11 @@ async function rezeptHinzufuegenMenue() {
         let zutatName = "";
         while (zutatName === "") {
             zutatName = (await question(`\nZutat ${zutatIndex} Name (oder 'fertig'): `)).trim();
-            if (zutatName.toLowerCase() === "abbrechen") {
-                console.log("Rezepterstellung abgebrochen.");
-                await question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
-                return await rezepteBearbeitenMenue();
+            if (await wurdeAbgebrochen(zutatName, "Rezepterstellung abgebrochen.")) {
+                return;
             } else if (zutatName === "") {
-                    console.log("Der Name der Zutat darf nicht leer sein!");
-                }
+                console.log("Der Name der Zutat darf nicht leer sein!");
+            }
         }
         
         if (zutatName.toLowerCase() === "fertig") {
@@ -254,16 +363,13 @@ async function rezeptHinzufuegenMenue() {
             break;
         }
         
-        let zutatMenge = "";
-        while (zutatMenge === "") {
-            zutatMenge = ((await question(`Zutat ${zutatIndex} Menge: `))).trim();
-            if (zutatMenge.toLowerCase() === "abbrechen") {
-                console.log("Rezepterstellung abgebrochen.");
-                await question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
-                return await rezepteBearbeitenMenue();
-            } else if (zutatMenge === "") {
-                console.log("Die Menge darf nicht leer sein!");
-            }
+        const zutatMenge = await fragePflichtfeld(
+            `Zutat ${zutatIndex} Menge: `,
+            "Die Menge darf nicht leer sein!",
+            "Rezepterstellung abgebrochen."
+        );
+        if (zutatMenge === null) {
+            return;
         }
         
         zutaten.push({ name: zutatName, menge: zutatMenge });
@@ -279,10 +385,8 @@ async function rezeptHinzufuegenMenue() {
         let schritt = "";
         while (schritt === "") {
             schritt = (await question(`\nSchritt ${schrittIndex} (oder 'fertig'): `)).trim();
-            if (schritt.toLowerCase() === "abbrechen") {
-                console.log("Rezepterstellung abgebrochen.");
-                await question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
-                return await rezepteBearbeitenMenue();
+            if (await wurdeAbgebrochen(schritt, "Rezepterstellung abgebrochen.")) {
+                return;
             } else if (schritt === "") {
                 console.log("Der Arbeitsschritt darf nicht leer sein!");
             }
@@ -320,40 +424,39 @@ async function rezeptHinzufuegenMenue() {
         console.log("\nFehler beim Speichern des Rezepts!");
     }
     
-    await question("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
-    return await rezepteBearbeitenMenue();
+    await warteAufEnter("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
 }
 
 async function rezeptVeraendernEinzelnMenue() {
-    process.stdout.write('\x1Bc');
-    console.log("===========Rezept Verändern===========");
-    
-    const rezepte = ladeRezepte();
-    if (rezepte.length === 0) {
-        console.log("Keine Rezepte zum Bearbeiten gefunden");
-        await question("Drücke Enter um zum Bearbeitungsmenü zurückzukehren");
-        return await rezepteBearbeitenMenue();
+    while (true) {
+        leereKonsole();
+        console.log("===========Rezept Verändern===========");
+        
+        const rezepte = ladeRezepte();
+        if (rezepte.length === 0) {
+            console.log("Keine Rezepte zum Bearbeiten gefunden");
+            await warteAufEnter("Drücke Enter um zum Bearbeitungsmenü zurückzukehren");
+            return;
+        }
+        
+        rezepte.forEach((rezept, index) => {
+            console.log(`[${index + 1}] ${rezept.name}`);
+        });
+        console.log(`[${rezepte.length + 1}] Zurück`);
+        
+        const menueSteuerung = await frageGanzzahl(1, rezepte.length + 1, "\nWelches Rezept möchtest du bearbeiten?\n");
+        if (menueSteuerung === rezepte.length + 1) {
+            return;
+        }
+        
+        const rezept = rezepte[menueSteuerung - 1];
+        await rezeptEditierMenue(rezept, rezepte);
     }
-    
-    rezepte.forEach((rezept, index) => {
-        console.log(`[${index + 1}] ${rezept.name}`);
-    });
-    console.log(`[${rezepte.length + 1}] Zurück`);
-    
-    const menueSteuerung = await frageGanzzahl(1, rezepte.length + 1, "\nWelches Rezept möchtest du bearbeiten?\n");
-    
-    // Zurück-Option
-    if (menueSteuerung === rezepte.length + 1) {
-        return await rezepteBearbeitenMenue();
-    }
-    
-    const rezept = rezepte[menueSteuerung - 1];
-    return await rezeptEditierMenue(rezept, rezepte);
 }
 
 async function rezeptEditierMenue(rezept, rezepte) {
     while (true) {
-        process.stdout.write('\x1Bc');
+        leereKonsole();
         console.log(`===========Bearbeite: ${rezept.name}===========\n`,
             "[1] Rezeptname ändern\n",
             "[2] Schwierigkeitsgrad ändern\n",
@@ -380,7 +483,7 @@ async function rezeptEditierMenue(rezept, rezepte) {
         } else if (menueSteuerung === 6) {
             bearbeitetesRezept = await bearbeiteArbeitsschritte(rezept);
         } else if (menueSteuerung === 7) {
-            return await rezeptVeraendernEinzelnMenue();
+            return;
         }
 
         // Nur speichern wenn tatsächlich eine Änderung gemacht wurde (nicht abgebrochen)
@@ -401,18 +504,19 @@ async function rezeptEditierMenue(rezept, rezepte) {
                 console.log("Fehler beim Speichern der Änderungen!");
             }
             
-            await question("Drücke Enter um fortzufahren");
+            await warteAufEnter("Drücke Enter um fortzufahren");
         }
     }
 }
 
 async function kiBeratungMenue() {
     console.log("Dummy: KI Beratung-Menü (noch nicht implementiert)");
+    await warteAufEnter();
 }
 
 // Funktionen für die Bearbeitung der Rezeptdetails (Logik wird gerade noch implementiert)
 async function bearbeiteRezeptName(rezept, rezepte) {
-    process.stdout.write('\x1Bc');
+    leereKonsole();
     console.log("===========Rezeptname ändern===========");
     console.log(`Aktueller Name: ${rezept.name}`);
 
@@ -420,13 +524,12 @@ async function bearbeiteRezeptName(rezept, rezepte) {
     let nameIstEinzigartig = false;
 
     while (!nameIstEinzigartig) {
-        neuerName = (await question("Gib den neuen Namen ein (oder 'abbrechen'): ")).trim();
-        if (neuerName === "") {
-            console.log("Der Name darf nicht leer sein!");
-            continue;
-        } else if (neuerName.toLowerCase() === "abbrechen") {
-            console.log("Namensänderung abgebrochen.");
-            await question("\nDrücke Enter um fortzufahren");
+        neuerName = await fragePflichtfeld(
+            "Gib den neuen Namen ein (oder 'abbrechen'): ",
+            "Der Name darf nicht leer sein!",
+            "Namensänderung abgebrochen."
+        );
+        if (neuerName === null) {
             return null;
         }
 
@@ -449,7 +552,7 @@ async function bearbeiteRezeptName(rezept, rezepte) {
 }
 
 async function bearbeiteSchwierigkeitsgrad(rezept) {
-    process.stdout.write('\x1Bc');
+    leereKonsole();
     console.log("===========Schwierigkeitsgrad ändern===========");
     console.log(`Aktueller Schwierigkeitsgrad: ${rezept.schwierigkeitsgrad}`);
     
@@ -464,7 +567,7 @@ async function bearbeiteSchwierigkeitsgrad(rezept) {
     
     if (schwierigkeitIndex === schwierigkeitsgrade.length + 1) {
         console.log("Änderung abgebrochen.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
     
@@ -473,21 +576,17 @@ async function bearbeiteSchwierigkeitsgrad(rezept) {
 }
 
 async function bearbeiteZeitaufwand(rezept) {
-    process.stdout.write('\x1Bc');
+    leereKonsole();
     console.log("===========Zeitaufwand ändern===========");
     console.log(`Aktueller Zeitaufwand: ${rezept.zeitaufwand}`);
 
-    let neuerZeitaufwand = "";
-
-    while (neuerZeitaufwand === "") {
-        neuerZeitaufwand = (await question("Gib den neuen Zeitaufwand ein (oder 'abbrechen'): ")).trim();
-        if (neuerZeitaufwand.toLowerCase() === "abbrechen") {
-            console.log("Zeitaufwandänderung abgebrochen.");
-            await question("\nDrücke Enter um fortzufahren");
-            return null;
-        } else if (neuerZeitaufwand === "") {
-            console.log("Der Zeitaufwand darf nicht leer sein!");
-        }
+    const neuerZeitaufwand = await fragePflichtfeld(
+        "Gib den neuen Zeitaufwand ein (oder 'abbrechen'): ",
+        "Der Zeitaufwand darf nicht leer sein!",
+        "Zeitaufwandänderung abgebrochen."
+    );
+    if (neuerZeitaufwand === null) {
+        return null;
     }
 
     rezept.zeitaufwand = neuerZeitaufwand;
@@ -496,7 +595,7 @@ async function bearbeiteZeitaufwand(rezept) {
 
 async function bearbeiteKategorien(rezept) {
     while (true) {
-        process.stdout.write('\x1Bc');
+        leereKonsole();
         console.log("===========Kategorien ändern===========");
         console.log(`Aktuelle Kategorien: ${(rezept.kategorien || []).join(", ")}`);
         console.log("[1] Kategorie hinzufügen",
@@ -530,26 +629,29 @@ async function bearbeiteKategorien(rezept) {
 }
 
 async function kategorieHinzufuegen(rezept) {
-    process.stdout.write('\x1Bc');
+    leereKonsole();
     console.log("===========Kategorie hinzufügen===========");
     console.log(`Aktuelle Kategorien: ${(rezept.kategorien || []).join(", ")}`);
 
     let neueKategorie = "";
     let kategorieIstEinzigartig = false;
 
+    if (!Array.isArray(rezept.kategorien)) {
+        rezept.kategorien = [];
+    }
+
     while (!kategorieIstEinzigartig) {
-        neueKategorie = (await question("Gib die neue Kategorie ein (oder 'abbrechen'): ")).trim();
-        if (neueKategorie === "") {
-            console.log("Die Kategorie darf nicht leer sein!");
-            continue;
-        } else if (neueKategorie.toLowerCase() === "abbrechen") {
-            console.log("Kategorie hinzufügen abgebrochen.");
-            await question("\nDrücke Enter um fortzufahren");
+        neueKategorie = await fragePflichtfeld(
+            "Gib die neue Kategorie ein (oder 'abbrechen'): ",
+            "Die Kategorie darf nicht leer sein!",
+            "Kategorie hinzufügen abgebrochen."
+        );
+        if (neueKategorie === null) {
             return null;
         }
 
         // Prüfe, ob Kategorie bereits existiert
-        const kategorieBereitsVorhanden = (rezept.kategorien || []).some(kategorie => kategorie.toLowerCase() === neueKategorie.toLowerCase());
+        const kategorieBereitsVorhanden = rezept.kategorien.some((kategorie) => kategorie.toLowerCase() === neueKategorie.toLowerCase());
 
         if (kategorieBereitsVorhanden) {
             console.log(`Die Kategorie "${neueKategorie}" existiert bereits!`);
@@ -565,12 +667,12 @@ async function kategorieHinzufuegen(rezept) {
 }
 
 async function kategorieEntfernen(rezept) {
-    process.stdout.write('\x1Bc');
+    leereKonsole();
     console.log("===========Kategorie entfernen===========");
     
     if (!rezept.kategorien || rezept.kategorien.length === 0) {
         console.log("Keine Kategorien zum Entfernen vorhanden.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
     
@@ -578,7 +680,7 @@ async function kategorieEntfernen(rezept) {
     if (rezept.kategorien.length === 1) {
         console.log("Es muss mindestens eine Kategorie erhalten bleiben!");
         console.log(`Aktuelle Kategorie: ${rezept.kategorien[0]}`);
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
     
@@ -592,7 +694,7 @@ async function kategorieEntfernen(rezept) {
     
     if (menueSteuerung === rezept.kategorien.length + 1) {
         console.log("Kategorie entfernen abgebrochen.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
     
@@ -603,12 +705,12 @@ async function kategorieEntfernen(rezept) {
 }
 
 async function kategorieUmbenennen(rezept) {
-    process.stdout.write('\x1Bc');
+    leereKonsole();
     console.log("===========Kategorie umbenennen===========");
     
     if (!rezept.kategorien || rezept.kategorien.length === 0) {
         console.log("Keine Kategorien zum Umbenennen vorhanden.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
     
@@ -622,7 +724,7 @@ async function kategorieUmbenennen(rezept) {
     
     if (menueSteuerung === rezept.kategorien.length + 1) {
         console.log("Kategorie umbenennen abgebrochen.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
     
@@ -633,13 +735,12 @@ async function kategorieUmbenennen(rezept) {
     let kategorieIstEinzigartig = false;
     
     while (!kategorieIstEinzigartig) {
-        neueKategorie = (await question("Gib den neuen Namen ein (oder 'abbrechen'): ")).trim();
-        if (neueKategorie === "") {
-            console.log("Der Kategoriename darf nicht leer sein!");
-            continue;
-        } else if (neueKategorie.toLowerCase() === "abbrechen") {
-            console.log("Kategorie umbenennen abgebrochen.");
-            await question("\nDrücke Enter um fortzufahren");
+        neueKategorie = await fragePflichtfeld(
+            "Gib den neuen Namen ein (oder 'abbrechen'): ",
+            "Der Kategoriename darf nicht leer sein!",
+            "Kategorie umbenennen abgebrochen."
+        );
+        if (neueKategorie === null) {
             return null;
         }
         
@@ -662,88 +763,53 @@ async function kategorieUmbenennen(rezept) {
 }
 
 async function kategorienErsetzen(rezept) {
-    process.stdout.write('\x1Bc');
-    console.log("===========Alle Kategorien ersetzen===========");
-    console.log(`Aktuelle Kategorien: ${(rezept.kategorien || []).join(", ")}`);
-    
-    console.log("\nGib neue Kategorien ein (getrennt durch Kommas, z.B. 'Pasta, Italienisch, Vegetarisch')");
-    const kategorienInput = (await question("Kategorien (oder 'abbrechen'): ")).trim();
-    
-    if (kategorienInput.toLowerCase() === "abbrechen") {
-        console.log("Kategorien ersetzen abgebrochen.");
-        await question("\nDrücke Enter um fortzufahren");
-        return null;
+    while (true) {
+        leereKonsole();
+        console.log("===========Alle Kategorien ersetzen===========");
+        console.log(`Aktuelle Kategorien: ${(rezept.kategorien || []).join(", ")}`);
+        
+        console.log("\nGib neue Kategorien ein (getrennt durch Kommas, z.B. 'Pasta, Italienisch, Vegetarisch')");
+        const kategorienInput = (await question("Kategorien (oder 'abbrechen'): ")).trim();
+        
+        if (await wurdeAbgebrochen(kategorienInput, "Kategorien ersetzen abgebrochen.")) {
+            return null;
+        }
+        
+        if (kategorienInput === "") {
+            console.log("Mindestens eine Kategorie ist erforderlich!");
+            await warteAufEnter("\nDrücke Enter um fortzufahren");
+            continue;
+        }
+        
+        const neueKategorien = kategorienInput
+            .split(",")
+            .map((kategorie) => kategorie.trim())
+            .filter((kategorie) => kategorie !== "");
+
+        if (neueKategorien.length === 0) {
+            console.log("Mindestens eine gültige Kategorie ist erforderlich!");
+            await warteAufEnter("\nDrücke Enter um fortzufahren");
+            continue;
+        }
+        
+        rezept.kategorien = neueKategorien;
+        console.log(`Kategorien erfolgreich aktualisiert: ${neueKategorien.join(", ")}`);
+        return rezept;
     }
-    
-    if (kategorienInput === "") {
-        console.log("Mindestens eine Kategorie ist erforderlich!");
-        await question("\nDrücke Enter um fortzufahren");
-        return await kategorienErsetzen(rezept);
-    }
-    
-    const neueKategorien = kategorienInput
-        .split(",") //Eingabe aufteilen
-        .map(kategorie => kategorie.trim()) //Leerzeichen entfernen
-        .filter(kategorie => kategorie !== ""); //Leere Einträge entfernen
-    
-    rezept.kategorien = neueKategorien;
-    console.log(`Kategorien erfolgreich aktualisiert: ${neueKategorien.join(", ")}`);
-    return rezept;
 }
 
 async function bearbeiteZutaten(rezept) {
-    while (true) {
-        process.stdout.write('\x1Bc');
-        console.log("===========Zutaten ändern===========");
-        console.log("Aktuelle Zutaten:");
-        (rezept.zutaten || []).forEach((zutat, index) => {
-            console.log(`${index + 1}. ${zutat.name} (${zutat.menge})`);
-        });
-
-        console.log(
-            "\n[1] Zutat und Menge hinzufügen",
-            "\n[2] Zutat löschen",
-            "\n[3] Zutat verändern",
-            "\n[4] Alle Zutaten neu schreiben",
-            "\n[5] Zurück"
-        );
-
-        const menueSteuerung = await frageGanzzahl(1, 5, "\nWas möchtest du tun?\n");
-
-        if (menueSteuerung === 1) {
-            const bearbeitetesRezept = await zutatHinzufuegen(rezept);
-            if (bearbeitetesRezept !== null) {
-                rezept = bearbeitetesRezept;
-                return rezept;
-            }
-        } else if (menueSteuerung === 2) {
-            const bearbeitetesRezept = await zutatEntfernen(rezept);
-            if (bearbeitetesRezept !== null) {
-                rezept = bearbeitetesRezept;
-                return rezept;
-            }
-        } else if (menueSteuerung === 3) {
-            const bearbeitetesRezept = await zutatVeraendern(rezept);
-            if (bearbeitetesRezept !== null) {
-                rezept = bearbeitetesRezept;
-                return rezept;
-            }
-        } else if (menueSteuerung === 4) {
-            const bearbeitetesRezept = await zutatenErsetzen(rezept);
-            if (bearbeitetesRezept !== null) {
-                rezept = bearbeitetesRezept;
-                return rezept;
-            }
-        } else if (menueSteuerung === 5) {
-            return null;
-        }
-    }
+    return bearbeiteListenMenue(rezept, "Zutaten ändern", zeigeZutatenListe, [
+        { label: "Zutat und Menge hinzufügen", aktion: zutatHinzufuegen },
+        { label: "Zutat löschen", aktion: zutatEntfernen },
+        { label: "Zutat verändern", aktion: zutatVeraendern },
+        { label: "Alle Zutaten neu schreiben", aktion: zutatenErsetzen }
+    ]);
 }
 
 async function zutatHinzufuegen(rezept) {
-    process.stdout.write('\x1Bc');
+    leereKonsole();
     console.log("===========Zutat und Menge hinzufügen===========");
-    console.log("Aktuelle Zutaten:");
 
     const zutaten = rezept.zutaten || [];
     if (zutaten.length === 0) {
@@ -758,16 +824,12 @@ async function zutatHinzufuegen(rezept) {
     let nameIstEinzigartig = false;
 
     while (!nameIstEinzigartig) {
-        zutatName = (await question("\nName der neuen Zutat (oder 'abbrechen'): ")).trim();
-
-        if (zutatName === "") {
-            console.log("Der Name der Zutat darf nicht leer sein!");
-            continue;
-        }
-
-        if (zutatName.toLowerCase() === "abbrechen") {
-            console.log("Zutat hinzufügen abgebrochen.");
-            await question("\nDrücke Enter um fortzufahren");
+        zutatName = await fragePflichtfeld(
+            "\nName der neuen Zutat (oder 'abbrechen'): ",
+            "Der Name der Zutat darf nicht leer sein!",
+            "Zutat hinzufügen abgebrochen."
+        );
+        if (zutatName === null) {
             return null;
         }
 
@@ -780,19 +842,13 @@ async function zutatHinzufuegen(rezept) {
         nameIstEinzigartig = true;
     }
 
-    let zutatMenge = "";
-    while (zutatMenge === "") {
-        zutatMenge = (await question("Menge der Zutat (oder 'abbrechen'): ")).trim();
-
-        if (zutatMenge.toLowerCase() === "abbrechen") {
-            console.log("Zutat hinzufügen abgebrochen.");
-            await question("\nDrücke Enter um fortzufahren");
-            return null;
-        }
-
-        if (zutatMenge === "") {
-            console.log("Die Menge darf nicht leer sein!");
-        }
+    const zutatMenge = await fragePflichtfeld(
+        "Menge der Zutat (oder 'abbrechen'): ",
+        "Die Menge darf nicht leer sein!",
+        "Zutat hinzufügen abgebrochen."
+    );
+    if (zutatMenge === null) {
+        return null;
     }
 
     if (!Array.isArray(rezept.zutaten)) {
@@ -805,19 +861,19 @@ async function zutatHinzufuegen(rezept) {
 }
 
 async function zutatEntfernen(rezept) {
-    process.stdout.write('\x1Bc');
+    leereKonsole();
     console.log("===========Zutat löschen===========");
 
     if (!Array.isArray(rezept.zutaten) || rezept.zutaten.length === 0) {
         console.log("Keine Zutaten zum Löschen vorhanden.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
 
     if (rezept.zutaten.length === 1) {
         console.log("Es muss mindestens eine Zutat erhalten bleiben!");
         console.log(`Aktuelle Zutat: ${rezept.zutaten[0].name} (${rezept.zutaten[0].menge})`);
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
 
@@ -831,7 +887,7 @@ async function zutatEntfernen(rezept) {
 
     if (menueSteuerung === rezept.zutaten.length + 1) {
         console.log("Zutat löschen abgebrochen.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
 
@@ -847,7 +903,7 @@ async function zutatEntfernen(rezept) {
 
     if (bestaetigung === "n") {
         console.log("Löschvorgang abgebrochen.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
 
@@ -857,12 +913,12 @@ async function zutatEntfernen(rezept) {
 }
 
 async function zutatVeraendern(rezept) {
-    process.stdout.write('\x1Bc');
+    leereKonsole();
     console.log("===========Zutat verändern===========");
 
     if (!Array.isArray(rezept.zutaten) || rezept.zutaten.length === 0) {
         console.log("Keine Zutaten zum Verändern vorhanden.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
 
@@ -876,7 +932,7 @@ async function zutatVeraendern(rezept) {
 
     if (menueSteuerung === rezept.zutaten.length + 1) {
         console.log("Zutat verändern abgebrochen.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
 
@@ -886,16 +942,12 @@ async function zutatVeraendern(rezept) {
     let neuerName = "";
     let nameIstEinzigartig = false;
     while (!nameIstEinzigartig) {
-        neuerName = (await question(`\nNeuer Name für \"${alteZutat.name}\" (oder 'abbrechen'): `)).trim();
-
-        if (neuerName === "") {
-            console.log("Der Name der Zutat darf nicht leer sein!");
-            continue;
-        }
-
-        if (neuerName.toLowerCase() === "abbrechen") {
-            console.log("Zutat verändern abgebrochen.");
-            await question("\nDrücke Enter um fortzufahren");
+        neuerName = await fragePflichtfeld(
+            `\nNeuer Name für "${alteZutat.name}" (oder 'abbrechen'): `,
+            "Der Name der Zutat darf nicht leer sein!",
+            "Zutat verändern abgebrochen."
+        );
+        if (neuerName === null) {
             return null;
         }
 
@@ -911,19 +963,13 @@ async function zutatVeraendern(rezept) {
         nameIstEinzigartig = true;
     }
 
-    let neueMenge = "";
-    while (neueMenge === "") {
-        neueMenge = ((await question(`Neue Menge für \"${neuerName}\" (oder 'abbrechen'): `))).trim();
-
-        if (neueMenge.toLowerCase() === "abbrechen") {
-            console.log("Zutat verändern abgebrochen.");
-            await question("\nDrücke Enter um fortzufahren");
-            return null;
-        }
-
-        if (neueMenge === "") {
-            console.log("Die Menge darf nicht leer sein!");
-        }
+    const neueMenge = await fragePflichtfeld(
+        `Neue Menge für "${neuerName}" (oder 'abbrechen'): `,
+        "Die Menge darf nicht leer sein!",
+        "Zutat verändern abgebrochen."
+    );
+    if (neueMenge === null) {
+        return null;
     }
 
     rezept.zutaten[index] = { name: neuerName, menge: neueMenge };
@@ -932,101 +978,58 @@ async function zutatVeraendern(rezept) {
 }
 
 async function zutatenErsetzen(rezept) {
-    process.stdout.write('\x1Bc');
-    console.log("===========Alle Zutaten neu schreiben===========");
-    console.log("Aktuelle Zutaten:");
-    (rezept.zutaten || []).forEach((zutat, index) => {
-        console.log(`${index + 1}. ${zutat.name} (${zutat.menge})`);
-    });
+    while (true) {
+        leereKonsole();
+        console.log("===========Alle Zutaten neu schreiben===========");
+        zeigeZutatenListe(rezept);
 
-    console.log("\nGib neue Zutaten ein (Format: 'Name Menge, Name Menge', z.B. 'Spaghetti 400g, Knoblauch 4 Zehen')");
-    const zutatenInput = (await question("Zutaten (oder 'abbrechen'): ")).trim();
+        console.log("\nGib neue Zutaten ein (Format: 'Name Menge, Name Menge', z.B. 'Spaghetti 400g, Knoblauch 4 Zehen')");
+        const zutatenInput = (await question("Zutaten (oder 'abbrechen'): ")).trim();
 
-    if (zutatenInput.toLowerCase() === "abbrechen") {
-        console.log("Zutaten ersetzen abgebrochen.");
-        await question("\nDrücke Enter um fortzufahren");
-        return null;
+        if (await wurdeAbgebrochen(zutatenInput, "Zutaten ersetzen abgebrochen.")) {
+            return null;
+        }
+
+        if (zutatenInput === "") {
+            console.log("Mindestens eine Zutat ist erforderlich!");
+            await warteAufEnter("\nDrücke Enter um fortzufahren");
+            continue;
+        }
+
+        const neueZutaten = zutatenInput
+            .split(",")
+            .map((zutatPaar) => {
+                const teile = zutatPaar.trim().split(/\s+(.+)/);
+                return {
+                    name: teile[0],
+                    menge: teile[1] || ""
+                };
+            })
+            .filter((zutat) => zutat.name !== "" && zutat.menge !== "");
+
+        if (neueZutaten.length === 0) {
+            console.log("Keine gültigen Zutaten eingegeben!");
+            await warteAufEnter("\nDrücke Enter um fortzufahren");
+            continue;
+        }
+
+        rezept.zutaten = neueZutaten;
+        console.log(`Zutaten erfolgreich aktualisiert: ${neueZutaten.map((zutat) => `${zutat.name} (${zutat.menge})`).join(", ")}`);
+        return rezept;
     }
-
-    if (zutatenInput === "") {
-        console.log("Mindestens eine Zutat ist erforderlich!");
-        await question("\nDrücke Enter um fortzufahren");
-        return await zutatenErsetzen(rezept);
-    }
-
-    const neueZutaten = zutatenInput
-        .split(",")
-        .map((zutatPaar) => {
-            const parts = zutatPaar.trim().split(/\s+(.+)/);
-            return {
-                name: parts[0],
-                menge: parts[1] || ""
-            };
-        })
-        .filter((zutat) => zutat.name !== "" && zutat.menge !== "");
-
-    if (neueZutaten.length === 0) {
-        console.log("Keine gültigen Zutaten eingegeben!");
-        await question("\nDrücke Enter um fortzufahren");
-        return await zutatenErsetzen(rezept);
-    }
-
-    rezept.zutaten = neueZutaten;
-    console.log(`Zutaten erfolgreich aktualisiert: ${neueZutaten.map((z) => `${z.name} (${z.menge})`).join(", ")}`);
-    return rezept;
 }
 
 async function bearbeiteArbeitsschritte(rezept) {
-    while (true) {
-        process.stdout.write('\x1Bc');
-        console.log("===========Arbeitsschritte ändern===========");
-        console.log("Aktuelle Arbeitsschritte:");
-        (rezept.arbeitsschritte || []).forEach((schritt, index) => {
-            console.log(`${index + 1}. ${schritt}`);
-        });
-
-        console.log(
-            "\n[1] Arbeitsschritt hinzufügen",
-            "\n[2] Arbeitsschritt löschen",
-            "\n[3] Arbeitsschritt verändern",
-            "\n[4] Alle Arbeitsschritte neu schreiben",
-            "\n[5] Zurück"
-        );
-
-        const menueSteuerung = await frageGanzzahl(1, 5, "\nWas möchtest du tun?\n");
-
-        if (menueSteuerung === 1) {
-            const bearbeitetesRezept = await arbeitsschrittHinzufuegen(rezept);
-            if (bearbeitetesRezept !== null) {
-                rezept = bearbeitetesRezept;
-                return rezept;
-            }
-        } else if (menueSteuerung === 2) {
-            const bearbeitetesRezept = await arbeitsschrittEntfernen(rezept);
-            if (bearbeitetesRezept !== null) {
-                rezept = bearbeitetesRezept;
-                return rezept;
-            }
-        } else if (menueSteuerung === 3) {
-            const bearbeitetesRezept = await arbeitsschrittVeraendern(rezept);
-            if (bearbeitetesRezept !== null) {
-                rezept = bearbeitetesRezept;
-                return rezept;
-            }
-        } else if (menueSteuerung === 4) {
-            const bearbeitetesRezept = await arbeitsschritteErsetzen(rezept);
-            if (bearbeitetesRezept !== null) {
-                rezept = bearbeitetesRezept;
-                return rezept;
-            }
-        } else if (menueSteuerung === 5) {
-            return null;
-        }
-    }
+    return bearbeiteListenMenue(rezept, "Arbeitsschritte ändern", zeigeArbeitsschritteListe, [
+        { label: "Arbeitsschritt hinzufügen", aktion: arbeitsschrittHinzufuegen },
+        { label: "Arbeitsschritt löschen", aktion: arbeitsschrittEntfernen },
+        { label: "Arbeitsschritt verändern", aktion: arbeitsschrittVeraendern },
+        { label: "Alle Arbeitsschritte neu schreiben", aktion: arbeitsschritteErsetzen }
+    ]);
 }
 
 async function arbeitsschrittHinzufuegen(rezept) {
-    process.stdout.write('\x1Bc');
+    leereKonsole();
     console.log("===========Arbeitsschritt hinzufügen===========");
     console.log("Aktuelle Arbeitsschritte:");
 
@@ -1047,23 +1050,17 @@ async function arbeitsschrittHinzufuegen(rezept) {
 
     if (positionEingabe === arbeitsschritte.length + 2) {
         console.log("Arbeitsschritt hinzufügen abgebrochen.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
 
-    let neuerArbeitsschritt = "";
-    while (neuerArbeitsschritt === "") {
-        neuerArbeitsschritt = (await question("\nNeuen Arbeitsschritt eingeben (oder 'abbrechen'): ")).trim();
-
-        if (neuerArbeitsschritt.toLowerCase() === "abbrechen") {
-            console.log("Arbeitsschritt hinzufügen abgebrochen.");
-            await question("\nDrücke Enter um fortzufahren");
-            return null;
-        }
-
-        if (neuerArbeitsschritt === "") {
-            console.log("Der Arbeitsschritt darf nicht leer sein!");
-        }
+    const neuerArbeitsschritt = await fragePflichtfeld(
+        "\nNeuen Arbeitsschritt eingeben (oder 'abbrechen'): ",
+        "Der Arbeitsschritt darf nicht leer sein!",
+        "Arbeitsschritt hinzufügen abgebrochen."
+    );
+    if (neuerArbeitsschritt === null) {
+        return null;
     }
 
     if (!Array.isArray(rezept.arbeitsschritte)) {
@@ -1077,19 +1074,19 @@ async function arbeitsschrittHinzufuegen(rezept) {
 }
 
 async function arbeitsschrittEntfernen(rezept) {
-    process.stdout.write('\x1Bc');
+    leereKonsole();
     console.log("===========Arbeitsschritt löschen===========");
 
     if (!Array.isArray(rezept.arbeitsschritte) || rezept.arbeitsschritte.length === 0) {
         console.log("Keine Arbeitsschritte zum Löschen vorhanden.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
 
     if (rezept.arbeitsschritte.length === 1) {
         console.log("Es muss mindestens ein Arbeitsschritt erhalten bleiben!");
         console.log(`Aktueller Arbeitsschritt: ${rezept.arbeitsschritte[0]}`);
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
 
@@ -1103,7 +1100,7 @@ async function arbeitsschrittEntfernen(rezept) {
 
     if (menueSteuerung === rezept.arbeitsschritte.length + 1) {
         console.log("Arbeitsschritt löschen abgebrochen.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
 
@@ -1119,7 +1116,7 @@ async function arbeitsschrittEntfernen(rezept) {
 
     if (bestaetigung === "n") {
         console.log("Löschvorgang abgebrochen.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
 
@@ -1129,12 +1126,12 @@ async function arbeitsschrittEntfernen(rezept) {
 }
 
 async function arbeitsschrittVeraendern(rezept) {
-    process.stdout.write('\x1Bc');
+    leereKonsole();
     console.log("===========Arbeitsschritt verändern===========");
 
     if (!Array.isArray(rezept.arbeitsschritte) || rezept.arbeitsschritte.length === 0) {
         console.log("Keine Arbeitsschritte zum Verändern vorhanden.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
 
@@ -1148,7 +1145,7 @@ async function arbeitsschrittVeraendern(rezept) {
 
     if (menueSteuerung === rezept.arbeitsschritte.length + 1) {
         console.log("Arbeitsschritt verändern abgebrochen.");
-        await question("\nDrücke Enter um fortzufahren");
+        await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
     }
 
@@ -1156,19 +1153,13 @@ async function arbeitsschrittVeraendern(rezept) {
     const alterSchritt = rezept.arbeitsschritte[index];
     console.log(`\nAlter Arbeitsschritt: ${alterSchritt}`);
 
-    let neuerArbeitsschritt = "";
-    while (neuerArbeitsschritt === "") {
-        neuerArbeitsschritt = (await question("Neuer Arbeitsschritt (oder 'abbrechen'): ")).trim();
-
-        if (neuerArbeitsschritt.toLowerCase() === "abbrechen") {
-            console.log("Arbeitsschritt verändern abgebrochen.");
-            await question("\nDrücke Enter um fortzufahren");
-            return null;
-        }
-
-        if (neuerArbeitsschritt === "") {
-            console.log("Der Arbeitsschritt darf nicht leer sein!");
-        }
+    const neuerArbeitsschritt = await fragePflichtfeld(
+        "Neuer Arbeitsschritt (oder 'abbrechen'): ",
+        "Der Arbeitsschritt darf nicht leer sein!",
+        "Arbeitsschritt verändern abgebrochen."
+    );
+    if (neuerArbeitsschritt === null) {
+        return null;
     }
 
     rezept.arbeitsschritte[index] = neuerArbeitsschritt;
@@ -1177,12 +1168,9 @@ async function arbeitsschrittVeraendern(rezept) {
 }
 
 async function arbeitsschritteErsetzen(rezept) {
-    process.stdout.write('\x1Bc');
+    leereKonsole();
     console.log("===========Alle Arbeitsschritte neu schreiben===========");
-    console.log("Aktuelle Arbeitsschritte:");
-    (rezept.arbeitsschritte || []).forEach((schritt, index) => {
-        console.log(`${index + 1}. ${schritt}`);
-    });
+    zeigeArbeitsschritteListe(rezept);
 
     console.log("\nGib neue Arbeitsschritte ein (gib 'fertig' ein, um zu stoppen):");
     const neueArbeitsschritte = [];
@@ -1192,9 +1180,7 @@ async function arbeitsschritteErsetzen(rezept) {
         let schritt = "";
         while (schritt === "") {
             schritt = (await question(`Schritt ${schrittIndex} (oder 'fertig'): `)).trim();
-            if (schritt.toLowerCase() === "abbrechen") {
-                console.log("Arbeitsschritte ersetzen abgebrochen.");
-                await question("\nDrücke Enter um fortzufahren");
+            if (await wurdeAbgebrochen(schritt, "Arbeitsschritte ersetzen abgebrochen.")) {
                 return null;
             } else if (schritt === "") {
                 console.log("Der Arbeitsschritt darf nicht leer sein!");
@@ -1269,31 +1255,30 @@ async function frageGanzzahl(min, max, prompt) {
 }
 
 async function rezeptListeMenue(rezepte, titel) {
-    process.stdout.write('\x1Bc');
-    console.log(`===========${titel}===========`);
+    while (true) {
+        leereKonsole();
+        console.log(`===========${titel}===========`);
 
-    // Kategorie ohne Treffer behandeln
-    if (!rezepte || rezepte.length === 0) {
-        console.log("Keine Rezepte in dieser Kategorie gefunden");
-        await question("Drücke Enter um zur Kategorieauswahl zurückzukehren");
-        return await rezeptAuswahlMenue();
+        if (!rezepte || rezepte.length === 0) {
+            console.log("Keine Rezepte in dieser Kategorie gefunden");
+            await warteAufEnter("Drücke Enter um zur Kategorieauswahl zurückzukehren");
+            return;
+        }
+
+        rezepte.forEach((rezept, index) => {
+            console.log(`[${index + 1}] ${rezept.name}`);
+        });
+        console.log(`[${rezepte.length + 1}] Zurück`);
+
+        const menueSteuerung = await frageGanzzahl(1, rezepte.length + 1, "\nWähle ein Rezept:\n");
+        if (menueSteuerung === rezepte.length + 1) {
+            return;
+        }
+
+        const rezept = rezepte[menueSteuerung - 1];
+        zeigeRezeptDetails(rezept);
+        await warteAufEnter("\nDrücke Enter um zur Rezeptliste zurückzukehren");
     }
-
-    rezepte.forEach((rezept, index) => {
-        console.log(`[${index + 1}] ${rezept.name}`);
-    });
-    console.log(`[${rezepte.length + 1}] Zurück`);
-
-    // Rezeptauswahl mit Rücksprung
-    const menueSteuerung = await frageGanzzahl(1, rezepte.length + 1, "\nWähle ein Rezept:\n");
-    if (menueSteuerung === rezepte.length + 1) {
-        return await rezeptAuswahlMenue();
-    }
-
-    const rezept = rezepte[menueSteuerung - 1];
-    zeigeRezeptDetails(rezept);
-    await question("\nDrücke Enter um zur Rezeptliste zurückzukehren");
-    return await rezeptListeMenue(rezepte, titel);
 }
 
 function zeigeRezeptDetails(rezept) {
