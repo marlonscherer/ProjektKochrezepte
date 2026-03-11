@@ -723,8 +723,11 @@ function bearbeiteZutaten(rezept) {
                 return rezept;
             }
         } else if (menueSteuerung === 4) {
-            console.log("Diese Funktion wird als nächstes implementiert: Alle Zutaten neu schreiben.");
-            question("\nDrücke Enter um fortzufahren");
+            const bearbeitetesRezept = zutatenErsetzen(rezept);
+            if (bearbeitetesRezept !== null) {
+                rezept = bearbeitetesRezept;
+                return rezept;
+            }
         } else if (menueSteuerung === 5) {
             return null;
         }
@@ -919,6 +922,51 @@ function zutatVeraendern(rezept) {
 
     rezept.zutaten[index] = { name: neuerName, menge: neueMenge };
     console.log(`Zutat erfolgreich geändert: ${neuerName} (${neueMenge})`);
+    return rezept;
+}
+
+function zutatenErsetzen(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Alle Zutaten neu schreiben===========");
+    console.log("Aktuelle Zutaten:");
+    (rezept.zutaten || []).forEach((zutat, index) => {
+        console.log(`${index + 1}. ${zutat.name} (${zutat.menge})`);
+    });
+
+    console.log("\nGib neue Zutaten ein (Format: 'Name Menge, Name Menge', z.B. 'Spaghetti 400g, Knoblauch 4 Zehen')");
+    const zutatenInput = question("Zutaten (oder 'abbrechen'): ").trim();
+
+    if (zutatenInput.toLowerCase() === "abbrechen") {
+        console.log("Zutaten ersetzen abgebrochen.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+
+    if (zutatenInput === "") {
+        console.log("Mindestens eine Zutat ist erforderlich!");
+        question("\nDrücke Enter um fortzufahren");
+        return zutatenErsetzen(rezept);
+    }
+
+    const neueZutaten = zutatenInput
+        .split(",")
+        .map((zutatPaar) => {
+            const parts = zutatPaar.trim().split(/\s+(.+)/);
+            return {
+                name: parts[0],
+                menge: parts[1] || ""
+            };
+        })
+        .filter((zutat) => zutat.name !== "" && zutat.menge !== "");
+
+    if (neueZutaten.length === 0) {
+        console.log("Keine gültigen Zutaten eingegeben!");
+        question("\nDrücke Enter um fortzufahren");
+        return zutatenErsetzen(rezept);
+    }
+
+    rezept.zutaten = neueZutaten;
+    console.log(`Zutaten erfolgreich aktualisiert: ${neueZutaten.map((z) => `${z.name} (${z.menge})`).join(", ")}`);
     return rezept;
 }
 
