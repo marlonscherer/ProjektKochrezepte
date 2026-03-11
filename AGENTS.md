@@ -5,16 +5,16 @@ German-language interactive CLI cookbook manager built with Node.js ESM modules.
 ## Running the Project
 
 ```bash
-node hauptMenue.js   # Real entry point — package.json "main" incorrectly points to index.js
+node main.js
 ```
 
 ## Architecture
 
 | File | Role |
 |---|---|
-| `hauptMenue.js` | **Entire application (~820 lines).** All menus, CRUD logic, data I/O live here. |
+| `main.js` | Einstiegspunkt der Anwendung. Startet das Hauptmenü und initialisiert die CLI. |
 | `rezepte.json` | Flat-file database — JSON array of recipe objects, read/written synchronously. |
-| `main.js`, `Rezepte.js`, `Schwierigkeitsgrad.js` | Unused prototypes/stubs — not connected to the main app. |
+| `menus/`, `editors/`, `ui/`, `data/` | Aufgeteilte Module für Menüs, Bearbeitung, Anzeige/Eingabe und Speicherlogik. |
 
 Menu hierarchy rooted at `hauptMenue()` → `rezeptAuswahlMenue()`, `rezepteBearbeitenMenue()`, `kiBeratungMenue()` (stub).
 
@@ -45,6 +45,4 @@ Menu hierarchy rooted at `hauptMenue()` → `rezeptAuswahlMenue()`, `rezepteBear
 
 ## Known Issues / Technical Debt
 
-- `readline-sync` mangles German umlauts (ä, ö, ü) on some terminals. Switching to Node's native `readline` is the planned fix.
-- `bearbeiteZutaten()`, `bearbeiteArbeitsschritte()`, and `kiBeratungMenue()` are unimplemented stubs.
-- `package.json` `"main"` field points to non-existent `index.js` — ignore it.
+- `kiBeratungMenue()` ist weiterhin nur ein Stub.
