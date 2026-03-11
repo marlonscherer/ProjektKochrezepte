@@ -711,8 +711,11 @@ function bearbeiteZutaten(rezept) {
                 return rezept;
             }
         } else if (menueSteuerung === 2) {
-            console.log("Diese Funktion wird als nächstes implementiert: Zutat löschen.");
-            question("\nDrücke Enter um fortzufahren");
+            const bearbeitetesRezept = zutatEntfernen(rezept);
+            if (bearbeitetesRezept !== null) {
+                rezept = bearbeitetesRezept;
+                return rezept;
+            }
         } else if (menueSteuerung === 3) {
             console.log("Diese Funktion wird als nächstes implementiert: Zutat verändern.");
             question("\nDrücke Enter um fortzufahren");
@@ -786,6 +789,58 @@ function zutatHinzufuegen(rezept) {
 
     rezept.zutaten.push({ name: zutatName, menge: zutatMenge });
     console.log(`Zutat \"${zutatName}\" hinzugefügt!`);
+    return rezept;
+}
+
+function zutatEntfernen(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Zutat löschen===========");
+
+    if (!Array.isArray(rezept.zutaten) || rezept.zutaten.length === 0) {
+        console.log("Keine Zutaten zum Löschen vorhanden.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+
+    if (rezept.zutaten.length === 1) {
+        console.log("Es muss mindestens eine Zutat erhalten bleiben!");
+        console.log(`Aktuelle Zutat: ${rezept.zutaten[0].name} (${rezept.zutaten[0].menge})`);
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+
+    console.log("Aktuelle Zutaten:");
+    rezept.zutaten.forEach((zutat, index) => {
+        console.log(`[${index + 1}] ${zutat.name} (${zutat.menge})`);
+    });
+    console.log(`[${rezept.zutaten.length + 1}] Abbrechen`);
+
+    const menueSteuerung = frageGanzzahl(1, rezept.zutaten.length + 1, "\nWelche Zutat möchtest du löschen?\n");
+
+    if (menueSteuerung === rezept.zutaten.length + 1) {
+        console.log("Zutat löschen abgebrochen.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+
+    const entfernteZutat = rezept.zutaten[menueSteuerung - 1];
+
+    let bestaetigung = "";
+    while (bestaetigung !== "j" && bestaetigung !== "n") {
+        bestaetigung = question(`\nMöchtest du \"${entfernteZutat.name}\" wirklich löschen? (j/n): `).trim().toLowerCase();
+        if (bestaetigung !== "j" && bestaetigung !== "n") {
+            console.log("Fehler: ungültige Eingabe.");
+        }
+    }
+
+    if (bestaetigung === "n") {
+        console.log("Löschvorgang abgebrochen.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+
+    rezept.zutaten.splice(menueSteuerung - 1, 1);
+    console.log(`Zutat \"${entfernteZutat.name}\" gelöscht!`);
     return rezept;
 }
 
