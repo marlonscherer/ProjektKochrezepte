@@ -686,14 +686,40 @@ function kategorienErsetzen(rezept) {
 }
 
 function bearbeiteZutaten(rezept) {
-    process.stdout.write('\x1Bc');
-    console.log("===========Zutaten ändern===========");
-    console.log("Aktuelle Zutaten:");
-    (rezept.zutaten || []).forEach((zutat, index) => {
-        console.log(`${index + 1}. ${zutat.name} (${zutat.menge})`);
-    });
-    console.log("\nDummy: Logik zum Ändern der Zutaten wird hier implementiert");
-    return rezept;
+    while (true) {
+        process.stdout.write('\x1Bc');
+        console.log("===========Zutaten ändern===========");
+        console.log("Aktuelle Zutaten:");
+        (rezept.zutaten || []).forEach((zutat, index) => {
+            console.log(`${index + 1}. ${zutat.name} (${zutat.menge})`);
+        });
+
+        console.log(
+            "\n[1] Zutat und Menge hinzufügen",
+            "\n[2] Zutat löschen",
+            "\n[3] Zutat verändern",
+            "\n[4] Alle Zutaten neu schreiben",
+            "\n[5] Zurück"
+        );
+
+        const menueSteuerung = frageGanzzahl(1, 5, "Was möchtest du tun?\n");
+
+        if (menueSteuerung === 1) {
+            console.log("Diese Funktion wird als nächstes implementiert: Zutat und Menge hinzufügen.");
+            question("\nDrücke Enter um fortzufahren");
+        } else if (menueSteuerung === 2) {
+            console.log("Diese Funktion wird als nächstes implementiert: Zutat löschen.");
+            question("\nDrücke Enter um fortzufahren");
+        } else if (menueSteuerung === 3) {
+            console.log("Diese Funktion wird als nächstes implementiert: Zutat verändern.");
+            question("\nDrücke Enter um fortzufahren");
+        } else if (menueSteuerung === 4) {
+            console.log("Diese Funktion wird als nächstes implementiert: Alle Zutaten neu schreiben.");
+            question("\nDrücke Enter um fortzufahren");
+        } else if (menueSteuerung === 5) {
+            return null;
+        }
+    }
 }
 
 function bearbeiteArbeitsschritte(rezept) {
