@@ -1002,8 +1002,11 @@ function bearbeiteArbeitsschritte(rezept) {
                 return rezept;
             }
         } else if (menueSteuerung === 3) {
-            console.log("Diese Funktion wird als nächstes implementiert: Arbeitsschritt verändern.");
-            question("\nDrücke Enter um fortzufahren");
+            const bearbeitetesRezept = arbeitsschrittVeraendern(rezept);
+            if (bearbeitetesRezept !== null) {
+                rezept = bearbeitetesRezept;
+                return rezept;
+            }
         } else if (menueSteuerung === 4) {
             console.log("Diese Funktion wird als nächstes implementiert: Alle Arbeitsschritte neu schreiben.");
             question("\nDrücke Enter um fortzufahren");
@@ -1113,6 +1116,54 @@ function arbeitsschrittEntfernen(rezept) {
 
     rezept.arbeitsschritte.splice(menueSteuerung - 1, 1);
     console.log(`Arbeitsschritt \"${entfernterSchritt}\" gelöscht!`);
+    return rezept;
+}
+
+function arbeitsschrittVeraendern(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Arbeitsschritt verändern===========");
+
+    if (!Array.isArray(rezept.arbeitsschritte) || rezept.arbeitsschritte.length === 0) {
+        console.log("Keine Arbeitsschritte zum Verändern vorhanden.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+
+    console.log("Aktuelle Arbeitsschritte:");
+    rezept.arbeitsschritte.forEach((schritt, index) => {
+        console.log(`[${index + 1}] ${schritt}`);
+    });
+    console.log(`[${rezept.arbeitsschritte.length + 1}] Abbrechen`);
+
+    const menueSteuerung = frageGanzzahl(1, rezept.arbeitsschritte.length + 1, "\nWelchen Arbeitsschritt möchtest du verändern?\n");
+
+    if (menueSteuerung === rezept.arbeitsschritte.length + 1) {
+        console.log("Arbeitsschritt verändern abgebrochen.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+
+    const index = menueSteuerung - 1;
+    const alterSchritt = rezept.arbeitsschritte[index];
+    console.log(`\nAlter Arbeitsschritt: ${alterSchritt}`);
+
+    let neuerArbeitsschritt = "";
+    while (neuerArbeitsschritt === "") {
+        neuerArbeitsschritt = question("Neuer Arbeitsschritt (oder 'abbrechen'): ").trim();
+
+        if (neuerArbeitsschritt.toLowerCase() === "abbrechen") {
+            console.log("Arbeitsschritt verändern abgebrochen.");
+            question("\nDrücke Enter um fortzufahren");
+            return null;
+        }
+
+        if (neuerArbeitsschritt === "") {
+            console.log("Der Arbeitsschritt darf nicht leer sein!");
+        }
+    }
+
+    rezept.arbeitsschritte[index] = neuerArbeitsschritt;
+    console.log(`Arbeitsschritt erfolgreich geändert zu: ${neuerArbeitsschritt}`);
     return rezept;
 }
 
