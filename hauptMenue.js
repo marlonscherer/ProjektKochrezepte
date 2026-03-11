@@ -996,8 +996,11 @@ function bearbeiteArbeitsschritte(rezept) {
                 return rezept;
             }
         } else if (menueSteuerung === 2) {
-            console.log("Diese Funktion wird als nächstes implementiert: Arbeitsschritt löschen.");
-            question("\nDrücke Enter um fortzufahren");
+            const bearbeitetesRezept = arbeitsschrittEntfernen(rezept);
+            if (bearbeitetesRezept !== null) {
+                rezept = bearbeitetesRezept;
+                return rezept;
+            }
         } else if (menueSteuerung === 3) {
             console.log("Diese Funktion wird als nächstes implementiert: Arbeitsschritt verändern.");
             question("\nDrücke Enter um fortzufahren");
@@ -1058,6 +1061,58 @@ function arbeitsschrittHinzufuegen(rezept) {
     const insertPosition = positionEingabe - 1;
     rezept.arbeitsschritte.splice(insertPosition, 0, neuerArbeitsschritt);
     console.log("Arbeitsschritt hinzugefügt!");
+    return rezept;
+}
+
+function arbeitsschrittEntfernen(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Arbeitsschritt löschen===========");
+
+    if (!Array.isArray(rezept.arbeitsschritte) || rezept.arbeitsschritte.length === 0) {
+        console.log("Keine Arbeitsschritte zum Löschen vorhanden.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+
+    if (rezept.arbeitsschritte.length === 1) {
+        console.log("Es muss mindestens ein Arbeitsschritt erhalten bleiben!");
+        console.log(`Aktueller Arbeitsschritt: ${rezept.arbeitsschritte[0]}`);
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+
+    console.log("Aktuelle Arbeitsschritte:");
+    rezept.arbeitsschritte.forEach((schritt, index) => {
+        console.log(`[${index + 1}] ${schritt}`);
+    });
+    console.log(`[${rezept.arbeitsschritte.length + 1}] Abbrechen`);
+
+    const menueSteuerung = frageGanzzahl(1, rezept.arbeitsschritte.length + 1, "\nWelchen Arbeitsschritt möchtest du löschen?\n");
+
+    if (menueSteuerung === rezept.arbeitsschritte.length + 1) {
+        console.log("Arbeitsschritt löschen abgebrochen.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+
+    const entfernterSchritt = rezept.arbeitsschritte[menueSteuerung - 1];
+
+    let bestaetigung = "";
+    while (bestaetigung !== "j" && bestaetigung !== "n") {
+        bestaetigung = question(`\nMöchtest du \"${entfernterSchritt}\" wirklich löschen? (j/n): `).trim().toLowerCase();
+        if (bestaetigung !== "j" && bestaetigung !== "n") {
+            console.log("Fehler: ungültige Eingabe.");
+        }
+    }
+
+    if (bestaetigung === "n") {
+        console.log("Löschvorgang abgebrochen.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+
+    rezept.arbeitsschritte.splice(menueSteuerung - 1, 1);
+    console.log(`Arbeitsschritt \"${entfernterSchritt}\" gelöscht!`);
     return rezept;
 }
 
