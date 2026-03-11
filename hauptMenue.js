@@ -738,7 +738,7 @@ function zutatHinzufuegen(rezept) {
         console.log("Keine Zutaten vorhanden");
     } else {
         zutaten.forEach((zutat, index) => {
-            console.log(`[${index + 1}] ${zutat.name} (${zutat.menge})`);
+            console.log(`${index + 1}. ${zutat.name} (${zutat.menge})`);
         });
     }
 
