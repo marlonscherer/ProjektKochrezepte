@@ -1,0 +1,65 @@
+import { jest } from '@jest/globals';
+
+const ladeRezepteMock = jest.fn();
+const holeKategorienMock = jest.fn();
+const zeigeRezeptDetailsMock = jest.fn();
+const frageGanzzahlMock = jest.fn();
+const leereKonsoleMock = jest.fn();
+const warteAufEnterMock = jest.fn();
+
+await jest.unstable_mockModule('../data/rezeptSpeicher.js', () => ({
+    ladeRezepte: ladeRezepteMock
+}));
+
+await jest.unstable_mockModule('../ui/anzeige.js', () => ({
+    holeKategorien: holeKategorienMock,
+    zeigeRezeptDetails: zeigeRezeptDetailsMock
+}));
+
+await jest.unstable_mockModule('../ui/eingabe.js', () => ({
+    frageGanzzahl: frageGanzzahlMock,
+    leereKonsole: leereKonsoleMock,
+    warteAufEnter: warteAufEnterMock
+}));
+
+const { rezeptAuswahlMenue } = await import('../menus/auswahlMenues.js');
+
+describe('auswahlMenues', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test('returns early when no recipes exist', async () => {
+        ladeRezepteMock.mockReturnValue([]);
+
+        await rezeptAuswahlMenue();
+
+        expect(warteAufEnterMock).toHaveBeenCalledTimes(1);
+    });
+
+    test('returns when selecting Zurueck in category menu', async () => {
+        ladeRezepteMock.mockReturnValue([{ id: 1, name: 'Pasta', kategorien: ['A'] }]);
+        holeKategorienMock.mockReturnValue(['A']);
+        frageGanzzahlMock.mockResolvedValue(3); // [1] Alle [2] A [3] Zurueck
+
+        await rezeptAuswahlMenue();
+
+        expect(holeKategorienMock).toHaveBeenCalledTimes(1);
+    });
+
+    test('shows recipe details in Alle Rezepte flow', async () => {
+        const rezepte = [{ id: 1, name: 'Pasta', kategorien: ['A'] }];
+        ladeRezepteMock.mockReturnValue(rezepte);
+        holeKategorienMock.mockReturnValue(['A']);
+        frageGanzzahlMock
+            .mockResolvedValueOnce(1) // Alle Rezepte
+            .mockResolvedValueOnce(1) // Rezept 1
+            .mockResolvedValueOnce(2) // Zurueck aus Liste
+            .mockResolvedValueOnce(3); // Zurueck aus Kategorien
+
+        await rezeptAuswahlMenue();
+
+        expect(zeigeRezeptDetailsMock).toHaveBeenCalledWith(rezepte[0]);
+        expect(warteAufEnterMock).toHaveBeenCalled();
+    });
+});

@@ -1,11 +1,21 @@
 import readline from "readline/promises";
 import { stdin as input, stdout as output } from "process";
 
-const rl = readline.createInterface({ input, output });
+let rl = null;
 const INPUT_GESCHLOSSEN = "INPUT_GESCHLOSSEN";
 
+function holeReadline() {
+    if (rl === null || rl.closed) {
+        rl = readline.createInterface({ input, output });
+    }
+
+    return rl;
+}
+
 export async function question(promptText) {
-    if (rl.closed) {
+    const aktiveRl = holeReadline();
+
+    if (aktiveRl.closed) {
         throw new Error(INPUT_GESCHLOSSEN);
     }
 
@@ -13,7 +23,7 @@ export async function question(promptText) {
         let erledigt = false;
 
         const cleanup = () => {
-            rl.off("close", onClose);
+            aktiveRl.off("close", onClose);
             input.off("end", onEnd);
         };
 
@@ -29,15 +39,15 @@ export async function question(promptText) {
 
         const onClose = finish(() => reject(new Error(INPUT_GESCHLOSSEN)));
         const onEnd = finish(() => {
-            if (!rl.closed) {
-                rl.close();
+            if (!aktiveRl.closed) {
+                aktiveRl.close();
             }
             reject(new Error(INPUT_GESCHLOSSEN));
         });
 
-        rl.once("close", onClose);
+        aktiveRl.once("close", onClose);
         input.once("end", onEnd);
-        rl.question(promptText).then(finish(resolve)).catch(finish(reject));
+        aktiveRl.question(promptText).then(finish(resolve)).catch(finish(reject));
     });
 }
 
@@ -95,7 +105,7 @@ export async function frageGanzzahl(min, max, promptText) {
 }
 
 export function schliesseEingabe() {
-    if (!rl.closed) {
+    if (rl !== null && !rl.closed) {
         rl.close();
     }
 }
