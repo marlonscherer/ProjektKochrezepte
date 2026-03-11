@@ -702,11 +702,14 @@ function bearbeiteZutaten(rezept) {
             "\n[5] Zurück"
         );
 
-        const menueSteuerung = frageGanzzahl(1, 5, "Was möchtest du tun?\n");
+        const menueSteuerung = frageGanzzahl(1, 5, "\nWas möchtest du tun?\n");
 
         if (menueSteuerung === 1) {
-            console.log("Diese Funktion wird als nächstes implementiert: Zutat und Menge hinzufügen.");
-            question("\nDrücke Enter um fortzufahren");
+            const bearbeitetesRezept = zutatHinzufuegen(rezept);
+            if (bearbeitetesRezept !== null) {
+                rezept = bearbeitetesRezept;
+                return rezept;
+            }
         } else if (menueSteuerung === 2) {
             console.log("Diese Funktion wird als nächstes implementiert: Zutat löschen.");
             question("\nDrücke Enter um fortzufahren");
@@ -720,6 +723,70 @@ function bearbeiteZutaten(rezept) {
             return null;
         }
     }
+}
+
+function zutatHinzufuegen(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Zutat und Menge hinzufügen===========");
+    console.log("Aktuelle Zutaten:");
+
+    const zutaten = rezept.zutaten || [];
+    if (zutaten.length === 0) {
+        console.log("Keine Zutaten vorhanden");
+    } else {
+        zutaten.forEach((zutat, index) => {
+            console.log(`[${index + 1}] ${zutat.name} (${zutat.menge})`);
+        });
+    }
+
+    let zutatName = "";
+    let nameIstEinzigartig = false;
+
+    while (!nameIstEinzigartig) {
+        zutatName = question("\nName der neuen Zutat (oder 'abbrechen'): ").trim();
+
+        if (zutatName === "") {
+            console.log("Der Name der Zutat darf nicht leer sein!");
+            continue;
+        }
+
+        if (zutatName.toLowerCase() === "abbrechen") {
+            console.log("Zutat hinzufügen abgebrochen.");
+            question("\nDrücke Enter um fortzufahren");
+            return null;
+        }
+
+        const zutatBereitsVorhanden = zutaten.some((zutat) => zutat.name.toLowerCase() === zutatName.toLowerCase());
+        if (zutatBereitsVorhanden) {
+            console.log(`Die Zutat \"${zutatName}\" existiert bereits!`);
+            continue;
+        }
+
+        nameIstEinzigartig = true;
+    }
+
+    let zutatMenge = "";
+    while (zutatMenge === "") {
+        zutatMenge = question("Menge der Zutat (oder 'abbrechen'): ").trim();
+
+        if (zutatMenge.toLowerCase() === "abbrechen") {
+            console.log("Zutat hinzufügen abgebrochen.");
+            question("\nDrücke Enter um fortzufahren");
+            return null;
+        }
+
+        if (zutatMenge === "") {
+            console.log("Die Menge darf nicht leer sein!");
+        }
+    }
+
+    if (!Array.isArray(rezept.zutaten)) {
+        rezept.zutaten = [];
+    }
+
+    rezept.zutaten.push({ name: zutatName, menge: zutatMenge });
+    console.log(`Zutat \"${zutatName}\" hinzugefügt!`);
+    return rezept;
 }
 
 function bearbeiteArbeitsschritte(rezept) {
