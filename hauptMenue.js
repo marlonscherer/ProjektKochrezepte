@@ -859,9 +859,9 @@ function zutatVeraendern(rezept) {
 
     console.log("Aktuelle Zutaten:");
     rezept.zutaten.forEach((zutat, index) => {
-        console.log(`${index + 1}. ${zutat.name} (${zutat.menge})`);
+        console.log(`[${index + 1}] ${zutat.name} (${zutat.menge})`);
     });
-    console.log(`${rezept.zutaten.length + 1}. Abbrechen`);
+    console.log(`[${rezept.zutaten.length + 1}] Abbrechen`);
 
     const menueSteuerung = frageGanzzahl(1, rezept.zutaten.length + 1, "\nWelche Zutat möchtest du verändern?\n");
 
