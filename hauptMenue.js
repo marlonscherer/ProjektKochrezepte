@@ -990,8 +990,11 @@ function bearbeiteArbeitsschritte(rezept) {
         const menueSteuerung = frageGanzzahl(1, 5, "\nWas möchtest du tun?\n");
 
         if (menueSteuerung === 1) {
-            console.log("Diese Funktion wird als nächstes implementiert: Arbeitsschritt hinzufügen.");
-            question("\nDrücke Enter um fortzufahren");
+            const bearbeitetesRezept = arbeitsschrittHinzufuegen(rezept);
+            if (bearbeitetesRezept !== null) {
+                rezept = bearbeitetesRezept;
+                return rezept;
+            }
         } else if (menueSteuerung === 2) {
             console.log("Diese Funktion wird als nächstes implementiert: Arbeitsschritt löschen.");
             question("\nDrücke Enter um fortzufahren");
@@ -1005,6 +1008,57 @@ function bearbeiteArbeitsschritte(rezept) {
             return null;
         }
     }
+}
+
+function arbeitsschrittHinzufuegen(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Arbeitsschritt hinzufügen===========");
+    console.log("Aktuelle Arbeitsschritte:");
+
+    const arbeitsschritte = rezept.arbeitsschritte || [];
+    if (arbeitsschritte.length === 0) {
+        console.log("Keine Arbeitsschritte vorhanden");
+    } else {
+        arbeitsschritte.forEach((schritt, index) => {
+            console.log(`${index + 1}. ${schritt}`);
+        });
+    }
+
+    console.log(`\n[1-${arbeitsschritte.length}] Position vor existierendem Schritt`);
+    console.log(`[${arbeitsschritte.length + 1}] Am Ende hinzufügen`);
+    console.log(`[${arbeitsschritte.length + 2}] Abbrechen`);
+
+    const positionEingabe = frageGanzzahl(1, arbeitsschritte.length + 2, "\nAn welcher Position soll der Schritt eingefügt werden?\n");
+
+    if (positionEingabe === arbeitsschritte.length + 2) {
+        console.log("Arbeitsschritt hinzufügen abgebrochen.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+
+    let neuerArbeitsschritt = "";
+    while (neuerArbeitsschritt === "") {
+        neuerArbeitsschritt = question("\nNeuen Arbeitsschritt eingeben (oder 'abbrechen'): ").trim();
+
+        if (neuerArbeitsschritt.toLowerCase() === "abbrechen") {
+            console.log("Arbeitsschritt hinzufügen abgebrochen.");
+            question("\nDrücke Enter um fortzufahren");
+            return null;
+        }
+
+        if (neuerArbeitsschritt === "") {
+            console.log("Der Arbeitsschritt darf nicht leer sein!");
+        }
+    }
+
+    if (!Array.isArray(rezept.arbeitsschritte)) {
+        rezept.arbeitsschritte = [];
+    }
+
+    const insertPosition = positionEingabe - 1;
+    rezept.arbeitsschritte.splice(insertPosition, 0, neuerArbeitsschritt);
+    console.log("Arbeitsschritt hinzugefügt!");
+    return rezept;
 }
 
 function ladeRezepte() {
