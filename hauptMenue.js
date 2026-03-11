@@ -717,8 +717,11 @@ function bearbeiteZutaten(rezept) {
                 return rezept;
             }
         } else if (menueSteuerung === 3) {
-            console.log("Diese Funktion wird als nächstes implementiert: Zutat verändern.");
-            question("\nDrücke Enter um fortzufahren");
+            const bearbeitetesRezept = zutatVeraendern(rezept);
+            if (bearbeitetesRezept !== null) {
+                rezept = bearbeitetesRezept;
+                return rezept;
+            }
         } else if (menueSteuerung === 4) {
             console.log("Diese Funktion wird als nächstes implementiert: Alle Zutaten neu schreiben.");
             question("\nDrücke Enter um fortzufahren");
@@ -841,6 +844,81 @@ function zutatEntfernen(rezept) {
 
     rezept.zutaten.splice(menueSteuerung - 1, 1);
     console.log(`Zutat \"${entfernteZutat.name}\" gelöscht!`);
+    return rezept;
+}
+
+function zutatVeraendern(rezept) {
+    process.stdout.write('\x1Bc');
+    console.log("===========Zutat verändern===========");
+
+    if (!Array.isArray(rezept.zutaten) || rezept.zutaten.length === 0) {
+        console.log("Keine Zutaten zum Verändern vorhanden.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+
+    console.log("Aktuelle Zutaten:");
+    rezept.zutaten.forEach((zutat, index) => {
+        console.log(`${index + 1}. ${zutat.name} (${zutat.menge})`);
+    });
+    console.log(`${rezept.zutaten.length + 1}. Abbrechen`);
+
+    const menueSteuerung = frageGanzzahl(1, rezept.zutaten.length + 1, "\nWelche Zutat möchtest du verändern?\n");
+
+    if (menueSteuerung === rezept.zutaten.length + 1) {
+        console.log("Zutat verändern abgebrochen.");
+        question("\nDrücke Enter um fortzufahren");
+        return null;
+    }
+
+    const index = menueSteuerung - 1;
+    const alteZutat = rezept.zutaten[index];
+
+    let neuerName = "";
+    let nameIstEinzigartig = false;
+    while (!nameIstEinzigartig) {
+        neuerName = question(`\nNeuer Name für \"${alteZutat.name}\" (oder 'abbrechen'): `).trim();
+
+        if (neuerName === "") {
+            console.log("Der Name der Zutat darf nicht leer sein!");
+            continue;
+        }
+
+        if (neuerName.toLowerCase() === "abbrechen") {
+            console.log("Zutat verändern abgebrochen.");
+            question("\nDrücke Enter um fortzufahren");
+            return null;
+        }
+
+        const zutatBereitsVorhanden = rezept.zutaten.some((zutat, aktuellePosition) => {
+            return aktuellePosition !== index && zutat.name.toLowerCase() === neuerName.toLowerCase();
+        });
+
+        if (zutatBereitsVorhanden) {
+            console.log(`Die Zutat \"${neuerName}\" existiert bereits!`);
+            continue;
+        }
+
+        nameIstEinzigartig = true;
+    }
+
+    let neueMenge = "";
+    while (neueMenge === "") {
+        neueMenge = question(`Neue Menge für \"${neuerName}\" (oder 'abbrechen'): `).trim();
+
+        if (neueMenge.toLowerCase() === "abbrechen") {
+            console.log("Zutat verändern abgebrochen.");
+            question("\nDrücke Enter um fortzufahren");
+            return null;
+        }
+
+        if (neueMenge === "") {
+            console.log("Die Menge darf nicht leer sein!");
+        }
+    }
+
+    rezept.zutaten[index] = { name: neuerName, menge: neueMenge };
+    console.log(`Zutat erfolgreich geändert: ${neuerName} (${neueMenge})`);
     return rezept;
 }
 
