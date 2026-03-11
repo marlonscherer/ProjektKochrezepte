@@ -1,4 +1,4 @@
-//Wenn man Karegorie bearbeitet kommt man 2 menüs zurück, Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus und gibt diese auch falsch an die json weiter, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen
+//Menüs fertigstellen, Funktionen für die Logik der Menüs erstellen, der Befehl question gibt Umlaute falsch aus und gibt diese auch falsch an die json weiter, Bei den Rezepten kann man auch was anderes vor Enter drücken um zurück zu kommen, umstrukturierung, README, wechsel auf native statt question
 import {question, questionInt} from "readline-sync";
 import fs from "fs";
 import { fileURLToPath } from "url";
