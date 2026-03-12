@@ -61,6 +61,7 @@ async function arbeitsschrittHinzufuegen(rezept) {
     }
 
     const insertPosition = positionEingabe - 1;
+    // splice mit deleteCount 0 fuegt an exakter Position ein.
     rezept.arbeitsschritte.splice(insertPosition, 0, neuerArbeitsschritt);
     console.log("Arbeitsschritt hinzugefügt!");
     return rezept;
@@ -188,6 +189,7 @@ async function arbeitsschritteErsetzen(rezept) {
             }
 
             if (schritt.toLowerCase() === "fertig") {
+                // Replace wird erst abgeschlossen, wenn mindestens ein Schritt erfasst wurde.
                 if (neueArbeitsschritte.length === 0) {
                     console.log("Mindestens ein Arbeitsschritt ist erforderlich!");
                     continue;

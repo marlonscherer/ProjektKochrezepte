@@ -41,6 +41,7 @@ async function zutatHinzufuegen(rezept) {
             return null;
         }
 
+        // Zutatennamen innerhalb eines Rezepts eindeutig halten.
         const zutatBereitsVorhanden = zutaten.some(
             (zutat) => zutat.name.toLowerCase() === zutatName.toLowerCase()
         );
@@ -199,6 +200,7 @@ async function zutatenErsetzen(rezept) {
         const neueZutaten = zutatenInput
             .split(",")
             .map((zutatPaar) => {
+                // Erstes Token = Name, Rest = Menge (inkl. Leerzeichen), z.B. "Mehl 300 g".
                 const teile = zutatPaar.trim().split(/\s+(.+)/);
                 return {
                     name: teile[0],

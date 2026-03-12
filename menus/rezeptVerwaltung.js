@@ -32,6 +32,7 @@ export async function rezeptLoeschenMenue() {
 
     const rezeptName = rezepte[menueSteuerung - 1].name;
     let bestaetigung = "";
+    // Explizite j/n-Bestaetigung, damit kein Rezept versehentlich geloescht wird.
     while (bestaetigung !== "j" && bestaetigung !== "n") {
         bestaetigung = (await question(`\nMöchtest du "${rezeptName}" wirklich löschen? (j/n): `)).trim().toLowerCase();
         if (bestaetigung !== "j" && bestaetigung !== "n") {
@@ -76,6 +77,7 @@ export async function rezeptHinzufuegenMenue() {
             return;
         }
 
+        // Doppelte Namen blocken (case-insensitive), damit Suche und Auswahl eindeutig bleiben.
         const nameBereitsVorhanden = rezepte.some((rezept) => rezept.name.toLowerCase() === rezeptName.toLowerCase());
         if (nameBereitsVorhanden) {
             console.log(`Ein Rezept mit dem Namen "${rezeptName}" existiert bereits!`);
@@ -137,6 +139,7 @@ export async function rezeptHinzufuegenMenue() {
         }
 
         if (zutatName.toLowerCase() === "fertig") {
+            // Beim Erstellen muss mindestens eine Zutat vorhanden sein.
             if (zutaten.length === 0) {
                 console.log("Mindestens eine Zutat ist erforderlich!");
                 continue;
@@ -174,6 +177,7 @@ export async function rezeptHinzufuegenMenue() {
         }
 
         if (schritt.toLowerCase() === "fertig") {
+            // Mindestens ein Schritt ist Pflicht, sonst ist das Rezept unvollstaendig.
             if (arbeitsschritte.length === 0) {
                 console.log("Mindestens ein Arbeitsschritt ist erforderlich!");
                 continue;

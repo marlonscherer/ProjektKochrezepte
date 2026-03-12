@@ -23,17 +23,20 @@ export function holeKategorien(rezepte) {
         }
 
         rezept.kategorien.forEach((kategorie) => {
+            // Vor dem Sammeln normalisieren, damit Dubletten durch Whitespace verschwinden.
             if (typeof kategorie === "string" && kategorie.trim() !== "") {
                 kategorienSet.add(kategorie.trim());
             }
         });
     });
 
+    // Fuer eine stabile, benutzerfreundliche Reihenfolge mit deutscher Sortierung.
     return Array.from(kategorienSet).sort((a, b) => a.localeCompare(b, "de"));
 }
 
 export function zeigeRezeptDetails(rezept) {
     leereKonsole();
+    // "-" signalisiert fehlende optionale Felder in der Detailansicht.
     console.log(`===========${rezept.name}===========`);
     console.log(`Schwierigkeitsgrad: ${rezept.schwierigkeitsgrad || "-"}`);
     console.log(`Zeitaufwand: ${rezept.zeitaufwand || "-"}`);

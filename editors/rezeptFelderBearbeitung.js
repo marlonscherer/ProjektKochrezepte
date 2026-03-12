@@ -40,6 +40,7 @@ export async function rezeptEditierMenue(rezept, rezepte) {
         if (bearbeitetesRezept !== null) {
             rezept = bearbeitetesRezept;
 
+            // Referenz im Gesamtarray aktualisieren, danach zentral speichern.
             const rezeptIndex = rezepte.findIndex((eintrag) => eintrag.id === rezept.id);
             if (rezeptIndex !== -1) {
                 rezepte[rezeptIndex] = rezept;
@@ -74,6 +75,7 @@ async function bearbeiteRezeptName(rezept, rezepte) {
 
         const nameBereitsVorhanden = rezepte.some((vorhandenesRezept) => {
             const istAktuellesRezept = vorhandenesRezept === rezept || vorhandenesRezept.id === rezept.id;
+            // Gleiches Rezept darf seinen Namen behalten; nur Fremdduplikate blockieren.
             return !istAktuellesRezept && vorhandenesRezept.name.toLowerCase() === neuerName.toLowerCase();
         });
         if (nameBereitsVorhanden) {

@@ -5,6 +5,7 @@ let rl = null;
 const INPUT_GESCHLOSSEN = "INPUT_GESCHLOSSEN";
 
 function holeReadline() {
+    // Lazy Init verhindert offene Handles in Tests und ungenutzten Sessions.
     if (rl === null || rl.closed) {
         rl = readline.createInterface({ input, output });
     }
@@ -28,6 +29,7 @@ export async function question(promptText) {
         };
 
         const finish = (handler) => (wert) => {
+            // Schutz gegen doppelte Aufloesung bei race zwischen close/end/question.
             if (erledigt) {
                 return;
             }
@@ -60,6 +62,7 @@ export async function warteAufEnter(promptText = "\nDrücke Enter um fortzufahre
 }
 
 export async function wurdeAbgebrochen(eingabe, nachricht) {
+    // Globales Escape-Wort fuer alle Text-Dialoge.
     if (typeof eingabe === "string" && eingabe.trim().toLowerCase() === "abbrechen") {
         console.log(nachricht);
         await warteAufEnter();

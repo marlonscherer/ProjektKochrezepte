@@ -60,6 +60,7 @@ async function kategorieHinzufuegen(rezept) {
             return null;
         }
 
+        // Kategorien im Rezept sind eindeutig (case-insensitive).
         const kategorieBereitsVorhanden = rezept.kategorien.some(
             (kategorie) => kategorie.toLowerCase() === neueKategorie.toLowerCase()
         );
@@ -194,6 +195,7 @@ async function kategorienErsetzen(rezept) {
             .map((kategorie) => kategorie.trim())
             .filter((kategorie) => kategorie !== "");
 
+        // Kompletter Replace statt Merge: alte Kategorien werden vollstaendig ersetzt.
         if (neueKategorien.length === 0) {
             console.log("Mindestens eine gültige Kategorie ist erforderlich!");
             await warteAufEnter("\nDrücke Enter um fortzufahren");

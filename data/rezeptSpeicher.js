@@ -1,12 +1,14 @@
 import fs from "fs";
 import { fileURLToPath } from "url";
 
+// Aufloesung relativ zur aktuellen Datei, damit der Pfad in ESM stabil bleibt.
 const rezepteDatei = fileURLToPath(new URL("../rezepte.json", import.meta.url));
 
 export function ladeRezepte() {
     try {
         const daten = fs.readFileSync(rezepteDatei, "utf-8");
         const rezepte = JSON.parse(daten);
+        // Defensive Absicherung: nur Arrays als gueltige Daten akzeptieren.
         return Array.isArray(rezepte) ? rezepte : [];
     } catch (error) {
         console.log("Fehler beim Laden der Rezepte.");

@@ -23,6 +23,7 @@ export async function rezeptSucheMenue() {
         return;
     }
 
+    // Teilstring-Suche, damit auch unvollstaendige Eingaben Treffer liefern.
     const suchbegriffKlein = suchbegriff.toLowerCase();
     const gefundeneRezepte = rezepte.filter((rezept) => {
         return typeof rezept.name === "string" && rezept.name.toLowerCase().includes(suchbegriffKlein);
@@ -61,6 +62,7 @@ export async function rezeptAuswahlMenue() {
             return;
         }
 
+        // Sonderfall: "Alle Rezepte" ohne Kategoriefilter.
         if (menueSteuerung === 1) {
             await rezeptListeMenue(rezepte, "Alle Rezepte");
             continue;
@@ -97,6 +99,7 @@ async function rezeptListeMenue(rezepte, titel) {
             return;
         }
 
+        // Detailansicht ist read-only; Rueckkehr erfolgt ueber Enter.
         const rezept = rezepte[menueSteuerung - 1];
         zeigeRezeptDetails(rezept);
         await warteAufEnter("\nDrücke Enter um zur Rezeptliste zurückzukehren");

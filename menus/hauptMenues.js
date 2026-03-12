@@ -20,6 +20,7 @@ export async function hauptMenue() {
 
         const menueSteuerung = await frageGanzzahl(1, 5, "Was möchtest du tun?\n");
 
+        // Flache if-Kette fuer klare Navigation zwischen den Menues.
         if (menueSteuerung === 1) {
             await rezeptSucheMenue();
         } else if (menueSteuerung === 2) {
@@ -48,6 +49,7 @@ async function rezepteBearbeitenMenue() {
 
         const menueSteuerung = await frageGanzzahl(1, 4, "Was möchtest du tun?\n");
 
+        // Rueckspruenge laufen ueber return, damit kein zusaetzlicher Zustand noetig ist.
         if (menueSteuerung === 1) {
             await rezeptHinzufuegenMenue();
         } else if (menueSteuerung === 2) {

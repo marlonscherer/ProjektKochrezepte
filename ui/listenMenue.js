@@ -17,6 +17,7 @@ export async function bearbeiteListenMenue(rezept, titel, zeigeEintraege, option
             return null;
         }
 
+        // Aktionen liefern entweder ein geaendertes Rezept oder null (weiter im Menue).
         const bearbeitetesRezept = await optionen[menueSteuerung - 1].aktion(rezept);
         if (bearbeitetesRezept !== null) {
             return bearbeitetesRezept;
