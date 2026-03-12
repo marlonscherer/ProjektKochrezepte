@@ -1,6 +1,41 @@
 import { ladeRezepte } from "../data/rezeptSpeicher.js";
 import { holeKategorien, zeigeRezeptDetails } from "../ui/anzeige.js";
-import { frageGanzzahl, leereKonsole, warteAufEnter } from "../ui/eingabe.js";
+import { frageGanzzahl, fragePflichtfeld, leereKonsole, warteAufEnter } from "../ui/eingabe.js";
+
+export async function rezeptSucheMenue() {
+    leereKonsole();
+    console.log("===========Rezept Suche===========");
+
+    const rezepte = ladeRezepte();
+    if (rezepte.length === 0) {
+        console.log("Keine Rezepte gefunden");
+        await warteAufEnter("Drücke Enter um zum Hauptmenü zurückzukehren");
+        return;
+    }
+
+    const suchbegriff = await fragePflichtfeld(
+        "\nGib einen Rezeptnamen ein (oder 'abbrechen'):\n",
+        "Fehler: Bitte gib einen Suchbegriff ein",
+        "Suche abgebrochen."
+    );
+
+    if (suchbegriff === null) {
+        return;
+    }
+
+    const suchbegriffKlein = suchbegriff.toLowerCase();
+    const gefundeneRezepte = rezepte.filter((rezept) => {
+        return typeof rezept.name === "string" && rezept.name.toLowerCase().includes(suchbegriffKlein);
+    });
+
+    if (gefundeneRezepte.length === 0) {
+        console.log("Keine Rezepte mit diesem Namen gefunden");
+        await warteAufEnter("Drücke Enter um zur Suche zurückzukehren");
+        return;
+    }
+
+    await rezeptListeMenue(gefundeneRezepte, `Suchergebnisse: ${suchbegriff}`);
+}
 
 export async function rezeptAuswahlMenue() {
     while (true) {

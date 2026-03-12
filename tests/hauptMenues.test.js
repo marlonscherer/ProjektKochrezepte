@@ -3,6 +3,7 @@ import { jest } from '@jest/globals';
 const frageGanzzahlMock = jest.fn();
 const leereKonsoleMock = jest.fn();
 const warteAufEnterMock = jest.fn();
+const rezeptSucheMenueMock = jest.fn();
 const rezeptAuswahlMenueMock = jest.fn();
 const rezeptHinzufuegenMenueMock = jest.fn();
 const rezeptLoeschenMenueMock = jest.fn();
@@ -15,6 +16,7 @@ await jest.unstable_mockModule('../ui/eingabe.js', () => ({
 }));
 
 await jest.unstable_mockModule('../menus/auswahlMenues.js', () => ({
+    rezeptSucheMenue: rezeptSucheMenueMock,
     rezeptAuswahlMenue: rezeptAuswahlMenueMock
 }));
 
@@ -32,17 +34,27 @@ describe('hauptMenues', () => {
     });
 
     test('exits when selecting Beenden', async () => {
-        frageGanzzahlMock.mockResolvedValue(4);
+        frageGanzzahlMock.mockResolvedValue(5);
 
         await hauptMenue();
 
-        expect(frageGanzzahlMock).toHaveBeenCalledWith(1, 4, 'Was möchtest du tun?\n');
+        expect(frageGanzzahlMock).toHaveBeenCalledWith(1, 5, 'Was möchtest du tun?\n');
+    });
+
+    test('calls rezeptSucheMenue and then exits', async () => {
+        frageGanzzahlMock
+            .mockResolvedValueOnce(1)
+            .mockResolvedValueOnce(5);
+
+        await hauptMenue();
+
+        expect(rezeptSucheMenueMock).toHaveBeenCalledTimes(1);
     });
 
     test('calls rezeptAuswahlMenue and then exits', async () => {
         frageGanzzahlMock
-            .mockResolvedValueOnce(1)
-            .mockResolvedValueOnce(4);
+            .mockResolvedValueOnce(2)
+            .mockResolvedValueOnce(5);
 
         await hauptMenue();
 
@@ -51,8 +63,8 @@ describe('hauptMenues', () => {
 
     test('calls KI menu path and then exits', async () => {
         frageGanzzahlMock
-            .mockResolvedValueOnce(3)
-            .mockResolvedValueOnce(4);
+            .mockResolvedValueOnce(4)
+            .mockResolvedValueOnce(5);
 
         await hauptMenue();
 

@@ -4,6 +4,7 @@ const ladeRezepteMock = jest.fn();
 const holeKategorienMock = jest.fn();
 const zeigeRezeptDetailsMock = jest.fn();
 const frageGanzzahlMock = jest.fn();
+const fragePflichtfeldMock = jest.fn();
 const leereKonsoleMock = jest.fn();
 const warteAufEnterMock = jest.fn();
 
@@ -18,11 +19,12 @@ await jest.unstable_mockModule('../ui/anzeige.js', () => ({
 
 await jest.unstable_mockModule('../ui/eingabe.js', () => ({
     frageGanzzahl: frageGanzzahlMock,
+    fragePflichtfeld: fragePflichtfeldMock,
     leereKonsole: leereKonsoleMock,
     warteAufEnter: warteAufEnterMock
 }));
 
-const { rezeptAuswahlMenue } = await import('../menus/auswahlMenues.js');
+const { rezeptAuswahlMenue, rezeptSucheMenue } = await import('../menus/auswahlMenues.js');
 
 describe('auswahlMenues', () => {
     beforeEach(() => {
@@ -61,5 +63,42 @@ describe('auswahlMenues', () => {
 
         expect(zeigeRezeptDetailsMock).toHaveBeenCalledWith(rezepte[0]);
         expect(warteAufEnterMock).toHaveBeenCalled();
+    });
+
+    test('search returns when user cancels input', async () => {
+        ladeRezepteMock.mockReturnValue([{ id: 1, name: 'Pasta', kategorien: ['A'] }]);
+        fragePflichtfeldMock.mockResolvedValue(null);
+
+        await rezeptSucheMenue();
+
+        expect(zeigeRezeptDetailsMock).not.toHaveBeenCalled();
+        expect(frageGanzzahlMock).not.toHaveBeenCalled();
+    });
+
+    test('search finds recipe names case-insensitive and shows details', async () => {
+        const rezepte = [
+            { id: 1, name: 'Pasta', kategorien: ['A'] },
+            { id: 2, name: 'Salat', kategorien: ['B'] }
+        ];
+        ladeRezepteMock.mockReturnValue(rezepte);
+        fragePflichtfeldMock.mockResolvedValue('pas');
+        frageGanzzahlMock
+            .mockResolvedValueOnce(1) // Rezept 1 in Trefferliste
+            .mockResolvedValueOnce(2); // Zurueck aus Trefferliste
+
+        await rezeptSucheMenue();
+
+        expect(zeigeRezeptDetailsMock).toHaveBeenCalledWith(rezepte[0]);
+        expect(warteAufEnterMock).toHaveBeenCalledWith('\nDrücke Enter um zur Rezeptliste zurückzukehren');
+    });
+
+    test('search shows message when no recipe matches', async () => {
+        ladeRezepteMock.mockReturnValue([{ id: 1, name: 'Pasta', kategorien: ['A'] }]);
+        fragePflichtfeldMock.mockResolvedValue('xyz');
+
+        await rezeptSucheMenue();
+
+        expect(warteAufEnterMock).toHaveBeenCalledWith('Drücke Enter um zur Suche zurückzukehren');
+        expect(zeigeRezeptDetailsMock).not.toHaveBeenCalled();
     });
 });

@@ -1,4 +1,4 @@
-import { rezeptAuswahlMenue } from "./auswahlMenues.js";
+import { rezeptAuswahlMenue, rezeptSucheMenue } from "./auswahlMenues.js";
 import {
     rezeptHinzufuegenMenue,
     rezeptLoeschenMenue,
@@ -11,21 +11,24 @@ export async function hauptMenue() {
         leereKonsole();
         console.log(
             "===========Kochrezepte===========\n",
-            "[1] Rezeptauswahl\n",
-            "[2] Rezepte Bearbeiten\n",
-            "[3] KI Beratung\n",
-            "[4] Beenden\n"
+            "[1] Rezept suchen\n",
+            "[2] Rezeptauswahl\n",
+            "[3] Rezepte Bearbeiten\n",
+            "[4] KI Beratung\n",
+            "[5] Beenden\n"
         );
 
-        const menueSteuerung = await frageGanzzahl(1, 4, "Was möchtest du tun?\n");
+        const menueSteuerung = await frageGanzzahl(1, 5, "Was möchtest du tun?\n");
 
         if (menueSteuerung === 1) {
-            await rezeptAuswahlMenue();
+            await rezeptSucheMenue();
         } else if (menueSteuerung === 2) {
-            await rezepteBearbeitenMenue();
+            await rezeptAuswahlMenue();
         } else if (menueSteuerung === 3) {
-            await kiBeratungMenue();
+            await rezepteBearbeitenMenue();
         } else if (menueSteuerung === 4) {
+            await kiBeratungMenue();
+        } else if (menueSteuerung === 5) {
             console.log("Das Programm wird beendet. Auf wiedersehen!");
             return;
         }
