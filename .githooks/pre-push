@@ -1,0 +1,13 @@
+#!/bin/sh
+
+echo "Fuehre Tests vor dem Push aus..."
+npm test
+status=$?
+
+if [ $status -ne 0 ]; then
+    echo "Push abgebrochen: Tests fehlgeschlagen."
+    exit $status
+fi
+
+echo "Tests erfolgreich. Push wird fortgesetzt."
+exit 0
