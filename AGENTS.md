@@ -16,7 +16,11 @@ node main.js
 | `rezepte.json` | Flat-file database — JSON array of recipe objects, read/written synchronously. |
 | `menus/`, `editors/`, `ui/`, `data/` | Aufgeteilte Module für Menüs, Bearbeitung, Anzeige/Eingabe und Speicherlogik. |
 
-Menu hierarchy rooted at `hauptMenue()` → `rezeptAuswahlMenue()`, `rezepteBearbeitenMenue()`, `kiBeratungMenue()` (stub).
+Menu hierarchy rooted at `hauptMenue()` with options:
+- `rezeptSucheMenue()` (Name-basierte Suche, case-insensitive Teilstring)
+- `rezeptAuswahlMenue()` (Kategorie/Alle Rezepte)
+- `rezepteBearbeitenMenue()` (Hinzufügen, Löschen, Verändern)
+- `kiBeratungMenue()` (stub)
 
 ## Recipe Data Shape
 
@@ -35,13 +39,15 @@ Menu hierarchy rooted at `hauptMenue()` → `rezeptAuswahlMenue()`, `rezepteBear
 ## Conventions
 
 - **ES Modules** — `import`/`export` throughout; resolve `rezepte.json` path via `fileURLToPath(new URL(..., import.meta.url))`.
-- **Navigation by recursive calls** — each menu function ends with `return otherMenue()`. Avoid deep extra nesting.
+- **Loop-based navigation** — Menüs laufen über `while (true)` + `return` für "Zurück"/"Beenden".
 - **Cancellation via `null`** — edit helpers return `null` on user cancel, modified object on success. Callers check `!== null` before saving.
 - **`"abbrechen"` keyword** — users type `"abbrechen"` in any text prompt to cancel and go back.
 - **`frageGanzzahl(min, max, prompt)`** — reusable integer-input helper with retry loop; use it for all numbered menus.
 - **German locale sorting** — use `.sort((a, b) => a.localeCompare(b, "de"))` for all displayed lists.
 - **Screen clearing** — start each new screen with `process.stdout.write('\x1Bc')`.
 - **Duplicate detection** — always use case-insensitive `.some()` checks before adding recipes or categories.
+- **Search behavior** — Rezeptsuche prüft `rezept.name` per `toLowerCase().includes(...)`.
+- **Shared list editors** — `bearbeiteListenMenue(...)` steuert wiederverwendbare Listen-Editor-Flows.
 
 ## Known Issues / Technical Debt
 
