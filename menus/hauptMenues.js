@@ -136,6 +136,7 @@ async function kiBeratungMenue() {
 async function kiVorschlaegeNachZutatenMenue() {
     const { holeKiRezeptvorschlaegeAusZutaten } = await import("../data/kiBeratung.js");
     const { zeigeRezeptDetails } = await import("../ui/anzeige.js");
+    const { ladeRezepte, speichereRezepte } = await import("../data/rezeptSpeicher.js");
 
     const eingabe = (await question("Gib Zutaten ein (kommagetrennt, oder 'abbrechen'): ")).trim();
     if (await wurdeAbgebrochen(eingabe, "KI-Beratung abgebrochen.")) {
@@ -180,6 +181,34 @@ async function kiVorschlaegeNachZutatenMenue() {
         return;
     }
 
-    zeigeRezeptDetails(vorschlaege[auswahl - 1]);
+    const ausgewaehltesRezept = vorschlaege[auswahl - 1];
+    zeigeRezeptDetails(ausgewaehltesRezept);
+
+    console.log("\n[1] Rezept speichern\n[2] Zurück ohne Speichern\n");
+    const speichernAuswahl = await frageGanzzahl(1, 2, "Was möchtest du tun?\n");
+
+    if (speichernAuswahl === 1) {
+        const rezepte = ladeRezepte();
+        const nameBereitsVorhanden = rezepte.some((rezept) => {
+            return typeof rezept.name === "string" && rezept.name.toLowerCase() === ausgewaehltesRezept.name.toLowerCase();
+        });
+
+        if (nameBereitsVorhanden) {
+            console.log(`Ein Rezept mit dem Namen "${ausgewaehltesRezept.name}" existiert bereits und wurde nicht erneut gespeichert.`);
+            await warteAufEnter("Drücke Enter um zur KI-Beratung zurückzukehren");
+            return;
+        }
+
+        rezepte.push(ausgewaehltesRezept);
+        try {
+            speichereRezepte(rezepte);
+            console.log(`"${ausgewaehltesRezept.name}" wurde gespeichert.`);
+        } catch (error) {
+            console.log("Fehler beim Speichern des KI-Rezepts!");
+        }
+        await warteAufEnter("Drücke Enter um zur KI-Beratung zurückzukehren");
+        return;
+    }
+
     await warteAufEnter("Drücke Enter um zur KI-Beratung zurückzukehren");
 }
