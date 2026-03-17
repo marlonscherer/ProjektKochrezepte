@@ -20,7 +20,6 @@ Interaktiver CLI-Rezeptmanager (Deutsch) mit Node.js und ES Modules.
 ## Nice-To-Haves
 
 - Personenanzahl einstellen (fehlt noch)
-- Gerichte favoritisieren (fehlt noch)
 - Suchfunktion
 - Zufallsrezept-Ausgabe (fehlt noch)
 - Rezept bewerten  (fehlt noch)
@@ -30,6 +29,7 @@ Interaktiver CLI-Rezeptmanager (Deutsch) mit Node.js und ES Modules.
 
 - Rezeptsuche nach Name (case-insensitive Teilstring)
 - Rezeptauswahl nach Kategorien oder "Alle Rezepte"
+- Rezepte favoritisieren und Favoriten verwalten
 - Rezepte hinzufügen, löschen und bearbeiten
 - Bearbeitung von:
   - Rezeptname
@@ -38,6 +38,7 @@ Interaktiver CLI-Rezeptmanager (Deutsch) mit Node.js und ES Modules.
   - Kategorien
   - Zutaten
   - Arbeitsschritten
+  - Favorit-Status
 - Persistenz über lokale Datei [rezepte.json](rezepte.json)
 
 ## Projekt starten

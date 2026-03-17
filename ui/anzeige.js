@@ -42,7 +42,9 @@ export function holeKategorien(rezepte) {
 export function zeigeRezeptDetails(rezept) {
     leereKonsole();
     // "-" signalisiert fehlende optionale Felder in der Detailansicht.
+    const favoritStatus = rezept.favorit ? "Favorit" : "-";
     console.log(`===========${rezept.name}===========`);
+    console.log(`Favorit: ${favoritStatus}`);
     console.log(`Schwierigkeitsgrad: ${rezept.schwierigkeitsgrad || "-"}`);
     console.log(`Zeitaufwand: ${rezept.zeitaufwand || "-"}`);
     console.log(`Kategorien: ${(rezept.kategorien || []).join(", ") || "-"}`);
