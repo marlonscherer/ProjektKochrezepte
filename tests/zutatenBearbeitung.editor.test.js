@@ -54,6 +54,26 @@ describe('editors/zutatenBearbeitung', () => {
         expect(result.zutaten[1]).toEqual({ name: 'Salz', menge: '1 TL' });
     });
 
+    test('rejects duplicate ingredient and retries until unique input', async () => {
+        const rezept = { zutaten: [{ name: 'Tomate', menge: '1' }] };
+        fragePflichtfeldMock
+            .mockResolvedValueOnce('tomate')
+            .mockResolvedValueOnce('Salz')
+            .mockResolvedValueOnce('1 TL');
+
+        bearbeiteListenMenueMock.mockImplementation(async (_rezept, _titel, _zeige, optionen) => {
+            return optionen[0].aktion(rezept);
+        });
+
+        const result = await bearbeiteZutaten(rezept);
+
+        expect(result.zutaten).toEqual([
+            { name: 'Tomate', menge: '1' },
+            { name: 'Salz', menge: '1 TL' }
+        ]);
+        expect(console.log).toHaveBeenCalledWith('Die Zutat "tomate" existiert bereits!');
+    });
+
     test('changes an ingredient via third menu action', async () => {
         const rezept = { zutaten: [{ name: 'Tomate', menge: '1' }, { name: 'Salz', menge: '1 TL' }] };
         frageGanzzahlMock.mockResolvedValue(1);
@@ -68,6 +88,20 @@ describe('editors/zutatenBearbeitung', () => {
         const result = await bearbeiteZutaten(rezept);
 
         expect(result.zutaten[0]).toEqual({ name: 'Paprika', menge: '2 Stk' });
+    });
+
+    test('prevents deleting the last remaining ingredient', async () => {
+        const rezept = { zutaten: [{ name: 'Tomate', menge: '1' }] };
+
+        bearbeiteListenMenueMock.mockImplementation(async (_rezept, _titel, _zeige, optionen) => {
+            return optionen[1].aktion(rezept);
+        });
+
+        const result = await bearbeiteZutaten(rezept);
+
+        expect(result).toBeNull();
+        expect(warteAufEnterMock).toHaveBeenCalledWith('\nDrücke Enter um fortzufahren');
+        expect(rezept.zutaten).toEqual([{ name: 'Tomate', menge: '1' }]);
     });
 
     test('replaces ingredients via fourth menu action', async () => {

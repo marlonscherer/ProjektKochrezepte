@@ -31,6 +31,11 @@ const { hauptMenue } = await import('../menus/hauptMenues.js');
 describe('hauptMenues', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.spyOn(console, 'log').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
     });
 
     test('exits when selecting Beenden', async () => {
@@ -38,10 +43,15 @@ describe('hauptMenues', () => {
 
         await hauptMenue();
 
+        expect(frageGanzzahlMock).toHaveBeenCalledTimes(1);
         expect(frageGanzzahlMock).toHaveBeenCalledWith(1, 5, 'Was möchtest du tun?\n');
+        expect(rezeptSucheMenueMock).not.toHaveBeenCalled();
+        expect(rezeptAuswahlMenueMock).not.toHaveBeenCalled();
+        expect(rezeptHinzufuegenMenueMock).not.toHaveBeenCalled();
+        expect(console.log).toHaveBeenCalledWith('Das Programm wird beendet. Auf wiedersehen!');
     });
 
-    test('calls rezeptSucheMenue and then exits', async () => {
+    test('returns to the main menu after search and then exits', async () => {
         frageGanzzahlMock
             .mockResolvedValueOnce(1)
             .mockResolvedValueOnce(5);
@@ -49,9 +59,29 @@ describe('hauptMenues', () => {
         await hauptMenue();
 
         expect(rezeptSucheMenueMock).toHaveBeenCalledTimes(1);
+        expect(frageGanzzahlMock).toHaveBeenCalledTimes(2);
+        expect(leereKonsoleMock).toHaveBeenCalledTimes(2);
     });
 
-    test('calls rezeptAuswahlMenue and then exits', async () => {
+    test('dispatches within recipe management menu and returns to main menu afterwards', async () => {
+        frageGanzzahlMock
+            .mockResolvedValueOnce(3)
+            .mockResolvedValueOnce(1)
+            .mockResolvedValueOnce(4)
+            .mockResolvedValueOnce(5);
+
+        await hauptMenue();
+
+        expect(rezeptHinzufuegenMenueMock).toHaveBeenCalledTimes(1);
+        expect(rezeptLoeschenMenueMock).not.toHaveBeenCalled();
+        expect(rezeptVeraendernEinzelnMenueMock).not.toHaveBeenCalled();
+        expect(frageGanzzahlMock).toHaveBeenNthCalledWith(1, 1, 5, 'Was möchtest du tun?\n');
+        expect(frageGanzzahlMock).toHaveBeenNthCalledWith(2, 1, 4, 'Was möchtest du tun?\n');
+        expect(frageGanzzahlMock).toHaveBeenNthCalledWith(3, 1, 4, 'Was möchtest du tun?\n');
+        expect(frageGanzzahlMock).toHaveBeenNthCalledWith(4, 1, 5, 'Was möchtest du tun?\n');
+    });
+
+    test('opens recipe selection and then returns to the main menu before exit', async () => {
         frageGanzzahlMock
             .mockResolvedValueOnce(2)
             .mockResolvedValueOnce(5);
@@ -59,9 +89,10 @@ describe('hauptMenues', () => {
         await hauptMenue();
 
         expect(rezeptAuswahlMenueMock).toHaveBeenCalledTimes(1);
+        expect(frageGanzzahlMock).toHaveBeenCalledTimes(2);
     });
 
-    test('calls KI menu path and then exits', async () => {
+    test('shows KI menu, waits for enter, and then returns to the main menu', async () => {
         frageGanzzahlMock
             .mockResolvedValueOnce(4)
             .mockResolvedValueOnce(5);
@@ -69,5 +100,8 @@ describe('hauptMenues', () => {
         await hauptMenue();
 
         expect(warteAufEnterMock).toHaveBeenCalledTimes(1);
+        expect(warteAufEnterMock).toHaveBeenCalledWith();
+        expect(frageGanzzahlMock).toHaveBeenCalledTimes(2);
+        expect(leereKonsoleMock).toHaveBeenCalledTimes(2);
     });
 });

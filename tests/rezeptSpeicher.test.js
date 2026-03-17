@@ -5,6 +5,7 @@ import { ladeRezepte, speichereRezepte } from '../data/rezeptSpeicher.js';
 describe('rezeptSpeicher', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.spyOn(console, 'log').mockImplementation(() => {});
     });
 
     afterEach(() => {
@@ -14,11 +15,12 @@ describe('rezeptSpeicher', () => {
     describe('ladeRezepte', () => {
         test('should return recipes when JSON file is valid', () => {
             const mockRezepte = [{ id: 1, name: 'Pasta' }];
-            jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(mockRezepte));
+            const readSpy = jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(mockRezepte));
 
             const result = ladeRezepte();
 
             expect(result).toEqual(mockRezepte);
+            expect(readSpy).toHaveBeenCalledWith(expect.any(String), 'utf-8');
         });
 
         test('should return empty array when file contains no array', () => {
@@ -27,17 +29,20 @@ describe('rezeptSpeicher', () => {
             const result = ladeRezepte();
 
             expect(result).toEqual([]);
+            expect(console.log).not.toHaveBeenCalled();
         });
 
-        test('should return empty array when JSON is invalid', () => {
+        test('should return empty array and log once when JSON is invalid', () => {
             jest.spyOn(fs, 'readFileSync').mockReturnValue('{ invalid json }');
 
             const result = ladeRezepte();
 
             expect(result).toEqual([]);
+            expect(console.log).toHaveBeenCalledWith('Fehler beim Laden der Rezepte.');
+            expect(console.log).toHaveBeenCalledTimes(1);
         });
 
-        test('should return empty array when file read fails', () => {
+        test('should return empty array and log once when file read fails', () => {
             jest.spyOn(fs, 'readFileSync').mockImplementation(() => {
                 throw new Error('File not found');
             });
@@ -45,6 +50,8 @@ describe('rezeptSpeicher', () => {
             const result = ladeRezepte();
 
             expect(result).toEqual([]);
+            expect(console.log).toHaveBeenCalledWith('Fehler beim Laden der Rezepte.');
+            expect(console.log).toHaveBeenCalledTimes(1);
         });
     });
 
@@ -60,6 +67,15 @@ describe('rezeptSpeicher', () => {
                 JSON.stringify(rezepte, null, 2),
                 'utf-8'
             );
+        });
+
+        test('should propagate write errors', () => {
+            const rezepte = [{ id: 1, name: 'Pasta' }];
+            jest.spyOn(fs, 'writeFileSync').mockImplementation(() => {
+                throw new Error('Disk full');
+            });
+
+            expect(() => speichereRezepte(rezepte)).toThrow('Disk full');
         });
     });
 });

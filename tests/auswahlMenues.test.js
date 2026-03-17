@@ -29,6 +29,11 @@ const { rezeptAuswahlMenue, rezeptSucheMenue } = await import('../menus/auswahlM
 describe('auswahlMenues', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.spyOn(console, 'log').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
     });
 
     test('returns early when no recipes exist', async () => {
@@ -36,17 +41,29 @@ describe('auswahlMenues', () => {
 
         await rezeptAuswahlMenue();
 
-        expect(warteAufEnterMock).toHaveBeenCalledTimes(1);
+        expect(warteAufEnterMock).toHaveBeenCalledWith('Drücke Enter um zum Hauptmenü zurückzukehren');
+        expect(holeKategorienMock).not.toHaveBeenCalled();
     });
 
-    test('returns when selecting Zurueck in category menu', async () => {
-        ladeRezepteMock.mockReturnValue([{ id: 1, name: 'Pasta', kategorien: ['A'] }]);
-        holeKategorienMock.mockReturnValue(['A']);
-        frageGanzzahlMock.mockResolvedValue(3); // [1] Alle [2] A [3] Zurueck
+    test('filters recipes by selected category case-insensitively and shows only matching recipe details', async () => {
+        const rezepte = [
+            { id: 1, name: 'Spaghetti', kategorien: ['pasta'] },
+            { id: 2, name: 'Suppe', kategorien: ['Suppe'] },
+            { id: 3, name: 'Lasagne', kategorien: ['Pasta', 'Ofen'] }
+        ];
+        ladeRezepteMock.mockReturnValue(rezepte);
+        holeKategorienMock.mockReturnValue(['Pasta', 'Suppe']);
+        frageGanzzahlMock
+            .mockResolvedValueOnce(2) // Kategorie Pasta
+            .mockResolvedValueOnce(2) // Lasagne aus gefilterter Liste
+            .mockResolvedValueOnce(3) // Zurueck aus Rezeptliste
+            .mockResolvedValueOnce(4); // Zurueck aus Kategorien
 
         await rezeptAuswahlMenue();
 
-        expect(holeKategorienMock).toHaveBeenCalledTimes(1);
+        expect(zeigeRezeptDetailsMock).toHaveBeenCalledTimes(1);
+        expect(zeigeRezeptDetailsMock).toHaveBeenCalledWith(rezepte[2]);
+        expect(warteAufEnterMock).toHaveBeenCalledWith('\nDrücke Enter um zur Rezeptliste zurückzukehren');
     });
 
     test('shows recipe details in Alle Rezepte flow', async () => {

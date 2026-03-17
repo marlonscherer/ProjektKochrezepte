@@ -52,6 +52,20 @@ describe('editors/arbeitsschritteBearbeitung', () => {
         expect(result.arbeitsschritte).toEqual(['Schritt 1', 'Schritt 2']);
     });
 
+    test('appends a step when end position is selected', async () => {
+        const rezept = { arbeitsschritte: ['Schritt 1'] };
+        frageGanzzahlMock.mockResolvedValue(2); // am Ende hinzufügen
+        fragePflichtfeldMock.mockResolvedValue('Schritt 2');
+
+        bearbeiteListenMenueMock.mockImplementation(async (_rezept, _titel, _zeige, optionen) => {
+            return optionen[0].aktion(rezept);
+        });
+
+        const result = await bearbeiteArbeitsschritte(rezept);
+
+        expect(result.arbeitsschritte).toEqual(['Schritt 1', 'Schritt 2']);
+    });
+
     test('changes a step via third menu action', async () => {
         const rezept = { arbeitsschritte: ['Alt'] };
         frageGanzzahlMock.mockResolvedValue(1);
@@ -64,6 +78,20 @@ describe('editors/arbeitsschritteBearbeitung', () => {
         const result = await bearbeiteArbeitsschritte(rezept);
 
         expect(result.arbeitsschritte).toEqual(['Neu']);
+    });
+
+    test('prevents deleting the last remaining step', async () => {
+        const rezept = { arbeitsschritte: ['Alt'] };
+
+        bearbeiteListenMenueMock.mockImplementation(async (_rezept, _titel, _zeige, optionen) => {
+            return optionen[1].aktion(rezept);
+        });
+
+        const result = await bearbeiteArbeitsschritte(rezept);
+
+        expect(result).toBeNull();
+        expect(warteAufEnterMock).toHaveBeenCalledWith('\nDrücke Enter um fortzufahren');
+        expect(rezept.arbeitsschritte).toEqual(['Alt']);
     });
 
     test('replaces all steps via fourth menu action', async () => {

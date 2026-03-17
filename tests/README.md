@@ -6,14 +6,14 @@ Dieses Verzeichnis enthält die Unit-Tests für den CLI-Cookbook-Manager.
 
 Zuletzt verifizierter Stand:
 
-- **14 Test-Suites**
-- **116 Tests**
+- **11 Test-Suites**
+- **86 Tests**
 - **0 fehlgeschlagene Tests**
 
 Die Zahlen stammen aus einer lokalen Ausführung mit:
 
 ```bash
-npm test -- --json --outputFile=tmp-jest-latest.json
+npm test -- --runInBand --json --outputFile=tmp-jest-final.json
 ```
 
 ## Test-Struktur
@@ -23,16 +23,13 @@ tests/
 ├── anzeige.test.js
 ├── arbeitsschritteBearbeitung.editor.test.js
 ├── auswahlMenues.test.js
-├── bearbeitungen.test.js
 ├── eingabe.async.test.js
-├── eingabe.test.js
 ├── hauptMenues.test.js
 ├── kategorienBearbeitung.editor.test.js
 ├── listenMenue.test.js
 ├── rezeptFelderBearbeitung.editor.test.js
 ├── rezeptSpeicher.test.js
 ├── rezeptVerwaltung.test.js
-├── validierung.test.js
 ├── zutatenBearbeitung.editor.test.js
 └── README.md
 ```
@@ -44,7 +41,6 @@ tests/
 
 ### ui/
 - `anzeige.test.js` testet Kategorien-, Zutaten-, Arbeitsschritte- und Detailanzeige.
-- `eingabe.test.js` testet pure Validierungslogik (`wurdeAbgebrochen`, Ganzzahl-, Pflichtfeld-Checks).
 - `eingabe.async.test.js` testet asynchrone Eingabe-Funktionen (`question`, `fragePflichtfeld`, `frageGanzzahl`, `warteAufEnter`, `schliesseEingabe`).
 - `listenMenue.test.js` testet den generischen Listen-Menue-Flow.
 
@@ -64,8 +60,7 @@ Diese Tests pruefen die Editor-Flows in isolierter Form.
 Diese Tests pruefen zentrale Navigations- und CRUD-Pfade.
 
 ### Querschnitt / Validierung
-- `bearbeitungen.test.js` testet Duplikat-Erkennung, Mindestanzahl-Validierungen, Array-Initialisierung und positionsbasiertes Einfuegen.
-- `validierung.test.js` testet Rezept-Namensvalidierung.
+- Die Validierungsregeln werden direkt ueber die Editor- und Menue-Flows getestet, statt ueber isolierte Fake-Logic-Tests.
 
 ## Verwendung
 

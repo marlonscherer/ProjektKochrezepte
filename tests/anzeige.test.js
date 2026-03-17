@@ -2,38 +2,47 @@ import { jest } from '@jest/globals';
 import { holeKategorien, zeigeZutatenListe, zeigeArbeitsschritteListe, zeigeRezeptDetails } from '../ui/anzeige.js';
 
 describe('anzeige', () => {
+    function sammleLogAusgaben() {
+        const ausgaben = [];
+        const consoleSpy = jest.spyOn(console, 'log').mockImplementation((...args) => {
+            ausgaben.push(args.join(' '));
+        });
+
+        return { ausgaben, consoleSpy };
+    }
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    });
+
     describe('holeKategorien', () => {
-        test('should extract unique categories from recipes', () => {
+        test('normalisiert Kategorien, entfernt ungueltige Eintraege und dedupliziert case-insensitive ueber mehrere Rezepte', () => {
             const rezepte = [
-                { kategorien: ['Pasta', 'Vegetarisch'] },
-                { kategorien: ['Pasta', 'Vegan'] },
-                { kategorien: ['Salat'] }
+                { kategorien: [' Pasta ', 'Vegetarisch', '', null] },
+                { kategorien: ['pasta', 'Vegan', 123] },
+                { kategorien: ['Salat', 'PASTA'] }
             ];
 
             const result = holeKategorien(rezepte);
 
-            // Result should be 4 unique categories from the input
-            expect(result).toHaveLength(4);
-            expect(result).toContain('Pasta');
-            expect(result).toContain('Vegetarisch');
-            expect(result).toContain('Vegan');
-            expect(result).toContain('Salat');
+            expect(result).toEqual(['Pasta', 'Salat', 'Vegan', 'Vegetarisch']);
         });
 
-        test('should return sorted categories in German locale', () => {
+        test('sortiert Kategorien mit deutscher Locale und behaelt die erste Schreibweise pro Kategorie', () => {
             const rezepte = [
-                { kategorien: ['Zebra', 'Apfel', 'Ärger'] }
+                { kategorien: ['Zebra', 'Ärger', 'Apfel', 'apfel'] }
             ];
 
             const result = holeKategorien(rezepte);
-            const expected = ['Apfel', 'Ärger', 'Zebra'];
 
-            expect(result).toEqual(expected);
+            expect(result).toEqual(['Apfel', 'Ärger', 'Zebra']);
         });
 
-        test('should handle empty category array', () => {
+        test('gibt ein leeres Array zurueck wenn keine verwertbaren Kategorien vorhanden sind', () => {
             const rezepte = [
-                { kategorien: [] }
+                { id: 1, name: 'Rezept 1' },
+                { kategorien: [] },
+                { kategorien: [' ', null] }
             ];
 
             const result = holeKategorien(rezepte);
@@ -41,67 +50,13 @@ describe('anzeige', () => {
             expect(result).toEqual([]);
         });
 
-        test('should handle recipes without kategorien property', () => {
-            const rezepte = [
-                { id: 1, name: 'Rezept1' },
-                { kategorien: ['Pasta'] }
-            ];
-
-            const result = holeKategorien(rezepte);
-
-            expect(result).toEqual(['Pasta']);
-        });
-
-        test('should filter out empty or whitespace-only categories', () => {
-            const rezepte = [
-                { kategorien: ['Pasta', '', '  ', 'Salat'] }
-            ];
-
-            const result = holeKategorien(rezepte);
-
-            expect(result).toEqual(['Pasta', 'Salat']);
-        });
-
-        test('should handle recipes with non-string categories', () => {
-            const rezepte = [
-                { kategorien: ['Pasta', 123, 'Salat', null] }
-            ];
-
-            const result = holeKategorien(rezepte);
-
-            expect(result).toEqual(['Pasta', 'Salat']);
-        });
-
-        test('should return empty array for empty recipe list', () => {
-            const result = holeKategorien([]);
-
-            expect(result).toEqual([]);
-        });
-
-        test('should trim whitespace from categories', () => {
-            const rezepte = [
-                { kategorien: [' Pasta ', 'Salat'] }
-            ];
-
-            const result = holeKategorien(rezepte);
-
-            expect(result).toEqual(['Pasta', 'Salat']);
-        });
-
-        test('should handle duplicate categories (case insensitive)', () => {
-            const rezepte = [
-                { kategorien: ['Pasta', 'pasta', 'PASTA'] }
-            ];
-
-            const result = holeKategorien(rezepte);
-
-            // Note: the function uses Set which is case-sensitive, so duplicates will remain
-            expect(result).toHaveLength(3);
+        test('gibt fuer eine leere Rezeptliste ebenfalls ein leeres Array zurueck', () => {
+            expect(holeKategorien([])).toEqual([]);
         });
     });
 
     describe('zeigeZutatenListe', () => {
-        test('should display ingredients list', () => {
+        test('gibt Ueberschrift und nummerierte Zutaten in Reihenfolge aus', () => {
             const rezept = {
                 zutaten: [
                     { name: 'Spaghetti', menge: '400g' },
@@ -109,44 +64,32 @@ describe('anzeige', () => {
                 ]
             };
 
-            const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+            const { ausgaben } = sammleLogAusgaben();
 
             zeigeZutatenListe(rezept);
 
-            expect(consoleSpy).toHaveBeenCalledWith('Aktuelle Zutaten:');
-            expect(consoleSpy).toHaveBeenCalledWith('1. Spaghetti (400g)');
-            expect(consoleSpy).toHaveBeenCalledWith('2. Tomaten (500g)');
-
-            consoleSpy.mockRestore();
+            expect(ausgaben).toEqual([
+                'Aktuelle Zutaten:',
+                '1. Spaghetti (400g)',
+                '2. Tomaten (500g)'
+            ]);
         });
 
-        test('should handle empty ingredients list', () => {
-            const rezept = { zutaten: [] };
+        test('gibt bei fehlenden oder leeren Zutaten nur die Ueberschrift aus', () => {
+            const { ausgaben } = sammleLogAusgaben();
 
-            const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+            zeigeZutatenListe({});
+            zeigeZutatenListe({ zutaten: [] });
 
-            zeigeZutatenListe(rezept);
-
-            expect(consoleSpy).toHaveBeenCalledWith('Aktuelle Zutaten:');
-
-            consoleSpy.mockRestore();
-        });
-
-        test('should handle missing zutaten property', () => {
-            const rezept = {};
-
-            const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-
-            zeigeZutatenListe(rezept);
-
-            expect(consoleSpy).toHaveBeenCalledWith('Aktuelle Zutaten:');
-
-            consoleSpy.mockRestore();
+            expect(ausgaben).toEqual([
+                'Aktuelle Zutaten:',
+                'Aktuelle Zutaten:'
+            ]);
         });
     });
 
     describe('zeigeArbeitsschritteListe', () => {
-        test('should display work steps list', () => {
+        test('gibt Ueberschrift und nummerierte Arbeitsschritte aus', () => {
             const rezept = {
                 arbeitsschritte: [
                     'Wasser kochen',
@@ -155,33 +98,33 @@ describe('anzeige', () => {
                 ]
             };
 
-            const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+            const { ausgaben } = sammleLogAusgaben();
 
             zeigeArbeitsschritteListe(rezept);
 
-            expect(consoleSpy).toHaveBeenCalledWith('Aktuelle Arbeitsschritte:');
-            expect(consoleSpy).toHaveBeenCalledWith('1. Wasser kochen');
-            expect(consoleSpy).toHaveBeenCalledWith('2. Nudeln hinzufügen');
-            expect(consoleSpy).toHaveBeenCalledWith('3. Servieren');
-
-            consoleSpy.mockRestore();
+            expect(ausgaben).toEqual([
+                'Aktuelle Arbeitsschritte:',
+                '1. Wasser kochen',
+                '2. Nudeln hinzufügen',
+                '3. Servieren'
+            ]);
         });
 
-        test('should handle empty work steps list', () => {
-            const rezept = { arbeitsschritte: [] };
+        test('gibt bei fehlenden oder leeren Arbeitsschritten nur die Ueberschrift aus', () => {
+            const { ausgaben } = sammleLogAusgaben();
 
-            const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+            zeigeArbeitsschritteListe({});
+            zeigeArbeitsschritteListe({ arbeitsschritte: [] });
 
-            zeigeArbeitsschritteListe(rezept);
-
-            expect(consoleSpy).toHaveBeenCalledWith('Aktuelle Arbeitsschritte:');
-
-            consoleSpy.mockRestore();
+            expect(ausgaben).toEqual([
+                'Aktuelle Arbeitsschritte:',
+                'Aktuelle Arbeitsschritte:'
+            ]);
         });
     });
 
     describe('zeigeRezeptDetails', () => {
-        test('should display complete recipe details', () => {
+        test('leert die Konsole und gibt eine vollstaendige Detailansicht aus', () => {
             const rezept = {
                 name: 'Spaghetti Bolognese',
                 schwierigkeitsgrad: 'Mittel',
@@ -197,34 +140,47 @@ describe('anzeige', () => {
                 ]
             };
 
-            const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+            const stdoutSpy = jest.spyOn(process.stdout, 'write').mockImplementation(() => true);
+            const { ausgaben } = sammleLogAusgaben();
 
             zeigeRezeptDetails(rezept);
 
-            expect(consoleSpy).toHaveBeenCalledWith('===========Spaghetti Bolognese===========');
-            expect(consoleSpy).toHaveBeenCalledWith('Schwierigkeitsgrad: Mittel');
-            expect(consoleSpy).toHaveBeenCalledWith('Zeitaufwand: 45 Minuten');
-            expect(consoleSpy).toHaveBeenCalledWith('Kategorien: Pasta, Italienisch');
-
-            consoleSpy.mockRestore();
+            expect(stdoutSpy).toHaveBeenCalledWith('\x1Bc');
+            expect(ausgaben).toEqual([
+                '===========Spaghetti Bolognese===========',
+                'Schwierigkeitsgrad: Mittel',
+                'Zeitaufwand: 45 Minuten',
+                'Kategorien: Pasta, Italienisch',
+                '\nZutaten:',
+                '- Spaghetti (400g)',
+                '- Tomaten (500g)',
+                '\nArbeitsschritte:',
+                '1. Sauce vorbereiten',
+                '2. Nudeln kochen'
+            ]);
         });
 
-        test('should handle missing optional fields', () => {
+        test('verwendet Platzhalter fuer fehlende optionale Felder und zeigt leere Bereiche stabil an', () => {
             const rezept = {
                 name: 'Einfaches Rezept',
                 zutaten: [],
                 arbeitsschritte: []
             };
 
-            const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+            const stdoutSpy = jest.spyOn(process.stdout, 'write').mockImplementation(() => true);
+            const { ausgaben } = sammleLogAusgaben();
 
             zeigeRezeptDetails(rezept);
 
-            expect(consoleSpy).toHaveBeenCalledWith('Schwierigkeitsgrad: -');
-            expect(consoleSpy).toHaveBeenCalledWith('Zeitaufwand: -');
-            expect(consoleSpy).toHaveBeenCalledWith('Kategorien: -');
-
-            consoleSpy.mockRestore();
+            expect(stdoutSpy).toHaveBeenCalledWith('\x1Bc');
+            expect(ausgaben).toEqual([
+                '===========Einfaches Rezept===========',
+                'Schwierigkeitsgrad: -',
+                'Zeitaufwand: -',
+                'Kategorien: -',
+                '\nZutaten:',
+                '\nArbeitsschritte:'
+            ]);
         });
     });
 });

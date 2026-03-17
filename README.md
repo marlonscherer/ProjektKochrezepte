@@ -13,18 +13,18 @@ Interaktiver CLI-Rezeptmanager (Deutsch) mit Node.js und ES Modules.
 - Menü (in Deutsch):
   - Rezeptauswahl
     - Unterkategorien (z.B. Pasta, schnell, Fisch, ...)
-  - KI Beratung (Rezepte vorschlagen, wenn Zutaten angegeben werden)
   - Zurück / Menü-Button
   - Bearbeiten, Löschen und Hinzufügen von Rezepten oder Kategorien
   - Programm beenden
 
 ## Nice-To-Haves
 
-- Personenanzahl einstellen
-- Gerichte favoritisieren
-- Suchfunktion (Suche filtern)
-- Zufallsrezept-Ausgabe
-- Rezept bewerten
+- Personenanzahl einstellen (fehlt noch)
+- Gerichte favoritisieren (fehlt noch)
+- Suchfunktion
+- Zufallsrezept-Ausgabe (fehlt noch)
+- Rezept bewerten  (fehlt noch)
+  - KI Beratung (Rezepte vorschlagen, wenn Zutaten angegeben werden) (fehlt noch)
 
 ## Funktionen
 

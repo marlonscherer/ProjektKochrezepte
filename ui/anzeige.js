@@ -15,7 +15,7 @@ export function zeigeArbeitsschritteListe(rezept) {
 }
 
 export function holeKategorien(rezepte) {
-    const kategorienSet = new Set();
+    const kategorienMap = new Map();
 
     rezepte.forEach((rezept) => {
         if (!Array.isArray(rezept.kategorien)) {
@@ -23,15 +23,20 @@ export function holeKategorien(rezepte) {
         }
 
         rezept.kategorien.forEach((kategorie) => {
-            // Vor dem Sammeln normalisieren, damit Dubletten durch Whitespace verschwinden.
+            // Vor dem Sammeln normalisieren, damit Whitespace und Gross-/Kleinschreibung keine Dubletten erzeugen.
             if (typeof kategorie === "string" && kategorie.trim() !== "") {
-                kategorienSet.add(kategorie.trim());
+                const normalisierteKategorie = kategorie.trim();
+                const schluessel = normalisierteKategorie.toLowerCase();
+
+                if (!kategorienMap.has(schluessel)) {
+                    kategorienMap.set(schluessel, normalisierteKategorie);
+                }
             }
         });
     });
 
     // Fuer eine stabile, benutzerfreundliche Reihenfolge mit deutscher Sortierung.
-    return Array.from(kategorienSet).sort((a, b) => a.localeCompare(b, "de"));
+    return Array.from(kategorienMap.values()).sort((a, b) => a.localeCompare(b, "de"));
 }
 
 export function zeigeRezeptDetails(rezept) {

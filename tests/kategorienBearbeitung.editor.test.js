@@ -38,6 +38,19 @@ describe('editors/kategorienBearbeitung', () => {
         expect(result.kategorien).toEqual(['Pasta', 'Vegan']);
     });
 
+    test('rejects duplicate category and retries until unique input', async () => {
+        const rezept = { kategorien: ['Pasta'] };
+        frageGanzzahlMock.mockResolvedValue(1);
+        fragePflichtfeldMock
+            .mockResolvedValueOnce('pasta')
+            .mockResolvedValueOnce('Vegan');
+
+        const result = await bearbeiteKategorien(rezept);
+
+        expect(result.kategorien).toEqual(['Pasta', 'Vegan']);
+        expect(console.log).toHaveBeenCalledWith('Die Kategorie "pasta" existiert bereits!');
+    });
+
     test('returns null on back', async () => {
         const rezept = { kategorien: ['Pasta'] };
         frageGanzzahlMock.mockResolvedValue(5);
@@ -57,6 +70,19 @@ describe('editors/kategorienBearbeitung', () => {
         const result = await bearbeiteKategorien(rezept);
 
         expect(result.kategorien).toEqual(['Nudeln', 'Suppe']);
+    });
+
+    test('prevents removing the last remaining category', async () => {
+        const rezept = { kategorien: ['Pasta'] };
+        frageGanzzahlMock
+            .mockResolvedValueOnce(2)
+            .mockResolvedValueOnce(5);
+
+        const result = await bearbeiteKategorien(rezept);
+
+        expect(result).toBeNull();
+        expect(warteAufEnterMock).toHaveBeenCalledWith('\nDrücke Enter um fortzufahren');
+        expect(rezept.kategorien).toEqual(['Pasta']);
     });
 
     test('replaces all categories from comma-separated input', async () => {
