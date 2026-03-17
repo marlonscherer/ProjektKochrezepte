@@ -4,7 +4,7 @@ import {
     rezeptLoeschenMenue,
     rezeptVeraendernEinzelnMenue
 } from "./rezeptVerwaltung.js";
-import { frageGanzzahl, leereKonsole, warteAufEnter } from "../ui/eingabe.js";
+import { frageGanzzahl, leereKonsole, question, warteAufEnter } from "../ui/eingabe.js";
 
 export async function hauptMenue() {
     while (true) {
@@ -116,6 +116,8 @@ async function favoritenMenue() {
 }
 
 async function kiBeratungMenue() {
-    console.log("===========KI-Beratung===========\n");
+    console.log("===========KI-Beratung===========\n",
+        "Gib Zutaten ein, die du zu Hause hast, und die KI wird dir passende Rezepte vorschlagen!\n"
+    );
     await warteAufEnter();
 }
