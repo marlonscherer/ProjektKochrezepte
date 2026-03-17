@@ -297,7 +297,11 @@
 <a name='L232'></a><a href='#L232'>232</a>
 <a name='L233'></a><a href='#L233'>233</a>
 <a name='L234'></a><a href='#L234'>234</a>
-<a name='L235'></a><a href='#L235'>235</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L235'></a><a href='#L235'>235</a>
+<a name='L236'></a><a href='#L236'>236</a>
+<a name='L237'></a><a href='#L237'>237</a>
+<a name='L238'></a><a href='#L238'>238</a>
+<a name='L239'></a><a href='#L239'>239</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -331,6 +335,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
@@ -375,6 +380,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -436,20 +442,21 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -473,6 +480,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -565,6 +573,7 @@ export async function rezeptLoeschenMenue() {
 &nbsp;
     const rezeptName = rezepte[menueSteuerung - 1].name;
     let bestaetigung = "";
+    // Explizite j/n-Bestaetigung, damit kein Rezept versehentlich geloescht wird.
     while (bestaetigung !== "j" &amp;&amp; bestaetigung !== "n") {
         bestaetigung = (await question(`\nMöchtest du "${rezeptName}" wirklich löschen? (j/n): `)).trim().toLowerCase();
         if (bestaetigung !== "j" &amp;&amp; bestaetigung !== "n") {
@@ -609,6 +618,7 @@ export async function rezeptHinzufuegenMenue() {
             return;
         }
 &nbsp;
+        // Doppelte Namen blocken (case-insensitive), damit Suche und Auswahl eindeutig bleiben.
         const nameBereitsVorhanden = rezepte.some(<span class="fstat-no" title="function not covered" >(r</span>ezept) =&gt; <span class="cstat-no" title="statement not covered" >rezept.name.toLowerCase() === rezeptName.toLowerCase())</span>;
         <span class="missing-if-branch" title="if path not taken" >I</span>if (nameBereitsVorhanden) {
 <span class="cstat-no" title="statement not covered" >            console.log(`Ein Rezept mit dem Namen "${rezeptName}" existiert bereits!`);</span>
@@ -670,6 +680,7 @@ export async function rezeptHinzufuegenMenue() {
         }
 &nbsp;
         if (zutatName.toLowerCase() === "fertig") {
+            // Beim Erstellen muss mindestens eine Zutat vorhanden sein.
             <span class="missing-if-branch" title="if path not taken" >I</span>if (zutaten.length === 0) {
 <span class="cstat-no" title="statement not covered" >                console.log("Mindestens eine Zutat ist erforderlich!");</span>
 <span class="cstat-no" title="statement not covered" >                continue;</span>
@@ -707,6 +718,7 @@ export async function rezeptHinzufuegenMenue() {
         }
 &nbsp;
         if (schritt.toLowerCase() === "fertig") {
+            // Mindestens ein Schritt ist Pflicht, sonst ist das Rezept unvollstaendig.
             <span class="missing-if-branch" title="if path not taken" >I</span>if (arbeitsschritte.length === 0) {
 <span class="cstat-no" title="statement not covered" >                console.log("Mindestens ein Arbeitsschritt ist erforderlich!");</span>
 <span class="cstat-no" title="statement not covered" >                continue;</span>
@@ -772,7 +784,7 @@ export async function rezeptVeraendernEinzelnMenue() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-11T20:40:23.192Z
+                at 2026-03-16T12:06:07.459Z
             </div>
         <script src="../prettify.js"></script>
         <script>

@@ -14,16 +14,20 @@ function holeReadline() {
 }
 
 export async function question(promptText) {
+    // Holt eine nutzbare readline-Instanz oder erzeugt bei Bedarf eine neue.
     const aktiveRl = holeReadline();
 
+    // Falls das Interface bereits geschlossen ist, darf keine neue Frage mehr gestartet werden.
     if (aktiveRl.closed) {
         throw new Error(INPUT_GESCHLOSSEN);
     }
 
     return new Promise((resolve, reject) => {
+        // Verhindert, dass die Promise durch konkurrierende Events mehrfach beendet wird.
         let erledigt = false;
 
         const cleanup = () => {
+            // Entfernt die temporären Listener, sobald die Anfrage abgeschlossen ist.
             aktiveRl.off("close", onClose);
             input.off("end", onEnd);
         };
@@ -39,7 +43,10 @@ export async function question(promptText) {
             handler(wert);
         };
 
+        // Wird das readline-Interface geschlossen, brechen wir die laufende Frage kontrolliert ab.
         const onClose = finish(() => reject(new Error(INPUT_GESCHLOSSEN)));
+
+        // Endet stdin, schliessen wir das Interface und melden denselben definierten Fehler.
         const onEnd = finish(() => {
             if (!aktiveRl.closed) {
                 aktiveRl.close();
@@ -47,8 +54,11 @@ export async function question(promptText) {
             reject(new Error(INPUT_GESCHLOSSEN));
         });
 
+        // Die Listener gelten nur fuer diese eine Frage und werden danach wieder entfernt.
         aktiveRl.once("close", onClose);
         input.once("end", onEnd);
+
+        // Startet die eigentliche Benutzereingabe und leitet Erfolg oder Fehler ueber finish weiter.
         aktiveRl.question(promptText).then(finish(resolve)).catch(finish(reject));
     });
 }
