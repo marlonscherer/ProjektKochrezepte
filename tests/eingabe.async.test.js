@@ -25,6 +25,7 @@ const {
     wurdeAbgebrochen,
     fragePflichtfeld,
     frageGanzzahl,
+    frageJaNein,
     schliesseEingabe,
     istInputGeschlossenFehler,
 } = await import('../ui/eingabe.js');
@@ -242,6 +243,43 @@ describe('eingabe.js', () => {
             const result = await frageGanzzahl(1, 5, 'Wahl: ');
             expect(result).toBe(3);
             expect(consoleSpy).toHaveBeenCalledWith('Fehler: Bitte wählen Sie eine der oben genannten Optionen');
+            consoleSpy.mockRestore();
+        });
+    });
+
+    // ─── frageJaNein ─────────────────────────────────────────────────────────
+
+    describe('frageJaNein', () => {
+        test('gibt true bei Eingabe j zurück', async () => {
+            mockRlQuestion.mockResolvedValue('j');
+            await expect(frageJaNein('Fortfahren? ')).resolves.toBe(true);
+        });
+
+        test('gibt false bei Eingabe n zurück', async () => {
+            mockRlQuestion.mockResolvedValue('n');
+            await expect(frageJaNein('Fortfahren? ')).resolves.toBe(false);
+        });
+
+        test('akzeptiert Whitespace und Gross-/Kleinschreibung', async () => {
+            mockRlQuestion
+                .mockResolvedValueOnce('  J  ')
+                .mockResolvedValueOnce('  N  ');
+
+            await expect(frageJaNein('Frage 1? ')).resolves.toBe(true);
+            await expect(frageJaNein('Frage 2? ')).resolves.toBe(false);
+        });
+
+        test('wiederholt bei ungueltiger Eingabe und nutzt custom Fehlermeldung', async () => {
+            mockRlQuestion
+                .mockResolvedValueOnce('x')
+                .mockResolvedValueOnce('j');
+            const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+            const result = await frageJaNein('Fortfahren? ', 'Bitte j oder n eingeben.');
+
+            expect(result).toBe(true);
+            expect(consoleSpy).toHaveBeenCalledWith('Bitte j oder n eingeben.');
+            expect(consoleSpy).toHaveBeenCalledTimes(1);
             consoleSpy.mockRestore();
         });
     });

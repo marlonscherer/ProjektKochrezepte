@@ -50,7 +50,8 @@ export async function rezeptEditierMenue(rezept, rezepte) {
                 speichereRezepte(rezepte);
                 console.log("Änderungen gespeichert!");
             } catch (error) {
-                console.log("Fehler beim Speichern der Änderungen!");
+                const fehlermeldung = error instanceof Error ? error.message : String(error);
+                console.log(`Fehler beim Speichern der Änderungen: ${fehlermeldung}`);
             }
 
             await warteAufEnter("Drücke Enter um fortzufahren");
@@ -76,7 +77,9 @@ async function bearbeiteRezeptName(rezept, rezepte) {
         const nameBereitsVorhanden = rezepte.some((vorhandenesRezept) => {
             const istAktuellesRezept = vorhandenesRezept === rezept || vorhandenesRezept.id === rezept.id;
             // Gleiches Rezept darf seinen Namen behalten; nur Fremdduplikate blockieren.
-            return !istAktuellesRezept && vorhandenesRezept.name.toLowerCase() === neuerName.toLowerCase();
+            return !istAktuellesRezept
+                && typeof vorhandenesRezept.name === "string"
+                && vorhandenesRezept.name.toLowerCase() === neuerName.toLowerCase();
         });
         if (nameBereitsVorhanden) {
             console.log(`Ein Rezept mit dem Namen "${neuerName}" existiert bereits!`);

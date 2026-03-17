@@ -163,4 +163,25 @@ describe('auswahlMenues', () => {
         ]);
         expect(warteAufEnterMock).toHaveBeenCalledWith('Drücke Enter um fortzufahren');
     });
+
+    test('logs save error when favorite update cannot be persisted', async () => {
+        const rezepte = [{ id: 1, name: 'Pasta', kategorien: ['A'], favorit: false }];
+        ladeRezepteMock.mockReturnValue(rezepte);
+        holeKategorienMock.mockReturnValue(['A']);
+        speichereRezepteMock.mockImplementation(() => {
+            throw new Error('Write protected');
+        });
+
+        frageGanzzahlMock
+            .mockResolvedValueOnce(1) // Alle Rezepte
+            .mockResolvedValueOnce(1) // Rezept 1
+            .mockResolvedValueOnce(1) // Zu Favoriten hinzufuegen
+            .mockResolvedValueOnce(2) // Zurueck aus Liste
+            .mockResolvedValueOnce(3); // Zurueck aus Kategorien
+
+        await rezeptAuswahlMenue();
+
+        expect(console.log).toHaveBeenCalledWith('Fehler beim Speichern: Write protected');
+        expect(warteAufEnterMock).toHaveBeenCalledWith('Drücke Enter um fortzufahren');
+    });
 });

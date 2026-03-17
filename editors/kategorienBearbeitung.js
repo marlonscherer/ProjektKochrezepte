@@ -62,7 +62,7 @@ async function kategorieHinzufuegen(rezept) {
 
         // Kategorien im Rezept sind eindeutig (case-insensitive).
         const kategorieBereitsVorhanden = rezept.kategorien.some(
-            (kategorie) => kategorie.toLowerCase() === neueKategorie.toLowerCase()
+            (kategorie) => typeof kategorie === "string" && kategorie.toLowerCase() === neueKategorie.toLowerCase()
         );
         if (kategorieBereitsVorhanden) {
             console.log(`Die Kategorie "${neueKategorie}" existiert bereits!`);
@@ -158,7 +158,9 @@ async function kategorieUmbenennen(rezept) {
         }
 
         const kategorieBereitsVorhanden = rezept.kategorien.some((kategorie, index) => {
-            return index !== (menueSteuerung - 1) && kategorie.toLowerCase() === neueKategorie.toLowerCase();
+            return index !== (menueSteuerung - 1)
+                && typeof kategorie === "string"
+                && kategorie.toLowerCase() === neueKategorie.toLowerCase();
         });
         if (kategorieBereitsVorhanden) {
             console.log(`Die Kategorie "${neueKategorie}" existiert bereits!`);

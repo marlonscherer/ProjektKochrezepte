@@ -5,6 +5,7 @@ import {
     rezeptVeraendernEinzelnMenue
 } from "./rezeptVerwaltung.js";
 import { frageGanzzahl, leereKonsole, question, warteAufEnter, wurdeAbgebrochen } from "../ui/eingabe.js";
+import { bearbeiteFavorit, aktualisiereFavoritStatus } from "../editors/favoritBearbeitung.js";
 
 export async function hauptMenue() {
     while (true) {
@@ -94,20 +95,21 @@ async function favoritenMenue() {
 
         const gewaehltesFavorit = favoriten[menueSteuerung - 1];
         zeigeRezeptDetails(gewaehltesFavorit);
-        
-        // Schnellmenü zum Entfernen aus Favoriten
-        console.log("\n[1] Aus Favoriten entfernen\n[2] Zurück zur Liste\n");
-        const favoritWahl = await frageGanzzahl(1, 2, "Was möchtest du tun?\n");
-        
-        if (favoritWahl === 1) {
-            const rezeptIndex = rezepte.findIndex((r) => r.id === gewaehltesFavorit.id);
-            if (rezeptIndex !== -1) {
-                rezepte[rezeptIndex].favorit = false;
+
+        const bearbeitetesRezept = await bearbeiteFavorit(gewaehltesFavorit);
+        if (bearbeitetesRezept !== null) {
+            const aktualisiert = aktualisiereFavoritStatus(rezepte, bearbeitetesRezept);
+            if (aktualisiert) {
                 try {
                     speichereRezepte(rezepte);
-                    console.log(`"${gewaehltesFavorit.name}" wurde aus deinen Favoriten entfernt!`);
+                    if (bearbeitetesRezept.favorit === true) {
+                        console.log(`"${gewaehltesFavorit.name}" wurde zu deinen Favoriten hinzugefügt!`);
+                    } else {
+                        console.log(`"${gewaehltesFavorit.name}" wurde aus deinen Favoriten entfernt!`);
+                    }
                 } catch (error) {
-                    console.log("Fehler beim Speichern!");
+                    const fehlermeldung = error instanceof Error ? error.message : String(error);
+                    console.log(`Fehler beim Speichern: ${fehlermeldung}`);
                 }
                 await warteAufEnter("Drücke Enter um fortzufahren");
             }
@@ -214,7 +216,8 @@ async function kiVorschlaegeNachZutatenMenue() {
             speichereRezepte(rezepte);
             console.log(`"${rezeptZumSpeichern.name}" wurde gespeichert.`);
         } catch (error) {
-            console.log("Fehler beim Speichern des KI-Rezepts!");
+            const fehlermeldung = error instanceof Error ? error.message : String(error);
+            console.log(`Fehler beim Speichern des KI-Rezepts: ${fehlermeldung}`);
         }
         await warteAufEnter("Drücke Enter um zur KI-Beratung zurückzukehren");
         return;

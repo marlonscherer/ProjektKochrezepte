@@ -1,6 +1,7 @@
 import { ladeRezepte, speichereRezepte } from "../data/rezeptSpeicher.js";
 import { holeKategorien, zeigeRezeptDetails } from "../ui/anzeige.js";
 import { frageGanzzahl, fragePflichtfeld, leereKonsole, warteAufEnter } from "../ui/eingabe.js";
+import { bearbeiteFavorit, aktualisiereFavoritStatus } from "../editors/favoritBearbeitung.js";
 
 export async function rezeptSucheMenue() {
     leereKonsole();
@@ -104,45 +105,24 @@ async function rezeptListeMenue(rezepte, titel) {
         // Detailansicht mit Favoriten-Schnellmenü
         const rezept = rezepte[menueSteuerung - 1];
         zeigeRezeptDetails(rezept);
-        
-        // Favoriten-Schnellmenü nach Rezeptansicht zeigt nur sinnvolle Aktion.
-        const istFavorit = rezept.favorit === true;
-        const favoritStatus = istFavorit ? "Favorit" : "Kein Favorit";
-        console.log(`\nAktueller Status: ${favoritStatus}`);
 
-        if (istFavorit) {
-            console.log("[1] Aus Favoriten entfernen\n[2] Zurück zur Liste\n");
-            const favoritWahl = await frageGanzzahl(1, 2, "Was möchtest du tun?\n");
-            if (favoritWahl === 1) {
-                const rezeptIndex = alleRezepte.findIndex((r) => r.id === rezept.id);
-                if (rezeptIndex !== -1) {
-                    alleRezepte[rezeptIndex].favorit = false;
-                    rezepte[menueSteuerung - 1].favorit = false;
-                    try {
-                        speichereRezepte(alleRezepte);
-                        console.log(`"${rezept.name}" wurde aus deinen Favoriten entfernt!`);
-                    } catch (error) {
-                        console.log("Fehler beim Speichern!");
-                    }
-                    await warteAufEnter("Drücke Enter um fortzufahren");
-                }
-            }
-        } else {
-            console.log("[1] Zu Favoriten hinzufügen\n[2] Zurück zur Liste\n");
-            const favoritWahl = await frageGanzzahl(1, 2, "Was möchtest du tun?\n");
-            if (favoritWahl === 1) {
-                const rezeptIndex = alleRezepte.findIndex((r) => r.id === rezept.id);
-                if (rezeptIndex !== -1) {
-                    alleRezepte[rezeptIndex].favorit = true;
-                    rezepte[menueSteuerung - 1].favorit = true;
-                    try {
-                        speichereRezepte(alleRezepte);
+        const bearbeitetesRezept = await bearbeiteFavorit(rezept);
+        if (bearbeitetesRezept !== null) {
+            const aktualisiert = aktualisiereFavoritStatus(alleRezepte, bearbeitetesRezept);
+            if (aktualisiert) {
+                rezepte[menueSteuerung - 1].favorit = bearbeitetesRezept.favorit === true;
+                try {
+                    speichereRezepte(alleRezepte);
+                    if (bearbeitetesRezept.favorit === true) {
                         console.log(`"${rezept.name}" wurde zu deinen Favoriten hinzugefügt!`);
-                    } catch (error) {
-                        console.log("Fehler beim Speichern!");
+                    } else {
+                        console.log(`"${rezept.name}" wurde aus deinen Favoriten entfernt!`);
                     }
-                    await warteAufEnter("Drücke Enter um fortzufahren");
+                } catch (error) {
+                    const fehlermeldung = error instanceof Error ? error.message : String(error);
+                    console.log(`Fehler beim Speichern: ${fehlermeldung}`);
                 }
+                await warteAufEnter("Drücke Enter um fortzufahren");
             }
         }
     }

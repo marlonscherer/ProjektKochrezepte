@@ -1,10 +1,9 @@
-import { leereKonsole, frageGanzzahl, warteAufEnter } from "../ui/eingabe.js";
+import { frageGanzzahl } from "../ui/eingabe.js";
 
 export async function bearbeiteFavorit(rezept) {
-    leereKonsole();
     const istFavorit = rezept.favorit === true;
     const aktuellerStatus = istFavorit ? "Favorit" : "Kein Favorit";
-    console.log(`===========Bearbeite Favorit: ${rezept.name}===========\n`);
+    console.log(`\n===========Bearbeite Favorit: ${rezept.name}===========\n`);
     console.log(`Aktueller Status: ${aktuellerStatus}\n`);
 
     if (istFavorit) {
@@ -12,9 +11,6 @@ export async function bearbeiteFavorit(rezept) {
         const wahl = await frageGanzzahl(1, 2, "Was möchtest du tun?\n");
         if (wahl === 1) {
             rezept.favorit = false;
-            leereKonsole();
-            console.log(`"${rezept.name}" wurde aus deinen Favoriten entfernt!`);
-            await warteAufEnter();
             return rezept;
         }
         return null;
@@ -24,11 +20,18 @@ export async function bearbeiteFavorit(rezept) {
     const wahl = await frageGanzzahl(1, 2, "Was möchtest du tun?\n");
     if (wahl === 1) {
         rezept.favorit = true;
-        leereKonsole();
-        console.log(`"${rezept.name}" wurde zu deinen Favoriten hinzugefügt!`);
-        await warteAufEnter();
         return rezept;
     }
 
     return null;
+}
+
+export function aktualisiereFavoritStatus(rezepte, bearbeitetesRezept) {
+    const rezeptIndex = rezepte.findIndex((rezept) => rezept.id === bearbeitetesRezept.id);
+    if (rezeptIndex === -1) {
+        return false;
+    }
+
+    rezepte[rezeptIndex].favorit = bearbeitetesRezept.favorit === true;
+    return true;
 }

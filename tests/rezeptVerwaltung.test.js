@@ -5,6 +5,7 @@ const speichereRezepteMock = jest.fn();
 const rezeptEditierMenueMock = jest.fn();
 const frageGanzzahlMock = jest.fn();
 const fragePflichtfeldMock = jest.fn();
+const frageJaNeinMock = jest.fn();
 const leereKonsoleMock = jest.fn();
 const questionMock = jest.fn();
 const warteAufEnterMock = jest.fn();
@@ -22,6 +23,7 @@ await jest.unstable_mockModule('../editors/rezeptFelderBearbeitung.js', () => ({
 await jest.unstable_mockModule('../ui/eingabe.js', () => ({
     frageGanzzahl: frageGanzzahlMock,
     fragePflichtfeld: fragePflichtfeldMock,
+    frageJaNein: frageJaNeinMock,
     leereKonsole: leereKonsoleMock,
     question: questionMock,
     warteAufEnter: warteAufEnterMock,
@@ -76,7 +78,7 @@ describe('rezeptVerwaltung', () => {
             { id: 2, name: 'Suppe' }
         ]);
         frageGanzzahlMock.mockResolvedValue(1);
-        questionMock.mockResolvedValue('n');
+        frageJaNeinMock.mockResolvedValue(false);
 
         await rezeptLoeschenMenue();
 
@@ -90,9 +92,7 @@ describe('rezeptVerwaltung', () => {
             { id: 2, name: 'Suppe' }
         ]);
         frageGanzzahlMock.mockResolvedValue(1);
-        questionMock
-            .mockResolvedValueOnce('x')
-            .mockResolvedValueOnce('j');
+        frageJaNeinMock.mockResolvedValue(true);
 
         await rezeptLoeschenMenue();
 

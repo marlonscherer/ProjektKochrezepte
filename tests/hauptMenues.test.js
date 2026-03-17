@@ -220,4 +220,92 @@ describe('hauptMenues', () => {
         expect(warteAufEnterMock).toHaveBeenCalledWith('Drücke Enter um zur KI-Beratung zurückzukehren');
     });
 
+    test('shows dedicated message when OPENAI_API_KEY is missing', async () => {
+        questionMock.mockResolvedValue('Tomate, Pasta');
+        wurdeAbgebrochenMock.mockResolvedValue(false);
+        holeKiRezeptvorschlaegeAusZutatenMock.mockRejectedValue(new Error('OPENAI_API_KEY fehlt. Bitte als Umgebungsvariable setzen.'));
+
+        frageGanzzahlMock
+            .mockResolvedValueOnce(5) // Hauptmenue: KI Beratung
+            .mockResolvedValueOnce(1) // KI-Menue: Vorschlaege nach Zutaten
+            .mockResolvedValueOnce(2) // KI-Menue: Zurueck
+            .mockResolvedValueOnce(6); // Hauptmenue: Beenden
+
+        await hauptMenue();
+
+        expect(console.log).toHaveBeenCalledWith('Fehler: OPENAI_API_KEY ist nicht gesetzt. Bitte API-Key als Umgebungsvariable setzen.');
+        expect(warteAufEnterMock).toHaveBeenCalled();
+        expect(speichereRezepteMock).not.toHaveBeenCalled();
+    });
+
+    test('shows generic KI error message for unexpected errors', async () => {
+        questionMock.mockResolvedValue('Tomate, Pasta');
+        wurdeAbgebrochenMock.mockResolvedValue(false);
+        holeKiRezeptvorschlaegeAusZutatenMock.mockRejectedValue(new Error('Netzwerkfehler'));
+
+        frageGanzzahlMock
+            .mockResolvedValueOnce(5) // Hauptmenue: KI Beratung
+            .mockResolvedValueOnce(1) // KI-Menue: Vorschlaege nach Zutaten
+            .mockResolvedValueOnce(2) // KI-Menue: Zurueck
+            .mockResolvedValueOnce(6); // Hauptmenue: Beenden
+
+        await hauptMenue();
+
+        expect(console.log).toHaveBeenCalledWith('Fehler bei der KI-Beratung. Bitte versuche es später erneut.');
+        expect(warteAufEnterMock).toHaveBeenCalled();
+        expect(speichereRezepteMock).not.toHaveBeenCalled();
+    });
+
+    test('shows message when KI returns no suggestions', async () => {
+        questionMock.mockResolvedValue('Tomate, Pasta');
+        wurdeAbgebrochenMock.mockResolvedValue(false);
+        holeKiRezeptvorschlaegeAusZutatenMock.mockResolvedValue([]);
+
+        frageGanzzahlMock
+            .mockResolvedValueOnce(5) // Hauptmenue: KI Beratung
+            .mockResolvedValueOnce(1) // KI-Menue: Vorschlaege nach Zutaten
+            .mockResolvedValueOnce(2) // KI-Menue: Zurueck
+            .mockResolvedValueOnce(6); // Hauptmenue: Beenden
+
+        await hauptMenue();
+
+        expect(console.log).toHaveBeenCalledWith('Keine Vorschläge gefunden.');
+        expect(warteAufEnterMock).toHaveBeenCalled();
+        expect(speichereRezepteMock).not.toHaveBeenCalled();
+    });
+
+    test('logs save failure when KI recipe cannot be persisted', async () => {
+        const vorschlag = {
+            id: 777,
+            name: 'Fehler Pasta',
+            schwierigkeitsgrad: 'Leicht',
+            zeitaufwand: '10 Minuten',
+            kategorien: ['Pasta'],
+            zutaten: [{ name: 'Tomate', menge: '2 Stück' }],
+            arbeitsschritte: ['Kochen'],
+            favorit: false
+        };
+
+        questionMock.mockResolvedValue('Tomate, Pasta');
+        wurdeAbgebrochenMock.mockResolvedValue(false);
+        holeKiRezeptvorschlaegeAusZutatenMock.mockResolvedValue([vorschlag]);
+        ladeRezepteMock.mockReturnValue([]);
+        speichereRezepteMock.mockImplementation(() => {
+            throw new Error('Disk full');
+        });
+
+        frageGanzzahlMock
+            .mockResolvedValueOnce(5) // Hauptmenue: KI Beratung
+            .mockResolvedValueOnce(1) // KI-Menue: Vorschlaege nach Zutaten
+            .mockResolvedValueOnce(1) // Vorschlag waehlen
+            .mockResolvedValueOnce(1) // Speichern bestaetigen
+            .mockResolvedValueOnce(2) // KI-Menue: Zurueck
+            .mockResolvedValueOnce(6); // Hauptmenue: Beenden
+
+        await hauptMenue();
+
+        expect(console.log).toHaveBeenCalledWith('Fehler beim Speichern des KI-Rezepts: Disk full');
+        expect(warteAufEnterMock).toHaveBeenCalledWith('Drücke Enter um zur KI-Beratung zurückzukehren');
+    });
+
 });

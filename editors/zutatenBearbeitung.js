@@ -1,6 +1,7 @@
 import {
     fragePflichtfeld,
     frageGanzzahl,
+    frageJaNein,
     leereKonsole,
     question,
     warteAufEnter,
@@ -43,7 +44,7 @@ async function zutatHinzufuegen(rezept) {
 
         // Zutatennamen innerhalb eines Rezepts eindeutig halten.
         const zutatBereitsVorhanden = zutaten.some(
-            (zutat) => zutat.name.toLowerCase() === zutatName.toLowerCase()
+            (zutat) => typeof zutat?.name === "string" && zutat.name.toLowerCase() === zutatName.toLowerCase()
         );
         if (zutatBereitsVorhanden) {
             console.log(`Die Zutat \"${zutatName}\" existiert bereits!`);
@@ -100,15 +101,8 @@ async function zutatEntfernen(rezept) {
     }
 
     const entfernteZutat = rezept.zutaten[menueSteuerung - 1];
-    let bestaetigung = "";
-    while (bestaetigung !== "j" && bestaetigung !== "n") {
-        bestaetigung = (await question(`\nMöchtest du \"${entfernteZutat.name}\" wirklich löschen? (j/n): `)).trim().toLowerCase();
-        if (bestaetigung !== "j" && bestaetigung !== "n") {
-            console.log("Fehler: ungültige Eingabe.");
-        }
-    }
-
-    if (bestaetigung === "n") {
+    const bestaetigt = await frageJaNein(`\nMöchtest du \"${entfernteZutat.name}\" wirklich löschen? (j/n): `, "Fehler: ungültige Eingabe.");
+    if (!bestaetigt) {
         console.log("Löschvorgang abgebrochen.");
         await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
@@ -156,7 +150,9 @@ async function zutatVeraendern(rezept) {
         }
 
         const zutatBereitsVorhanden = rezept.zutaten.some((zutat, aktuellePosition) => {
-            return aktuellePosition !== index && zutat.name.toLowerCase() === neuerName.toLowerCase();
+            return aktuellePosition !== index
+                && typeof zutat?.name === "string"
+                && zutat.name.toLowerCase() === neuerName.toLowerCase();
         });
         if (zutatBereitsVorhanden) {
             console.log(`Die Zutat \"${neuerName}\" existiert bereits!`);

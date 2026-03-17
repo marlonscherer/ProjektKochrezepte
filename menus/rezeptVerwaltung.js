@@ -3,6 +3,7 @@ import { rezeptEditierMenue } from "../editors/rezeptFelderBearbeitung.js";
 import {
     frageGanzzahl,
     fragePflichtfeld,
+    frageJaNein,
     leereKonsole,
     question,
     warteAufEnter,
@@ -31,16 +32,9 @@ export async function rezeptLoeschenMenue() {
     }
 
     const rezeptName = rezepte[menueSteuerung - 1].name;
-    let bestaetigung = "";
-    // Explizite j/n-Bestaetigung, damit kein Rezept versehentlich geloescht wird.
-    while (bestaetigung !== "j" && bestaetigung !== "n") {
-        bestaetigung = (await question(`\nMöchtest du "${rezeptName}" wirklich löschen? (j/n): `)).trim().toLowerCase();
-        if (bestaetigung !== "j" && bestaetigung !== "n") {
-            console.log("Fehler: Bitte nur 'j' oder 'n' eingeben.");
-        }
-    }
+    const bestaetigt = await frageJaNein(`\nMöchtest du "${rezeptName}" wirklich löschen? (j/n): `);
 
-    if (bestaetigung === "n") {
+    if (!bestaetigt) {
         console.log("Löschvorgang abgebrochen");
         await warteAufEnter("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");
         return;
@@ -51,7 +45,8 @@ export async function rezeptLoeschenMenue() {
         speichereRezepte(rezepte);
         console.log("\nRezept erfolgreich gelöscht!");
     } catch (error) {
-        console.log("\nFehler beim Speichern der Änderungen!");
+        const fehlermeldung = error instanceof Error ? error.message : String(error);
+        console.log(`\nFehler beim Speichern der Änderungen: ${fehlermeldung}`);
     }
 
     await warteAufEnter("Drücke Enter um zum Bearbeitungsmenü zurückzukehren");
@@ -78,7 +73,9 @@ export async function rezeptHinzufuegenMenue() {
         }
 
         // Doppelte Namen blocken (case-insensitive), damit Suche und Auswahl eindeutig bleiben.
-        const nameBereitsVorhanden = rezepte.some((rezept) => rezept.name.toLowerCase() === rezeptName.toLowerCase());
+        const nameBereitsVorhanden = rezepte.some((rezept) => {
+            return typeof rezept.name === "string" && rezept.name.toLowerCase() === rezeptName.toLowerCase();
+        });
         if (nameBereitsVorhanden) {
             console.log(`Ein Rezept mit dem Namen "${rezeptName}" existiert bereits!`);
             continue;
@@ -204,7 +201,8 @@ export async function rezeptHinzufuegenMenue() {
         speichereRezepte(rezepte);
         console.log(`\nRezept "${rezeptName}" erfolgreich hinzugefügt!`);
     } catch (error) {
-        console.log("\nFehler beim Speichern des Rezepts!");
+        const fehlermeldung = error instanceof Error ? error.message : String(error);
+        console.log(`\nFehler beim Speichern des Rezepts: ${fehlermeldung}`);
     }
 
     await warteAufEnter("\nDrücke Enter um zum Bearbeitungsmenü zurückzukehren");

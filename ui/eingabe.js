@@ -117,6 +117,21 @@ export async function frageGanzzahl(min, max, promptText) {
     }
 }
 
+export async function frageJaNein(promptText, fehlerText = "Fehler: Bitte nur 'j' oder 'n' eingeben.") {
+    while (true) {
+        const eingabe = (await question(promptText)).trim().toLowerCase();
+        if (eingabe === "j") {
+            return true;
+        }
+
+        if (eingabe === "n") {
+            return false;
+        }
+
+        console.log(fehlerText);
+    }
+}
+
 export function schliesseEingabe() {
     if (rl !== null && !rl.closed) {
         rl.close();

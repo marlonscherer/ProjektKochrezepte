@@ -11,6 +11,7 @@ await jest.unstable_mockModule('../ui/eingabe.js', () => ({
 }));
 
 const { bearbeiteFavorit } = await import('../editors/favoritBearbeitung.js');
+const { aktualisiereFavoritStatus } = await import('../editors/favoritBearbeitung.js');
 
 describe('editors/favoritBearbeitung', () => {
     beforeEach(() => {
@@ -31,7 +32,7 @@ describe('editors/favoritBearbeitung', () => {
         expect(frageGanzzahlMock).toHaveBeenCalledWith(1, 2, 'Was möchtest du tun?\n');
         expect(result).toBe(rezept);
         expect(result.favorit).toBe(true);
-        expect(warteAufEnterMock).toHaveBeenCalledTimes(1);
+        expect(warteAufEnterMock).not.toHaveBeenCalled();
     });
 
     test('returns null on back when recipe is not favorite', async () => {
@@ -54,7 +55,7 @@ describe('editors/favoritBearbeitung', () => {
         expect(frageGanzzahlMock).toHaveBeenCalledWith(1, 2, 'Was möchtest du tun?\n');
         expect(result).toBe(rezept);
         expect(result.favorit).toBe(false);
-        expect(warteAufEnterMock).toHaveBeenCalledTimes(1);
+        expect(warteAufEnterMock).not.toHaveBeenCalled();
     });
 
     test('returns null on back when recipe is already favorite', async () => {
@@ -66,5 +67,28 @@ describe('editors/favoritBearbeitung', () => {
         expect(result).toBeNull();
         expect(rezept.favorit).toBe(true);
         expect(warteAufEnterMock).not.toHaveBeenCalled();
+    });
+
+    test('aktualisiert Favoritenstatus im Zielarray per Rezept-ID', () => {
+        const rezepte = [
+            { id: 1, name: 'Pasta', favorit: false },
+            { id: 2, name: 'Suppe', favorit: false }
+        ];
+
+        const bearbeitet = { id: 2, name: 'Suppe', favorit: true };
+        const result = aktualisiereFavoritStatus(rezepte, bearbeitet);
+
+        expect(result).toBe(true);
+        expect(rezepte[1].favorit).toBe(true);
+    });
+
+    test('gibt false zurueck wenn Rezept-ID im Zielarray fehlt', () => {
+        const rezepte = [{ id: 1, name: 'Pasta', favorit: false }];
+        const bearbeitet = { id: 999, name: 'Unbekannt', favorit: true };
+
+        const result = aktualisiereFavoritStatus(rezepte, bearbeitet);
+
+        expect(result).toBe(false);
+        expect(rezepte[0].favorit).toBe(false);
     });
 });

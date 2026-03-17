@@ -2,6 +2,7 @@ import { jest } from '@jest/globals';
 
 const fragePflichtfeldMock = jest.fn();
 const frageGanzzahlMock = jest.fn();
+const frageJaNeinMock = jest.fn();
 const leereKonsoleMock = jest.fn();
 const questionMock = jest.fn();
 const warteAufEnterMock = jest.fn();
@@ -12,6 +13,7 @@ const bearbeiteListenMenueMock = jest.fn();
 await jest.unstable_mockModule('../ui/eingabe.js', () => ({
     fragePflichtfeld: fragePflichtfeldMock,
     frageGanzzahl: frageGanzzahlMock,
+    frageJaNein: frageJaNeinMock,
     leereKonsole: leereKonsoleMock,
     question: questionMock,
     warteAufEnter: warteAufEnterMock,

@@ -1,6 +1,7 @@
 import {
     fragePflichtfeld,
     frageGanzzahl,
+    frageJaNein,
     leereKonsole,
     question,
     warteAufEnter,
@@ -102,15 +103,8 @@ async function arbeitsschrittEntfernen(rezept) {
     }
 
     const entfernterSchritt = rezept.arbeitsschritte[menueSteuerung - 1];
-    let bestaetigung = "";
-    while (bestaetigung !== "j" && bestaetigung !== "n") {
-        bestaetigung = (await question(`\nMöchtest du \"${entfernterSchritt}\" wirklich löschen? (j/n): `)).trim().toLowerCase();
-        if (bestaetigung !== "j" && bestaetigung !== "n") {
-            console.log("Fehler: ungültige Eingabe.");
-        }
-    }
-
-    if (bestaetigung === "n") {
+    const bestaetigt = await frageJaNein(`\nMöchtest du \"${entfernterSchritt}\" wirklich löschen? (j/n): `, "Fehler: ungültige Eingabe.");
+    if (!bestaetigt) {
         console.log("Löschvorgang abgebrochen.");
         await warteAufEnter("\nDrücke Enter um fortzufahren");
         return null;
