@@ -1,6 +1,7 @@
 import { jest } from '@jest/globals';
 
 const ladeRezepteMock = jest.fn();
+const speichereRezepteMock = jest.fn();
 const holeKategorienMock = jest.fn();
 const zeigeRezeptDetailsMock = jest.fn();
 const frageGanzzahlMock = jest.fn();
@@ -9,7 +10,8 @@ const leereKonsoleMock = jest.fn();
 const warteAufEnterMock = jest.fn();
 
 await jest.unstable_mockModule('../data/rezeptSpeicher.js', () => ({
-    ladeRezepte: ladeRezepteMock
+    ladeRezepte: ladeRezepteMock,
+    speichereRezepte: speichereRezepteMock
 }));
 
 await jest.unstable_mockModule('../ui/anzeige.js', () => ({
@@ -56,6 +58,7 @@ describe('auswahlMenues', () => {
         frageGanzzahlMock
             .mockResolvedValueOnce(2) // Kategorie Pasta
             .mockResolvedValueOnce(2) // Lasagne aus gefilterter Liste
+            .mockResolvedValueOnce(2) // Zurueck aus Favoriten-Schnellmenue
             .mockResolvedValueOnce(3) // Zurueck aus Rezeptliste
             .mockResolvedValueOnce(4); // Zurueck aus Kategorien
 
@@ -63,7 +66,7 @@ describe('auswahlMenues', () => {
 
         expect(zeigeRezeptDetailsMock).toHaveBeenCalledTimes(1);
         expect(zeigeRezeptDetailsMock).toHaveBeenCalledWith(rezepte[2]);
-        expect(warteAufEnterMock).toHaveBeenCalledWith('\nDrücke Enter um zur Rezeptliste zurückzukehren');
+        expect(warteAufEnterMock).not.toHaveBeenCalled();
     });
 
     test('shows recipe details in Alle Rezepte flow', async () => {
@@ -73,13 +76,14 @@ describe('auswahlMenues', () => {
         frageGanzzahlMock
             .mockResolvedValueOnce(1) // Alle Rezepte
             .mockResolvedValueOnce(1) // Rezept 1
+            .mockResolvedValueOnce(2) // Zurueck aus Favoriten-Schnellmenue
             .mockResolvedValueOnce(2) // Zurueck aus Liste
             .mockResolvedValueOnce(3); // Zurueck aus Kategorien
 
         await rezeptAuswahlMenue();
 
         expect(zeigeRezeptDetailsMock).toHaveBeenCalledWith(rezepte[0]);
-        expect(warteAufEnterMock).toHaveBeenCalled();
+        expect(warteAufEnterMock).not.toHaveBeenCalled();
     });
 
     test('search returns when user cancels input', async () => {
@@ -101,12 +105,13 @@ describe('auswahlMenues', () => {
         fragePflichtfeldMock.mockResolvedValue('pas');
         frageGanzzahlMock
             .mockResolvedValueOnce(1) // Rezept 1 in Trefferliste
+            .mockResolvedValueOnce(2) // Zurueck aus Favoriten-Schnellmenue
             .mockResolvedValueOnce(2); // Zurueck aus Trefferliste
 
         await rezeptSucheMenue();
 
         expect(zeigeRezeptDetailsMock).toHaveBeenCalledWith(rezepte[0]);
-        expect(warteAufEnterMock).toHaveBeenCalledWith('\nDrücke Enter um zur Rezeptliste zurückzukehren');
+        expect(warteAufEnterMock).not.toHaveBeenCalled();
     });
 
     test('search shows message when no recipe matches', async () => {
@@ -117,5 +122,45 @@ describe('auswahlMenues', () => {
 
         expect(warteAufEnterMock).toHaveBeenCalledWith('Drücke Enter um zur Suche zurückzukehren');
         expect(zeigeRezeptDetailsMock).not.toHaveBeenCalled();
+    });
+
+    test('fuegt ein Rezept aus dem Schnellmenue zu Favoriten hinzu und speichert', async () => {
+        const rezepte = [{ id: 1, name: 'Pasta', kategorien: ['A'], favorit: false }];
+        ladeRezepteMock.mockReturnValue(rezepte);
+        holeKategorienMock.mockReturnValue(['A']);
+        frageGanzzahlMock
+            .mockResolvedValueOnce(1) // Alle Rezepte
+            .mockResolvedValueOnce(1) // Rezept 1
+            .mockResolvedValueOnce(1) // Zu Favoriten hinzufuegen
+            .mockResolvedValueOnce(2) // Zurueck aus Liste
+            .mockResolvedValueOnce(3); // Zurueck aus Kategorien
+
+        await rezeptAuswahlMenue();
+
+        expect(speichereRezepteMock).toHaveBeenCalledTimes(1);
+        expect(speichereRezepteMock).toHaveBeenCalledWith([
+            { id: 1, name: 'Pasta', kategorien: ['A'], favorit: true }
+        ]);
+        expect(warteAufEnterMock).toHaveBeenCalledWith('Drücke Enter um fortzufahren');
+    });
+
+    test('entfernt ein bereits favorisiertes Rezept aus Favoriten im Schnellmenue und speichert', async () => {
+        const rezepte = [{ id: 1, name: 'Pasta', kategorien: ['A'], favorit: true }];
+        ladeRezepteMock.mockReturnValue(rezepte);
+        holeKategorienMock.mockReturnValue(['A']);
+        frageGanzzahlMock
+            .mockResolvedValueOnce(1) // Alle Rezepte
+            .mockResolvedValueOnce(1) // Rezept 1
+            .mockResolvedValueOnce(1) // Aus Favoriten entfernen
+            .mockResolvedValueOnce(2) // Zurueck aus Liste
+            .mockResolvedValueOnce(3); // Zurueck aus Kategorien
+
+        await rezeptAuswahlMenue();
+
+        expect(speichereRezepteMock).toHaveBeenCalledTimes(1);
+        expect(speichereRezepteMock).toHaveBeenCalledWith([
+            { id: 1, name: 'Pasta', kategorien: ['A'], favorit: false }
+        ]);
+        expect(warteAufEnterMock).toHaveBeenCalledWith('Drücke Enter um fortzufahren');
     });
 });

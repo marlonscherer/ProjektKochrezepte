@@ -148,6 +148,7 @@ describe('anzeige', () => {
             expect(stdoutSpy).toHaveBeenCalledWith('\x1Bc');
             expect(ausgaben).toEqual([
                 '===========Spaghetti Bolognese===========',
+                'Favorit: -',
                 'Schwierigkeitsgrad: Mittel',
                 'Zeitaufwand: 45 Minuten',
                 'Kategorien: Pasta, Italienisch',
@@ -175,12 +176,28 @@ describe('anzeige', () => {
             expect(stdoutSpy).toHaveBeenCalledWith('\x1Bc');
             expect(ausgaben).toEqual([
                 '===========Einfaches Rezept===========',
+                'Favorit: -',
                 'Schwierigkeitsgrad: -',
                 'Zeitaufwand: -',
                 'Kategorien: -',
                 '\nZutaten:',
                 '\nArbeitsschritte:'
             ]);
+        });
+
+        test('zeigt Favorit-Status als Favorit wenn das Rezept markiert ist', () => {
+            const rezept = {
+                name: 'Pesto Pasta',
+                favorit: true,
+                zutaten: [],
+                arbeitsschritte: []
+            };
+
+            const { ausgaben } = sammleLogAusgaben();
+
+            zeigeRezeptDetails(rezept);
+
+            expect(ausgaben).toContain('Favorit: Favorit');
         });
     });
 });
