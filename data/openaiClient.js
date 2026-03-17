@@ -13,7 +13,7 @@ export async function sendeOpenAIAnfrage({ systemPrompt, userPrompt }) {
             Authorization: `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-            model: "gpt-5.3-codex",
+            model: "gpt-5-mini",
             input: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: userPrompt }
