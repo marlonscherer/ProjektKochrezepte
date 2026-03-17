@@ -23,7 +23,8 @@ Interaktiver CLI-Rezeptmanager (Deutsch) mit Node.js und ES Modules.
 - Suchfunktion
 - Zufallsrezept-Ausgabe (fehlt noch)
 - Rezept bewerten  (fehlt noch)
-  - KI Beratung (Rezepte vorschlagen, wenn Zutaten angegeben werden) (fehlt noch)
+- Favoriten markieren und Favoritenliste
+- KI Beratung (Rezepte aus Zutaten vorschlagen, optional speichern)
 
 ## Funktionen
 
@@ -40,6 +41,8 @@ Interaktiver CLI-Rezeptmanager (Deutsch) mit Node.js und ES Modules.
   - Arbeitsschritten
   - Favorit-Status
 - Persistenz über lokale Datei [rezepte.json](rezepte.json)
+- Defensivere Validierung bei Duplikatchecks (`typeof ... === "string"` vor `toLowerCase()`)
+- Einheitliche j/n-Bestaetigungen ueber `frageJaNein(...)`
 
 ## Projekt starten
 
@@ -102,5 +105,12 @@ In [jest.config.js](jest.config.js) sind globale Mindestwerte gesetzt:
 
 ## Hinweis
 
-Die KI-Beratung ist derzeit noch ein Platzhalter (Stub).
+Die KI-Beratung benoetigt die Umgebungsvariable `OPENAI_API_KEY`.
+
+Beispiel (PowerShell):
+
+```powershell
+$env:OPENAI_API_KEY = "dein_key"
+npm start
+```
     

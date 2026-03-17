@@ -7,13 +7,13 @@ Dieses Verzeichnis enthält die Unit-Tests für den CLI-Cookbook-Manager.
 Zuletzt verifizierter Stand:
 
 - **12 Test-Suites**
-- **95 Tests**
+- **108 Tests**
 - **0 fehlgeschlagene Tests**
 
 Die Zahlen stammen aus einer lokalen Ausführung mit:
 
 ```bash
-npm test -- --runInBand --json --outputFile=tmp-jest-final.json
+npm test -- --runInBand --json --outputFile=tmp-jest-latest.json
 ```
 
 ## Test-Struktur
@@ -42,7 +42,7 @@ tests/
 
 ### ui/
 - `anzeige.test.js` testet Kategorien-, Zutaten-, Arbeitsschritte- und Detailanzeige.
-- `eingabe.async.test.js` testet asynchrone Eingabe-Funktionen (`question`, `fragePflichtfeld`, `frageGanzzahl`, `warteAufEnter`, `schliesseEingabe`).
+- `eingabe.async.test.js` testet asynchrone Eingabe-Funktionen (`question`, `fragePflichtfeld`, `frageGanzzahl`, `frageJaNein`, `warteAufEnter`, `schliesseEingabe`).
 - `listenMenue.test.js` testet den generischen Listen-Menue-Flow.
 
 ### editors/
@@ -59,22 +59,26 @@ Diese Tests pruefen die Editor-Flows in isolierter Form.
 	- Hinzufuegen zu Favoriten
 	- Entfernen aus Favoriten
 	- Ruecksprung ohne Aenderung fuer beide Status
+	- Aktualisierung per Rezept-ID (`aktualisiereFavoritStatus`)
 - `auswahlMenues.test.js` und `hauptMenues.test.js` decken die Schnellaktionen in Rezept- und Favoritenmenues ab.
+
+### KI-Flow (neu erweitert)
+- `hauptMenues.test.js` deckt zusaetzlich ab:
+	- API-Key fehlt (`OPENAI_API_KEY fehlt`)
+	- generischer KI-Fehlerpfad
+	- leere Vorschlagsliste
+	- Speicherfehler beim Speichern eines KI-Rezepts
 
 ## Qualitaetscheck
 
-Aktueller Qualitaetsstatus nach lokalem Lauf (`npm run test:coverage`):
+Aktueller Qualitaetsstatus nach lokalem Lauf:
 
-- Stabilitaet: **95/95 Tests bestanden**
-- Global Coverage (aus `coverage/coverage-final.json` berechnet):
-	- Lines: **78.79%**
-	- Statements: **78.79%**
-	- Functions: **92.71%**
-	- Branches: **70.66%**
+- Stabilitaet: **108/108 Tests bestanden**
+- Global Coverage: siehe `coverage/lcov-report/index.html` nach `npm run test:coverage`
 
 Einschaetzung:
-- Die neue Favoriten-Funktion ist fuer Kernpfade gut abgesichert (add/remove/back).
-- Es bestehen weiterhin sinnvolle Ausbaupunkte bei Branch-Cases in einigen Editor-/Verwaltungsmodulen.
+- Favoriten- und KI-Fehlerpfade sind jetzt deutlich besser abgesichert.
+- Weitere sinnvolle Ausbaupunkte bleiben Integrationstests ueber mehrere Menueebenen.
 
 ### menus/
 - `hauptMenues.test.js`
