@@ -2,7 +2,9 @@ import { jest } from '@jest/globals';
 
 const frageGanzzahlMock = jest.fn();
 const leereKonsoleMock = jest.fn();
+const questionMock = jest.fn();
 const warteAufEnterMock = jest.fn();
+const wurdeAbgebrochenMock = jest.fn();
 const rezeptSucheMenueMock = jest.fn();
 const rezeptAuswahlMenueMock = jest.fn();
 const rezeptHinzufuegenMenueMock = jest.fn();
@@ -11,11 +13,14 @@ const rezeptVeraendernEinzelnMenueMock = jest.fn();
 const ladeRezepteMock = jest.fn();
 const speichereRezepteMock = jest.fn();
 const zeigeRezeptDetailsMock = jest.fn();
+const holeKiRezeptvorschlaegeAusZutatenMock = jest.fn();
 
 await jest.unstable_mockModule('../ui/eingabe.js', () => ({
     frageGanzzahl: frageGanzzahlMock,
     leereKonsole: leereKonsoleMock,
-    warteAufEnter: warteAufEnterMock
+    question: questionMock,
+    warteAufEnter: warteAufEnterMock,
+    wurdeAbgebrochen: wurdeAbgebrochenMock
 }));
 
 await jest.unstable_mockModule('../menus/auswahlMenues.js', () => ({
@@ -36,6 +41,10 @@ await jest.unstable_mockModule('../data/rezeptSpeicher.js', () => ({
 
 await jest.unstable_mockModule('../ui/anzeige.js', () => ({
     zeigeRezeptDetails: zeigeRezeptDetailsMock
+}));
+
+await jest.unstable_mockModule('../data/kiBeratung.js', () => ({
+    holeKiRezeptvorschlaegeAusZutaten: holeKiRezeptvorschlaegeAusZutatenMock
 }));
 
 const { hauptMenue } = await import('../menus/hauptMenues.js');
@@ -107,14 +116,14 @@ describe('hauptMenues', () => {
     test('shows KI menu, waits for enter, and then returns to the main menu', async () => {
         frageGanzzahlMock
             .mockResolvedValueOnce(5)
+            .mockResolvedValueOnce(2)
             .mockResolvedValueOnce(6);
 
         await hauptMenue();
 
-        expect(warteAufEnterMock).toHaveBeenCalledTimes(1);
-        expect(warteAufEnterMock).toHaveBeenCalledWith();
-        expect(frageGanzzahlMock).toHaveBeenCalledTimes(2);
-        expect(leereKonsoleMock).toHaveBeenCalledTimes(2);
+        expect(warteAufEnterMock).not.toHaveBeenCalled();
+        expect(frageGanzzahlMock).toHaveBeenCalledTimes(3);
+        expect(leereKonsoleMock).toHaveBeenCalledTimes(3);
     });
 
     test('opens Favoriten menu and returns when no favorites exist', async () => {
@@ -144,5 +153,36 @@ describe('hauptMenues', () => {
         expect(speichereRezepteMock).toHaveBeenCalledTimes(1);
         expect(speichereRezepteMock).toHaveBeenCalledWith([{ id: 1, name: 'Pasta', favorit: false }]);
         expect(warteAufEnterMock).toHaveBeenCalledWith('Drücke Enter um fortzufahren');
+    });
+
+    test('shows KI recipe suggestions by ingredients and opens selected recipe details', async () => {
+        const vorschlaege = [
+            {
+                id: 1,
+                name: 'Tomaten Pasta',
+                schwierigkeitsgrad: 'Leicht',
+                zeitaufwand: '20 Minuten',
+                kategorien: ['Pasta'],
+                zutaten: [{ name: 'Tomate', menge: '2 Stück' }],
+                arbeitsschritte: ['Kochen'],
+                favorit: false
+            }
+        ];
+
+        wurdeAbgebrochenMock.mockResolvedValue(false);
+        questionMock.mockResolvedValue('Tomate, Pasta');
+        holeKiRezeptvorschlaegeAusZutatenMock.mockResolvedValue(vorschlaege);
+        frageGanzzahlMock
+            .mockResolvedValueOnce(5) // Hauptmenue: KI Beratung
+            .mockResolvedValueOnce(1) // KI-Menue: Vorschlaege
+            .mockResolvedValueOnce(1) // Vorschlagsliste: Rezept 1
+            .mockResolvedValueOnce(2) // KI-Menue: Zurueck
+            .mockResolvedValueOnce(6); // Hauptmenue: Beenden
+
+        await hauptMenue();
+
+        expect(holeKiRezeptvorschlaegeAusZutatenMock).toHaveBeenCalledWith(['Tomate', 'Pasta'], 3);
+        expect(zeigeRezeptDetailsMock).toHaveBeenCalledWith(vorschlaege[0]);
+        expect(warteAufEnterMock).toHaveBeenCalledWith('Drücke Enter um zur KI-Beratung zurückzukehren');
     });
 });

@@ -4,7 +4,7 @@ import {
     rezeptLoeschenMenue,
     rezeptVeraendernEinzelnMenue
 } from "./rezeptVerwaltung.js";
-import { frageGanzzahl, leereKonsole, question, warteAufEnter } from "../ui/eingabe.js";
+import { frageGanzzahl, leereKonsole, question, warteAufEnter, wurdeAbgebrochen } from "../ui/eingabe.js";
 
 export async function hauptMenue() {
     while (true) {
@@ -116,8 +116,70 @@ async function favoritenMenue() {
 }
 
 async function kiBeratungMenue() {
-    console.log("===========KI-Beratung===========\n",
-        "Gib Zutaten ein, die du zu Hause hast, und die KI wird dir passende Rezepte vorschlagen!\n"
-    );
-    await warteAufEnter();
+    while (true) {
+        leereKonsole();
+        console.log(
+            "===========KI-Beratung===========\n",
+            "[1] Rezeptvorschläge nach Zutaten\n",
+            "[2] Zurück\n"
+        );
+
+        const menueSteuerung = await frageGanzzahl(1, 2, "Was möchtest du tun?\n");
+        if (menueSteuerung === 1) {
+            await kiVorschlaegeNachZutatenMenue();
+        } else if (menueSteuerung === 2) {
+            return;
+        }
+    }
+}
+
+async function kiVorschlaegeNachZutatenMenue() {
+    const { holeKiRezeptvorschlaegeAusZutaten } = await import("../data/kiBeratung.js");
+    const { zeigeRezeptDetails } = await import("../ui/anzeige.js");
+
+    const eingabe = (await question("Gib Zutaten ein (kommagetrennt, oder 'abbrechen'): ")).trim();
+    if (await wurdeAbgebrochen(eingabe, "KI-Beratung abgebrochen.")) {
+        return;
+    }
+
+    const zutaten = eingabe
+        .split(",")
+        .map((eintrag) => eintrag.trim())
+        .filter((eintrag) => eintrag !== "");
+
+    if (zutaten.length === 0) {
+        console.log("Bitte gib mindestens eine Zutat ein.");
+        await warteAufEnter();
+        return;
+    }
+
+    let vorschlaege = [];
+    try {
+        vorschlaege = await holeKiRezeptvorschlaegeAusZutaten(zutaten, 3);
+    } catch (error) {
+        console.log("Fehler bei der KI-Beratung. Bitte versuche es später erneut.");
+        await warteAufEnter();
+        return;
+    }
+
+    if (!Array.isArray(vorschlaege) || vorschlaege.length === 0) {
+        console.log("Keine Vorschläge gefunden.");
+        await warteAufEnter();
+        return;
+    }
+
+    leereKonsole();
+    console.log("===========KI-Vorschläge===========");
+    vorschlaege.forEach((rezept, index) => {
+        console.log(`[${index + 1}] ${rezept.name}`);
+    });
+    console.log(`[${vorschlaege.length + 1}] Zurück`);
+
+    const auswahl = await frageGanzzahl(1, vorschlaege.length + 1, "\nWähle ein Rezept:\n");
+    if (auswahl === vorschlaege.length + 1) {
+        return;
+    }
+
+    zeigeRezeptDetails(vorschlaege[auswahl - 1]);
+    await warteAufEnter("Drücke Enter um zur KI-Beratung zurückzukehren");
 }

@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for ui/listenMenue.js</title>
+    <title>Code coverage report for data/openaiClient.js</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../prettify.css" />
     <link rel="stylesheet" href="../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../index.html">All files</a> / <a href="index.html">ui</a> listenMenue.js</h1>
+        <h1><a href="../index.html">All files</a> / <a href="index.html">data</a> openaiClient.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>14/14</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>4/4</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/2</span>
+                <span class='fraction'>0/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>14/14</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -89,57 +89,69 @@
 <a name='L24'></a><a href='#L24'>24</a>
 <a name='L25'></a><a href='#L25'>25</a>
 <a name='L26'></a><a href='#L26'>26</a>
-<a name='L27'></a><a href='#L27'>27</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { frageGanzzahl, leereKonsole } from "./eingabe.js";
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import process from "process";
 &nbsp;
-export async function bearbeiteListenMenue(rezept, titel, zeigeEintraege, optionen) {
-    while (true) {
-        leereKonsole();
-        console.log(`===========${titel}===========`);
-        zeigeEintraege(rezept);
-        console.log();
-&nbsp;
-        optionen.forEach((option, index) =&gt; {
-            console.log(`[${index + 1}] ${option.label}`);
-        });
-        console.log(`[${optionen.length + 1}] Zurück`);
-&nbsp;
-        const menueSteuerung = await frageGanzzahl(1, optionen.length + 1, "\nWas möchtest du tun?\n");
-        if (menueSteuerung === optionen.length + 1) {
-            return null;
-        }
-&nbsp;
-        // Aktionen liefern entweder ein geaendertes Rezept oder null (weiter im Menue).
-        const bearbeitetesRezept = await optionen[menueSteuerung - 1].aktion(rezept);
-        if (bearbeitetesRezept !== null) {
-            return bearbeitetesRezept;
-        }
+export async function <span class="fstat-no" title="function not covered" >sendeOpenAIAnfrage(</span>{ systemPrompt, userPrompt }) {
+    const apiKey = <span class="cstat-no" title="statement not covered" >process.env.OPENAI_API_KEY;</span>
+<span class="cstat-no" title="statement not covered" >    if (!apiKey) {</span>
+<span class="cstat-no" title="statement not covered" >        throw new Error("OPENAI_API_KEY fehlt. Bitte als Umgebungsvariable setzen.");</span>
     }
+&nbsp;
+    const response = <span class="cstat-no" title="statement not covered" >await fetch("https://api.openai.com/v1/responses", {</span>
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            model: "gpt-5-mini",
+            input: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: userPrompt }
+            ]
+        })
+    });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    if (!response.ok) {</span>
+        const fehlerText = <span class="cstat-no" title="statement not covered" >await response.text();</span>
+<span class="cstat-no" title="statement not covered" >        throw new Error(`OpenAI API Fehler: ${response.status} ${fehlerText}`);</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return response.json();</span>
 }
 &nbsp;</pre></td></tr></table></pre>
 
