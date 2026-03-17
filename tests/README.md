@@ -6,8 +6,8 @@ Dieses Verzeichnis enthält die Unit-Tests für den CLI-Cookbook-Manager.
 
 Zuletzt verifizierter Stand:
 
-- **11 Test-Suites**
-- **86 Tests**
+- **12 Test-Suites**
+- **95 Tests**
 - **0 fehlgeschlagene Tests**
 
 Die Zahlen stammen aus einer lokalen Ausführung mit:
@@ -24,6 +24,7 @@ tests/
 ├── arbeitsschritteBearbeitung.editor.test.js
 ├── auswahlMenues.test.js
 ├── eingabe.async.test.js
+├── favoritBearbeitung.editor.test.js
 ├── hauptMenues.test.js
 ├── kategorienBearbeitung.editor.test.js
 ├── listenMenue.test.js
@@ -48,9 +49,32 @@ tests/
 - `zutatenBearbeitung.editor.test.js`
 - `kategorienBearbeitung.editor.test.js`
 - `arbeitsschritteBearbeitung.editor.test.js`
+- `favoritBearbeitung.editor.test.js`
 - `rezeptFelderBearbeitung.editor.test.js`
 
 Diese Tests pruefen die Editor-Flows in isolierter Form.
+
+### Favoriten-Flow (neu)
+- `favoritBearbeitung.editor.test.js` testet den neuen Favoriten-Editor:
+	- Hinzufuegen zu Favoriten
+	- Entfernen aus Favoriten
+	- Ruecksprung ohne Aenderung fuer beide Status
+- `auswahlMenues.test.js` und `hauptMenues.test.js` decken die Schnellaktionen in Rezept- und Favoritenmenues ab.
+
+## Qualitaetscheck
+
+Aktueller Qualitaetsstatus nach lokalem Lauf (`npm run test:coverage`):
+
+- Stabilitaet: **95/95 Tests bestanden**
+- Global Coverage (aus `coverage/coverage-final.json` berechnet):
+	- Lines: **78.79%**
+	- Statements: **78.79%**
+	- Functions: **92.71%**
+	- Branches: **70.66%**
+
+Einschaetzung:
+- Die neue Favoriten-Funktion ist fuer Kernpfade gut abgesichert (add/remove/back).
+- Es bestehen weiterhin sinnvolle Ausbaupunkte bei Branch-Cases in einigen Editor-/Verwaltungsmodulen.
 
 ### menus/
 - `hauptMenues.test.js`
