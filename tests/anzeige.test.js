@@ -148,7 +148,7 @@ describe('anzeige', () => {
             expect(stdoutSpy).toHaveBeenCalledWith('\x1Bc');
             expect(ausgaben).toEqual([
                 '===========Spaghetti Bolognese===========',
-                'Favorit: -',
+                'Favorit: Nicht Favorit',
                 'Schwierigkeitsgrad: Mittel',
                 'Zeitaufwand: 45 Minuten',
                 'Kategorien: Pasta, Italienisch',
@@ -176,7 +176,7 @@ describe('anzeige', () => {
             expect(stdoutSpy).toHaveBeenCalledWith('\x1Bc');
             expect(ausgaben).toEqual([
                 '===========Einfaches Rezept===========',
-                'Favorit: -',
+                'Favorit: Nicht Favorit',
                 'Schwierigkeitsgrad: -',
                 'Zeitaufwand: -',
                 'Kategorien: -',

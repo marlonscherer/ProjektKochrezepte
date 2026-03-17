@@ -158,6 +158,11 @@ async function kiVorschlaegeNachZutatenMenue() {
     try {
         vorschlaege = await holeKiRezeptvorschlaegeAusZutaten(zutaten, 3);
     } catch (error) {
+        if (error instanceof Error && error.message.includes("OPENAI_API_KEY fehlt")) {
+            console.log("Fehler: OPENAI_API_KEY ist nicht gesetzt. Bitte API-Key als Umgebungsvariable setzen.");
+            await warteAufEnter();
+            return;
+        }
         console.log("Fehler bei der KI-Beratung. Bitte versuche es später erneut.");
         await warteAufEnter();
         return;
@@ -199,10 +204,15 @@ async function kiVorschlaegeNachZutatenMenue() {
             return;
         }
 
-        rezepte.push(ausgewaehltesRezept);
+        const rezeptZumSpeichern = {
+            ...ausgewaehltesRezept,
+            favorit: false
+        };
+
+        rezepte.push(rezeptZumSpeichern);
         try {
             speichereRezepte(rezepte);
-            console.log(`"${ausgewaehltesRezept.name}" wurde gespeichert.`);
+            console.log(`"${rezeptZumSpeichern.name}" wurde gespeichert.`);
         } catch (error) {
             console.log("Fehler beim Speichern des KI-Rezepts!");
         }

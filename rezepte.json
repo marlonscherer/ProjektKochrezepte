@@ -76,5 +76,123 @@
       "Mit Zitrone und Dill servieren"
     ],
     "favorit": false
+  },
+  {
+    "id": 1773752586164,
+    "name": "Klassischer Hackfleisch-Burger mit Tomate und Salat",
+    "schwierigkeitsgrad": "Leicht",
+    "zeitaufwand": "30 Minuten",
+    "kategorien": [
+      "Hauptgericht",
+      "Schnell"
+    ],
+    "zutaten": [
+      {
+        "name": "Brötchen",
+        "menge": "4 Stück"
+      },
+      {
+        "name": "Hackfleisch (gemischt oder Rind)",
+        "menge": "500 g"
+      },
+      {
+        "name": "Tomaten",
+        "menge": "2 Stück"
+      },
+      {
+        "name": "Salatblätter",
+        "menge": "4–6 Blätter (z. B. Kopfsalat)"
+      },
+      {
+        "name": "Zwiebel",
+        "menge": "1 kleine, optional in Ringen"
+      },
+      {
+        "name": "Käsescheiben",
+        "menge": "4 Scheiben, optional"
+      },
+      {
+        "name": "Öl",
+        "menge": "1 EL"
+      },
+      {
+        "name": "Salz und Pfeffer",
+        "menge": "nach Geschmack"
+      }
+    ],
+    "arbeitsschritte": [
+      "Hackfleisch mit Salz und Pfeffer würzen, in 4 gleichgroße Patties formen.",
+      "Pfanne mit Öl erhitzen und die Patties bei mittlerer Hitze ca. 4–5 Minuten pro Seite braten (je nach gewünschtem Gargrad).",
+      "Brötchen halbieren und kurz im Ofen oder in der Pfanne anrösten.",
+      "Tomaten in Scheiben schneiden, Brötchen mit Salat, Tomatenscheiben und optional Zwiebelringen belegen, Patties daraufsetzen und mit Käse abschließen.",
+      "Burger schließen und sofort servieren."
+    ],
+    "favorit": false
+  },
+  {
+    "id": 1773752980494,
+    "name": "Brokkoli-Käse-Nudelauflauf",
+    "schwierigkeitsgrad": "Mittel",
+    "zeitaufwand": "45 Minuten",
+    "kategorien": [
+      "Vegetarisch",
+      "Auflauf",
+      "Pasta"
+    ],
+    "zutaten": [
+      {
+        "name": "Brokkoli (Röschen)",
+        "menge": "400 g"
+      },
+      {
+        "name": "Nudeln (z. B. Penne)",
+        "menge": "300 g"
+      },
+      {
+        "name": "Käse (gerieben, z. B. Gouda/Emmentaler)",
+        "menge": "200 g"
+      },
+      {
+        "name": "Sahne",
+        "menge": "150 ml"
+      },
+      {
+        "name": "Milch",
+        "menge": "150 ml"
+      },
+      {
+        "name": "Butter",
+        "menge": "1 EL"
+      },
+      {
+        "name": "Mehl",
+        "menge": "1 EL"
+      },
+      {
+        "name": "Paniermehl (optional)",
+        "menge": "50 g"
+      },
+      {
+        "name": "Salz",
+        "menge": "nach Geschmack"
+      },
+      {
+        "name": "Pfeffer",
+        "menge": "nach Geschmack"
+      },
+      {
+        "name": "Muskatnuss",
+        "menge": "eine Prise"
+      }
+    ],
+    "arbeitsschritte": [
+      "Backofen auf 200 °C vorheizen.",
+      "Nudeln in Salzwasser nach Packungsanweisung al dente kochen; in den letzten 3–4 Minuten Brokkoliröschen zugeben und mitkochen. Abgießen.",
+      "In einem Topf Butter schmelzen, Mehl kurz anschwitzen und nach und nach Milch und Sahne unter Rühren zu einer cremigen Sauce einkochen.",
+      "Die Hälfte des geriebenen Käses in die Sauce einrühren, mit Salz, Pfeffer und Muskat abschmecken.",
+      "Nudeln und Brokkoli mit der Käsesauce vermengen, in eine Auflaufform geben, restlichen Käse und optional Paniermehl darüberstreuen.",
+      "Im Ofen ca. 15–20 Minuten backen, bis die Oberfläche goldbraun ist. Kurz ruhen lassen und servieren."
+    ],
+    "favorit": false
   }
 ]
