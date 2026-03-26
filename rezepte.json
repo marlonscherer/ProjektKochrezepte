@@ -194,5 +194,317 @@
       "Im Ofen ca. 15–20 Minuten backen, bis die Oberfläche goldbraun ist. Kurz ruhen lassen und servieren."
     ],
     "favorit": false
+  },
+  {
+    "id": 1774821001001,
+    "name": "Hähnchen-Curry mit Reis",
+    "schwierigkeitsgrad": "Mittel",
+    "zeitaufwand": "35 Minuten",
+    "kategorien": [
+      "Hauptgericht",
+      "Asiatisch",
+      "Schnell"
+    ],
+    "zutaten": [
+      {
+        "name": "Hähnchenbrust",
+        "menge": "500 g"
+      },
+      {
+        "name": "Reis",
+        "menge": "250 g"
+      },
+      {
+        "name": "Kokosmilch",
+        "menge": "400 ml"
+      },
+      {
+        "name": "Curry-Pulver",
+        "menge": "2 EL"
+      },
+      {
+        "name": "Zwiebel",
+        "menge": "1 Stück"
+      },
+      {
+        "name": "Paprika",
+        "menge": "1 Stück"
+      },
+      {
+        "name": "Öl",
+        "menge": "1 EL"
+      },
+      {
+        "name": "Salz und Pfeffer",
+        "menge": "nach Geschmack"
+      }
+    ],
+    "arbeitsschritte": [
+      "Reis nach Packungsanweisung garen.",
+      "Hähnchen in Würfel schneiden und mit Salz, Pfeffer und Curry würzen.",
+      "Zwiebel und Paprika klein schneiden und in Öl anbraten.",
+      "Hähnchen dazugeben und rundherum anbraten.",
+      "Mit Kokosmilch ablöschen und 10 Minuten köcheln lassen.",
+      "Mit Reis servieren."
+    ],
+    "favorit": false
+  },
+  {
+    "id": 1774821001002,
+    "name": "Ofengemüse mit Feta",
+    "schwierigkeitsgrad": "Leicht",
+    "zeitaufwand": "40 Minuten",
+    "kategorien": [
+      "Vegetarisch",
+      "Ofengericht",
+      "Gesund"
+    ],
+    "zutaten": [
+      {
+        "name": "Kartoffeln",
+        "menge": "500 g"
+      },
+      {
+        "name": "Zucchini",
+        "menge": "1 Stück"
+      },
+      {
+        "name": "Paprika",
+        "menge": "2 Stück"
+      },
+      {
+        "name": "rote Zwiebel",
+        "menge": "1 Stück"
+      },
+      {
+        "name": "Feta",
+        "menge": "200 g"
+      },
+      {
+        "name": "Olivenöl",
+        "menge": "3 EL"
+      },
+      {
+        "name": "Oregano",
+        "menge": "1 TL"
+      },
+      {
+        "name": "Salz und Pfeffer",
+        "menge": "nach Geschmack"
+      }
+    ],
+    "arbeitsschritte": [
+      "Backofen auf 200 °C vorheizen.",
+      "Gemüse in mundgerechte Stücke schneiden.",
+      "Gemüse mit Öl, Oregano, Salz und Pfeffer mischen.",
+      "Auf einem Backblech verteilen und 25 Minuten backen.",
+      "Feta darüber bröseln und weitere 10 Minuten backen.",
+      "Heiß servieren."
+    ],
+    "favorit": false
+  },
+  {
+    "id": 1774821001003,
+    "name": "Rote Linsensuppe",
+    "schwierigkeitsgrad": "Leicht",
+    "zeitaufwand": "30 Minuten",
+    "kategorien": [
+      "Suppe",
+      "Vegan",
+      "Gesund"
+    ],
+    "zutaten": [
+      {
+        "name": "rote Linsen",
+        "menge": "250 g"
+      },
+      {
+        "name": "Karotten",
+        "menge": "2 Stück"
+      },
+      {
+        "name": "Zwiebel",
+        "menge": "1 Stück"
+      },
+      {
+        "name": "Gemüsebrühe",
+        "menge": "1 Liter"
+      },
+      {
+        "name": "Tomatenmark",
+        "menge": "1 EL"
+      },
+      {
+        "name": "Olivenöl",
+        "menge": "1 EL"
+      },
+      {
+        "name": "Kreuzkümmel",
+        "menge": "1 TL"
+      },
+      {
+        "name": "Salz und Pfeffer",
+        "menge": "nach Geschmack"
+      }
+    ],
+    "arbeitsschritte": [
+      "Zwiebel und Karotten fein würfeln.",
+      "Öl in einem Topf erhitzen und Gemüse anschwitzen.",
+      "Tomatenmark und Kreuzkümmel kurz mitrösten.",
+      "Linsen und Brühe zugeben und 20 Minuten köcheln lassen.",
+      "Suppe nach Wunsch pürieren und abschmecken.",
+      "Mit Brot servieren."
+    ],
+    "favorit": false
+  },
+  {
+    "id": 1774821001004,
+    "name": "Kartoffelgratin",
+    "schwierigkeitsgrad": "Mittel",
+    "zeitaufwand": "55 Minuten",
+    "kategorien": [
+      "Auflauf",
+      "Beilage",
+      "Vegetarisch"
+    ],
+    "zutaten": [
+      {
+        "name": "Kartoffeln",
+        "menge": "800 g"
+      },
+      {
+        "name": "Sahne",
+        "menge": "300 ml"
+      },
+      {
+        "name": "Milch",
+        "menge": "100 ml"
+      },
+      {
+        "name": "Knoblauch",
+        "menge": "1 Zehe"
+      },
+      {
+        "name": "Muskat",
+        "menge": "1 Prise"
+      },
+      {
+        "name": "geriebener Käse",
+        "menge": "150 g"
+      },
+      {
+        "name": "Salz und Pfeffer",
+        "menge": "nach Geschmack"
+      }
+    ],
+    "arbeitsschritte": [
+      "Backofen auf 180 °C vorheizen.",
+      "Kartoffeln schälen und in dünne Scheiben schneiden.",
+      "Sahne, Milch, Knoblauch, Muskat, Salz und Pfeffer verrühren.",
+      "Kartoffeln in eine Auflaufform schichten und mit der Mischung übergießen.",
+      "Käse darüberstreuen und 40 Minuten backen.",
+      "Kurz ruhen lassen und servieren."
+    ],
+    "favorit": false
+  },
+  {
+    "id": 1774821001005,
+    "name": "Pfannkuchen klassisch",
+    "schwierigkeitsgrad": "Leicht",
+    "zeitaufwand": "20 Minuten",
+    "kategorien": [
+      "Dessert",
+      "Frühstück",
+      "Süß"
+    ],
+    "zutaten": [
+      {
+        "name": "Mehl",
+        "menge": "250 g"
+      },
+      {
+        "name": "Milch",
+        "menge": "500 ml"
+      },
+      {
+        "name": "Eier",
+        "menge": "3 Stück"
+      },
+      {
+        "name": "Zucker",
+        "menge": "2 EL"
+      },
+      {
+        "name": "Salz",
+        "menge": "1 Prise"
+      },
+      {
+        "name": "Butter oder Öl",
+        "menge": "zum Ausbacken"
+      }
+    ],
+    "arbeitsschritte": [
+      "Mehl, Milch, Eier, Zucker und Salz zu einem glatten Teig verrühren.",
+      "Teig 5 Minuten ruhen lassen.",
+      "Etwas Butter oder Öl in einer Pfanne erhitzen.",
+      "Pro Pfannkuchen eine Kelle Teig hineingeben und dünn verteilen.",
+      "Von beiden Seiten goldbraun backen.",
+      "Mit Zimt-Zucker, Obst oder Marmelade servieren."
+    ],
+    "favorit": false
+  },
+  {
+    "id": 1774821001006,
+    "name": "Bunter Couscous-Salat",
+    "schwierigkeitsgrad": "Leicht",
+    "zeitaufwand": "25 Minuten",
+    "kategorien": [
+      "Salat",
+      "Vegetarisch",
+      "Schnell"
+    ],
+    "zutaten": [
+      {
+        "name": "Couscous",
+        "menge": "250 g"
+      },
+      {
+        "name": "Gurke",
+        "menge": "1 Stück"
+      },
+      {
+        "name": "Kirschtomaten",
+        "menge": "250 g"
+      },
+      {
+        "name": "Frühlingszwiebeln",
+        "menge": "3 Stück"
+      },
+      {
+        "name": "Petersilie",
+        "menge": "1 Bund"
+      },
+      {
+        "name": "Olivenöl",
+        "menge": "3 EL"
+      },
+      {
+        "name": "Zitronensaft",
+        "menge": "2 EL"
+      },
+      {
+        "name": "Salz und Pfeffer",
+        "menge": "nach Geschmack"
+      }
+    ],
+    "arbeitsschritte": [
+      "Couscous nach Packungsanweisung mit heißem Wasser quellen lassen.",
+      "Gemüse und Kräuter klein schneiden.",
+      "Couscous mit einer Gabel auflockern.",
+      "Gemüse und Kräuter unterheben.",
+      "Mit Olivenöl, Zitronensaft, Salz und Pfeffer abschmecken.",
+      "Vor dem Servieren 10 Minuten ziehen lassen."
+    ],
+    "favorit": false
   }
 ]
