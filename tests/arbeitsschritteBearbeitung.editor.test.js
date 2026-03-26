@@ -4,33 +4,33 @@ const fragePflichtfeldMock = jest.fn();
 const frageGanzzahlMock = jest.fn();
 const frageJaNeinMock = jest.fn();
 const leereKonsoleMock = jest.fn();
-const questionMock = jest.fn();
+const frageTextMock = jest.fn();
 const warteAufEnterMock = jest.fn();
 const wurdeAbgebrochenMock = jest.fn();
 const zeigeArbeitsschritteListeMock = jest.fn();
 const bearbeiteListenMenueMock = jest.fn();
 
-await jest.unstable_mockModule('../ui/eingabe.js', () => ({
+await jest.unstable_mockModule('../oberflaeche/eingabe.js', () => ({
     fragePflichtfeld: fragePflichtfeldMock,
     frageGanzzahl: frageGanzzahlMock,
     frageJaNein: frageJaNeinMock,
     leereKonsole: leereKonsoleMock,
-    question: questionMock,
+    frageText: frageTextMock,
     warteAufEnter: warteAufEnterMock,
     wurdeAbgebrochen: wurdeAbgebrochenMock
 }));
 
-await jest.unstable_mockModule('../ui/anzeige.js', () => ({
+await jest.unstable_mockModule('../oberflaeche/anzeige.js', () => ({
     zeigeArbeitsschritteListe: zeigeArbeitsschritteListeMock
 }));
 
-await jest.unstable_mockModule('../ui/listenMenue.js', () => ({
+await jest.unstable_mockModule('../oberflaeche/listenMenue.js', () => ({
     bearbeiteListenMenue: bearbeiteListenMenueMock
 }));
 
-const { bearbeiteArbeitsschritte } = await import('../editors/arbeitsschritteBearbeitung.js');
+const { bearbeiteArbeitsschritte } = await import('../bearbeitungen/arbeitsschritteBearbeitung.js');
 
-describe('editors/arbeitsschritteBearbeitung', () => {
+describe('bearbeitungen/arbeitsschritteBearbeitung', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         jest.spyOn(console, 'log').mockImplementation(() => {});
@@ -40,7 +40,7 @@ describe('editors/arbeitsschritteBearbeitung', () => {
         jest.restoreAllMocks();
     });
 
-    test('adds a step via first menu action', async () => {
+    test('fuegt ueber die erste Menueaktion einen Schritt hinzu', async () => {
         const rezept = { arbeitsschritte: ['Schritt 2'] };
         frageGanzzahlMock.mockResolvedValue(1); // insert before first
         fragePflichtfeldMock.mockResolvedValue('Schritt 1');
@@ -54,7 +54,7 @@ describe('editors/arbeitsschritteBearbeitung', () => {
         expect(result.arbeitsschritte).toEqual(['Schritt 1', 'Schritt 2']);
     });
 
-    test('appends a step when end position is selected', async () => {
+    test('haengt einen Schritt an wenn die Endposition gewaehlt ist', async () => {
         const rezept = { arbeitsschritte: ['Schritt 1'] };
         frageGanzzahlMock.mockResolvedValue(2); // am Ende hinzufügen
         fragePflichtfeldMock.mockResolvedValue('Schritt 2');
@@ -68,7 +68,7 @@ describe('editors/arbeitsschritteBearbeitung', () => {
         expect(result.arbeitsschritte).toEqual(['Schritt 1', 'Schritt 2']);
     });
 
-    test('changes a step via third menu action', async () => {
+    test('aendert einen Schritt ueber die dritte Menueaktion', async () => {
         const rezept = { arbeitsschritte: ['Alt'] };
         frageGanzzahlMock.mockResolvedValue(1);
         fragePflichtfeldMock.mockResolvedValue('Neu');
@@ -82,7 +82,7 @@ describe('editors/arbeitsschritteBearbeitung', () => {
         expect(result.arbeitsschritte).toEqual(['Neu']);
     });
 
-    test('prevents deleting the last remaining step', async () => {
+    test('verhindert das Loeschen des letzten verbleibenden Schritts', async () => {
         const rezept = { arbeitsschritte: ['Alt'] };
 
         bearbeiteListenMenueMock.mockImplementation(async (_rezept, _titel, _zeige, optionen) => {
@@ -96,9 +96,9 @@ describe('editors/arbeitsschritteBearbeitung', () => {
         expect(rezept.arbeitsschritte).toEqual(['Alt']);
     });
 
-    test('replaces all steps via fourth menu action', async () => {
+    test('ersetzt alle Schritte ueber die vierte Menueaktion', async () => {
         const rezept = { arbeitsschritte: ['Alt'] };
-        questionMock
+        frageTextMock
             .mockResolvedValueOnce('Schritt A')
             .mockResolvedValueOnce('Schritt B')
             .mockResolvedValueOnce('fertig');

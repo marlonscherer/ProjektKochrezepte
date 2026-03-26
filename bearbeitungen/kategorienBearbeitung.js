@@ -1,11 +1,11 @@
 import {
     frageGanzzahl,
     fragePflichtfeld,
+    frageText,
     leereKonsole,
     warteAufEnter,
-    question,
     wurdeAbgebrochen
-} from "../ui/eingabe.js";
+} from "../oberflaeche/eingabe.js";
 
 export async function bearbeiteKategorien(rezept) {
     while (true) {
@@ -180,7 +180,7 @@ async function kategorienErsetzen(rezept) {
         console.log(`Aktuelle Kategorien: ${(rezept.kategorien || []).join(", ")}`);
 
         console.log("\nGib neue Kategorien ein (getrennt durch Kommas, z.B. 'Pasta, Italienisch, Vegetarisch')");
-        const kategorienInput = (await question("Kategorien (oder 'abbrechen'): ")).trim();
+        const kategorienInput = (await frageText("Kategorien (oder 'abbrechen'): ")).trim();
 
         if (await wurdeAbgebrochen(kategorienInput, "Kategorien ersetzen abgebrochen.")) {
             return null;

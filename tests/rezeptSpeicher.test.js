@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { jest } from '@jest/globals';
-import { ladeRezepte, speichereRezepte } from '../data/rezeptSpeicher.js';
+import { ladeRezepte, speichereRezepte } from '../daten/rezeptSpeicher.js';
 
 describe('rezeptSpeicher', () => {
     beforeEach(() => {
@@ -13,7 +13,7 @@ describe('rezeptSpeicher', () => {
     });
 
     describe('ladeRezepte', () => {
-        test('should return recipes when JSON file is valid', () => {
+        test('soll Rezepte zurueckgeben wenn die JSON-Datei gueltig ist', () => {
             const mockRezepte = [{ id: 1, name: 'Pasta' }];
             const readSpy = jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify(mockRezepte));
 
@@ -23,7 +23,7 @@ describe('rezeptSpeicher', () => {
             expect(readSpy).toHaveBeenCalledWith(expect.any(String), 'utf-8');
         });
 
-        test('should return empty array when file contains no array', () => {
+        test('soll ein leeres Array zurueckgeben wenn die Datei kein Array enthaelt', () => {
             jest.spyOn(fs, 'readFileSync').mockReturnValue(JSON.stringify({ foo: 'bar' }));
 
             const result = ladeRezepte();
@@ -32,7 +32,7 @@ describe('rezeptSpeicher', () => {
             expect(console.log).not.toHaveBeenCalled();
         });
 
-        test('should return empty array and log once when JSON is invalid', () => {
+        test('soll ein leeres Array zurueckgeben und einmal loggen wenn JSON ungueltig ist', () => {
             jest.spyOn(fs, 'readFileSync').mockReturnValue('{ invalid json }');
 
             const result = ladeRezepte();
@@ -42,7 +42,7 @@ describe('rezeptSpeicher', () => {
             expect(console.log).toHaveBeenCalledTimes(1);
         });
 
-        test('should return empty array and log once when file read fails', () => {
+        test('soll ein leeres Array zurueckgeben und einmal loggen wenn das Lesen der Datei fehlschlaegt', () => {
             jest.spyOn(fs, 'readFileSync').mockImplementation(() => {
                 throw new Error('File not found');
             });
@@ -56,7 +56,7 @@ describe('rezeptSpeicher', () => {
     });
 
     describe('speichereRezepte', () => {
-        test('should write recipes as formatted JSON', () => {
+        test('soll Rezepte als formatiertes JSON schreiben', () => {
             const rezepte = [{ id: 1, name: 'Pasta' }];
             const writeSpy = jest.spyOn(fs, 'writeFileSync').mockImplementation(() => undefined);
 
@@ -69,7 +69,7 @@ describe('rezeptSpeicher', () => {
             );
         });
 
-        test('should propagate write errors', () => {
+        test('soll Schreibfehler weitergeben', () => {
             const rezepte = [{ id: 1, name: 'Pasta' }];
             jest.spyOn(fs, 'writeFileSync').mockImplementation(() => {
                 throw new Error('Disk full');

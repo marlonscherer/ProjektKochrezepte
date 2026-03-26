@@ -13,7 +13,7 @@ function holeReadline() {
     return rl;
 }
 
-export async function question(promptText) {
+export async function frageText(promptText) {
     // Holt eine nutzbare readline-Instanz oder erzeugt bei Bedarf eine neue.
     const aktiveRl = holeReadline();
 
@@ -68,7 +68,7 @@ export function leereKonsole() {
 }
 
 export async function warteAufEnter(promptText = "\nDrücke Enter um fortzufahren") {
-    await question(promptText);
+    await frageText(promptText);
 }
 
 export async function wurdeAbgebrochen(eingabe, nachricht) {
@@ -84,7 +84,7 @@ export async function wurdeAbgebrochen(eingabe, nachricht) {
 
 export async function fragePflichtfeld(promptText, leereMeldung, abbruchNachricht) {
     while (true) {
-        const eingabe = (await question(promptText)).trim();
+        const eingabe = (await frageText(promptText)).trim();
 
         if (await wurdeAbgebrochen(eingabe, abbruchNachricht)) {
             return null;
@@ -101,7 +101,7 @@ export async function fragePflichtfeld(promptText, leereMeldung, abbruchNachrich
 
 export async function frageGanzzahl(min, max, promptText) {
     while (true) {
-        const eingabe = await question(promptText);
+        const eingabe = await frageText(promptText);
         if (!/^\d+$/.test(eingabe)) {
             console.log("Fehler: Bitte geben Sie eine gültige Zahl ein");
             continue;
@@ -119,7 +119,7 @@ export async function frageGanzzahl(min, max, promptText) {
 
 export async function frageJaNein(promptText, fehlerText = "Fehler: Bitte nur 'j' oder 'n' eingeben.") {
     while (true) {
-        const eingabe = (await question(promptText)).trim().toLowerCase();
+        const eingabe = (await frageText(promptText)).trim().toLowerCase();
         if (eingabe === "j") {
             return true;
         }

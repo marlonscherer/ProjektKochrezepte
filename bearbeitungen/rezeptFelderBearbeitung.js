@@ -1,8 +1,8 @@
-import { speichereRezepte } from "../data/rezeptSpeicher.js";
+import { speichereRezepte } from "../daten/rezeptSpeicher.js";
 import { bearbeiteKategorien } from "./kategorienBearbeitung.js";
 import { bearbeiteZutaten } from "./zutatenBearbeitung.js";
 import { bearbeiteArbeitsschritte } from "./arbeitsschritteBearbeitung.js";
-import { frageGanzzahl, fragePflichtfeld, leereKonsole, warteAufEnter } from "../ui/eingabe.js";
+import { frageGanzzahl, fragePflichtfeld, leereKonsole, warteAufEnter } from "../oberflaeche/eingabe.js";
 
 export async function rezeptEditierMenue(rezept, rezepte) {
     while (true) {

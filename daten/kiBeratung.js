@@ -1,4 +1,4 @@
-import { sendeOpenAIAnfrage } from "./openaiClient.js";
+import { sendeOpenAIAnfrage } from "./kiKlient.js";
 
 function normalisiereSchwierigkeitsgrad(wert) {
     const text = String(wert || "").trim().toLowerCase();

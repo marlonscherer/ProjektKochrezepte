@@ -37,15 +37,15 @@ tests/
 
 ## Abgedeckte Bereiche
 
-### data/
+### daten/
 - `rezeptSpeicher.test.js` testet Laden/Speichern von Rezepten inkl. Fehlerfaellen.
 
-### ui/
+### oberflaeche/
 - `anzeige.test.js` testet Kategorien-, Zutaten-, Arbeitsschritte- und Detailanzeige.
-- `eingabe.async.test.js` testet asynchrone Eingabe-Funktionen (`question`, `fragePflichtfeld`, `frageGanzzahl`, `frageJaNein`, `warteAufEnter`, `schliesseEingabe`).
+- `eingabe.async.test.js` testet asynchrone Eingabe-Funktionen (`frageText`, `fragePflichtfeld`, `frageGanzzahl`, `frageJaNein`, `warteAufEnter`, `schliesseEingabe`).
 - `listenMenue.test.js` testet den generischen Listen-Menue-Flow.
 
-### editors/
+### bearbeitungen/
 - `zutatenBearbeitung.editor.test.js`
 - `kategorienBearbeitung.editor.test.js`
 - `arbeitsschritteBearbeitung.editor.test.js`
@@ -80,7 +80,7 @@ Einschaetzung:
 - Favoriten- und KI-Fehlerpfade sind jetzt deutlich besser abgesichert.
 - Weitere sinnvolle Ausbaupunkte bleiben Integrationstests ueber mehrere Menueebenen.
 
-### menus/
+### menues/
 - `hauptMenues.test.js`
 - `auswahlMenues.test.js`
 - `rezeptVerwaltung.test.js`

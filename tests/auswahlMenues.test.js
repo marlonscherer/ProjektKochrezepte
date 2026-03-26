@@ -9,24 +9,24 @@ const fragePflichtfeldMock = jest.fn();
 const leereKonsoleMock = jest.fn();
 const warteAufEnterMock = jest.fn();
 
-await jest.unstable_mockModule('../data/rezeptSpeicher.js', () => ({
+await jest.unstable_mockModule('../daten/rezeptSpeicher.js', () => ({
     ladeRezepte: ladeRezepteMock,
     speichereRezepte: speichereRezepteMock
 }));
 
-await jest.unstable_mockModule('../ui/anzeige.js', () => ({
+await jest.unstable_mockModule('../oberflaeche/anzeige.js', () => ({
     holeKategorien: holeKategorienMock,
     zeigeRezeptDetails: zeigeRezeptDetailsMock
 }));
 
-await jest.unstable_mockModule('../ui/eingabe.js', () => ({
+await jest.unstable_mockModule('../oberflaeche/eingabe.js', () => ({
     frageGanzzahl: frageGanzzahlMock,
     fragePflichtfeld: fragePflichtfeldMock,
     leereKonsole: leereKonsoleMock,
     warteAufEnter: warteAufEnterMock
 }));
 
-const { rezeptAuswahlMenue, rezeptSucheMenue } = await import('../menus/auswahlMenues.js');
+const { rezeptAuswahlMenue, rezeptSucheMenue } = await import('../menues/auswahlMenues.js');
 
 describe('auswahlMenues', () => {
     beforeEach(() => {
@@ -38,7 +38,7 @@ describe('auswahlMenues', () => {
         jest.restoreAllMocks();
     });
 
-    test('returns early when no recipes exist', async () => {
+    test('kehrt frueh zurueck wenn keine Rezepte vorhanden sind', async () => {
         ladeRezepteMock.mockReturnValue([]);
 
         await rezeptAuswahlMenue();
@@ -47,7 +47,7 @@ describe('auswahlMenues', () => {
         expect(holeKategorienMock).not.toHaveBeenCalled();
     });
 
-    test('filters recipes by selected category case-insensitively and shows only matching recipe details', async () => {
+    test('filtert Rezepte nach gewaehlter Kategorie ohne Gross-/Kleinschreibung und zeigt nur passende Details', async () => {
         const rezepte = [
             { id: 1, name: 'Spaghetti', kategorien: ['pasta'] },
             { id: 2, name: 'Suppe', kategorien: ['Suppe'] },
@@ -69,7 +69,7 @@ describe('auswahlMenues', () => {
         expect(warteAufEnterMock).not.toHaveBeenCalled();
     });
 
-    test('shows recipe details in Alle Rezepte flow', async () => {
+    test('zeigt Rezeptdetails im Alle-Rezepte-Ablauf', async () => {
         const rezepte = [{ id: 1, name: 'Pasta', kategorien: ['A'] }];
         ladeRezepteMock.mockReturnValue(rezepte);
         holeKategorienMock.mockReturnValue(['A']);
@@ -86,7 +86,7 @@ describe('auswahlMenues', () => {
         expect(warteAufEnterMock).not.toHaveBeenCalled();
     });
 
-    test('search returns when user cancels input', async () => {
+    test('die Suche kehrt zurueck wenn der Nutzer die Eingabe abbricht', async () => {
         ladeRezepteMock.mockReturnValue([{ id: 1, name: 'Pasta', kategorien: ['A'] }]);
         fragePflichtfeldMock.mockResolvedValue(null);
 
@@ -96,7 +96,7 @@ describe('auswahlMenues', () => {
         expect(frageGanzzahlMock).not.toHaveBeenCalled();
     });
 
-    test('search finds recipe names case-insensitive and shows details', async () => {
+    test('die Suche findet Rezeptnamen ohne Gross-/Kleinschreibung und zeigt Details', async () => {
         const rezepte = [
             { id: 1, name: 'Pasta', kategorien: ['A'] },
             { id: 2, name: 'Salat', kategorien: ['B'] }
@@ -114,7 +114,7 @@ describe('auswahlMenues', () => {
         expect(warteAufEnterMock).not.toHaveBeenCalled();
     });
 
-    test('search shows message when no recipe matches', async () => {
+    test('die Suche zeigt eine Meldung wenn kein Rezept passt', async () => {
         ladeRezepteMock.mockReturnValue([{ id: 1, name: 'Pasta', kategorien: ['A'] }]);
         fragePflichtfeldMock.mockResolvedValue('xyz');
 
@@ -164,7 +164,7 @@ describe('auswahlMenues', () => {
         expect(warteAufEnterMock).toHaveBeenCalledWith('Drücke Enter um fortzufahren');
     });
 
-    test('logs save error when favorite update cannot be persisted', async () => {
+    test('protokolliert einen Speicherfehler wenn die Favoriten-Aktualisierung nicht gespeichert werden kann', async () => {
         const rezepte = [{ id: 1, name: 'Pasta', kategorien: ['A'], favorit: false }];
         ladeRezepteMock.mockReturnValue(rezepte);
         holeKategorienMock.mockReturnValue(['A']);

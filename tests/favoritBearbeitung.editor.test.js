@@ -4,16 +4,16 @@ const leereKonsoleMock = jest.fn();
 const frageGanzzahlMock = jest.fn();
 const warteAufEnterMock = jest.fn();
 
-await jest.unstable_mockModule('../ui/eingabe.js', () => ({
+await jest.unstable_mockModule('../oberflaeche/eingabe.js', () => ({
     leereKonsole: leereKonsoleMock,
     frageGanzzahl: frageGanzzahlMock,
     warteAufEnter: warteAufEnterMock
 }));
 
-const { bearbeiteFavorit } = await import('../editors/favoritBearbeitung.js');
-const { aktualisiereFavoritStatus } = await import('../editors/favoritBearbeitung.js');
+const { bearbeiteFavorit } = await import('../bearbeitungen/favoritBearbeitung.js');
+const { aktualisiereFavoritStatus } = await import('../bearbeitungen/favoritBearbeitung.js');
 
-describe('editors/favoritBearbeitung', () => {
+describe('bearbeitungen/favoritBearbeitung', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         jest.spyOn(console, 'log').mockImplementation(() => {});
@@ -23,7 +23,7 @@ describe('editors/favoritBearbeitung', () => {
         jest.restoreAllMocks();
     });
 
-    test('adds recipe to favorites when recipe is not favorite', async () => {
+    test('fuegt ein Rezept zu Favoriten hinzu wenn es noch kein Favorit ist', async () => {
         const rezept = { name: 'Pasta', favorit: false };
         frageGanzzahlMock.mockResolvedValue(1);
 
@@ -35,7 +35,7 @@ describe('editors/favoritBearbeitung', () => {
         expect(warteAufEnterMock).not.toHaveBeenCalled();
     });
 
-    test('returns null on back when recipe is not favorite', async () => {
+    test('gibt bei Zurueck null zurueck wenn das Rezept kein Favorit ist', async () => {
         const rezept = { name: 'Pasta', favorit: false };
         frageGanzzahlMock.mockResolvedValue(2);
 
@@ -46,7 +46,7 @@ describe('editors/favoritBearbeitung', () => {
         expect(warteAufEnterMock).not.toHaveBeenCalled();
     });
 
-    test('removes recipe from favorites when recipe is already favorite', async () => {
+    test('entfernt ein Rezept aus Favoriten wenn es bereits Favorit ist', async () => {
         const rezept = { name: 'Pasta', favorit: true };
         frageGanzzahlMock.mockResolvedValue(1);
 
@@ -58,7 +58,7 @@ describe('editors/favoritBearbeitung', () => {
         expect(warteAufEnterMock).not.toHaveBeenCalled();
     });
 
-    test('returns null on back when recipe is already favorite', async () => {
+    test('gibt bei Zurueck null zurueck wenn das Rezept bereits Favorit ist', async () => {
         const rezept = { name: 'Pasta', favorit: true };
         frageGanzzahlMock.mockResolvedValue(2);
 

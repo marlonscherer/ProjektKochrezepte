@@ -97,10 +97,10 @@ In [jest.config.js](jest.config.js) sind globale Mindestwerte gesetzt:
 ## Projektstruktur
 
 - [main.js](main.js): Einstiegspunkt
-- [menus/](menus/): Haupt- und Untermenues
-- [editors/](editors/): Bearbeitungslogik fuer Rezeptfelder
-- [ui/](ui/): Eingabe-/Anzeige-Helfer
-- [data/](data/): Laden/Speichern der Rezepte
+- [menues/](menues/): Haupt- und Untermenues
+- [bearbeitungen/](bearbeitungen/): Bearbeitungslogik fuer Rezeptfelder
+- [oberflaeche/](oberflaeche/): Eingabe-/Anzeige-Helfer
+- [daten/](daten/): Laden/Speichern der Rezepte
 - [tests/](tests/): Unit- und Modultests
 
 ## Hinweis

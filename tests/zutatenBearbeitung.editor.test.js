@@ -4,33 +4,33 @@ const fragePflichtfeldMock = jest.fn();
 const frageGanzzahlMock = jest.fn();
 const frageJaNeinMock = jest.fn();
 const leereKonsoleMock = jest.fn();
-const questionMock = jest.fn();
+const frageTextMock = jest.fn();
 const warteAufEnterMock = jest.fn();
 const wurdeAbgebrochenMock = jest.fn();
 const zeigeZutatenListeMock = jest.fn();
 const bearbeiteListenMenueMock = jest.fn();
 
-await jest.unstable_mockModule('../ui/eingabe.js', () => ({
+await jest.unstable_mockModule('../oberflaeche/eingabe.js', () => ({
     fragePflichtfeld: fragePflichtfeldMock,
     frageGanzzahl: frageGanzzahlMock,
     frageJaNein: frageJaNeinMock,
     leereKonsole: leereKonsoleMock,
-    question: questionMock,
+    frageText: frageTextMock,
     warteAufEnter: warteAufEnterMock,
     wurdeAbgebrochen: wurdeAbgebrochenMock
 }));
 
-await jest.unstable_mockModule('../ui/anzeige.js', () => ({
+await jest.unstable_mockModule('../oberflaeche/anzeige.js', () => ({
     zeigeZutatenListe: zeigeZutatenListeMock
 }));
 
-await jest.unstable_mockModule('../ui/listenMenue.js', () => ({
+await jest.unstable_mockModule('../oberflaeche/listenMenue.js', () => ({
     bearbeiteListenMenue: bearbeiteListenMenueMock
 }));
 
-const { bearbeiteZutaten } = await import('../editors/zutatenBearbeitung.js');
+const { bearbeiteZutaten } = await import('../bearbeitungen/zutatenBearbeitung.js');
 
-describe('editors/zutatenBearbeitung', () => {
+describe('bearbeitungen/zutatenBearbeitung', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         jest.spyOn(console, 'log').mockImplementation(() => {});
@@ -40,7 +40,7 @@ describe('editors/zutatenBearbeitung', () => {
         jest.restoreAllMocks();
     });
 
-    test('adds a new ingredient via first menu action', async () => {
+    test('fuegt ueber die erste Menueaktion eine neue Zutat hinzu', async () => {
         const rezept = { zutaten: [{ name: 'Tomate', menge: '1' }] };
         fragePflichtfeldMock
             .mockResolvedValueOnce('Salz')
@@ -56,7 +56,7 @@ describe('editors/zutatenBearbeitung', () => {
         expect(result.zutaten[1]).toEqual({ name: 'Salz', menge: '1 TL' });
     });
 
-    test('rejects duplicate ingredient and retries until unique input', async () => {
+    test('lehnt doppelte Zutaten ab und fragt bis zu einer eindeutigen Eingabe erneut', async () => {
         const rezept = { zutaten: [{ name: 'Tomate', menge: '1' }] };
         fragePflichtfeldMock
             .mockResolvedValueOnce('tomate')
@@ -76,7 +76,7 @@ describe('editors/zutatenBearbeitung', () => {
         expect(console.log).toHaveBeenCalledWith('Die Zutat "tomate" existiert bereits!');
     });
 
-    test('changes an ingredient via third menu action', async () => {
+    test('aendert eine Zutat ueber die dritte Menueaktion', async () => {
         const rezept = { zutaten: [{ name: 'Tomate', menge: '1' }, { name: 'Salz', menge: '1 TL' }] };
         frageGanzzahlMock.mockResolvedValue(1);
         fragePflichtfeldMock
@@ -92,7 +92,7 @@ describe('editors/zutatenBearbeitung', () => {
         expect(result.zutaten[0]).toEqual({ name: 'Paprika', menge: '2 Stk' });
     });
 
-    test('prevents deleting the last remaining ingredient', async () => {
+    test('verhindert das Loeschen der letzten verbleibenden Zutat', async () => {
         const rezept = { zutaten: [{ name: 'Tomate', menge: '1' }] };
 
         bearbeiteListenMenueMock.mockImplementation(async (_rezept, _titel, _zeige, optionen) => {
@@ -106,9 +106,9 @@ describe('editors/zutatenBearbeitung', () => {
         expect(rezept.zutaten).toEqual([{ name: 'Tomate', menge: '1' }]);
     });
 
-    test('replaces ingredients via fourth menu action', async () => {
+    test('ersetzt Zutaten ueber die vierte Menueaktion', async () => {
         const rezept = { zutaten: [{ name: 'Alt', menge: '1' }] };
-        questionMock.mockResolvedValue('Mehl 500g, Wasser 300ml');
+        frageTextMock.mockResolvedValue('Mehl 500g, Wasser 300ml');
         wurdeAbgebrochenMock.mockResolvedValue(false);
 
         bearbeiteListenMenueMock.mockImplementation(async (_rezept, _titel, _zeige, optionen) => {

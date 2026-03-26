@@ -3,12 +3,12 @@ import { jest } from '@jest/globals';
 const frageGanzzahlMock = jest.fn();
 const leereKonsoleMock = jest.fn();
 
-await jest.unstable_mockModule('../ui/eingabe.js', () => ({
+await jest.unstable_mockModule('../oberflaeche/eingabe.js', () => ({
     frageGanzzahl: frageGanzzahlMock,
     leereKonsole: leereKonsoleMock
 }));
 
-const { bearbeiteListenMenue } = await import('../ui/listenMenue.js');
+const { bearbeiteListenMenue } = await import('../oberflaeche/listenMenue.js');
 
 describe('listenMenue', () => {
     beforeEach(() => {
@@ -20,7 +20,7 @@ describe('listenMenue', () => {
         jest.restoreAllMocks();
     });
 
-    test('renders title and options and returns null when user selects Zurueck', async () => {
+    test('rendert Titel und Optionen und gibt bei Zurueck null zurueck', async () => {
         frageGanzzahlMock.mockResolvedValue(3);
 
         const rezept = { id: 1 };
@@ -42,7 +42,7 @@ describe('listenMenue', () => {
         expect(console.log).toHaveBeenCalledWith('[3] Zurück');
     });
 
-    test('returns edited recipe when selected action returns non-null', async () => {
+    test('gibt das bearbeitete Rezept zurueck wenn die gewaehlte Aktion nicht-null liefert', async () => {
         frageGanzzahlMock.mockResolvedValue(1);
 
         const rezept = { id: 1, name: 'Alt' };
@@ -59,7 +59,7 @@ describe('listenMenue', () => {
         expect(leereKonsoleMock).toHaveBeenCalledTimes(1);
     });
 
-    test('loops, rerenders the menu, and returns a later action result after a null action', async () => {
+    test('wiederholt, rendert das Menue neu und gibt spaeteres Aktionsergebnis nach einer null-Aktion zurueck', async () => {
         frageGanzzahlMock
             .mockResolvedValueOnce(1)
             .mockResolvedValueOnce(2);

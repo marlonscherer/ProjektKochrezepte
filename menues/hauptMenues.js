@@ -4,8 +4,8 @@ import {
     rezeptLoeschenMenue,
     rezeptVeraendernEinzelnMenue
 } from "./rezeptVerwaltung.js";
-import { frageGanzzahl, leereKonsole, question, warteAufEnter, wurdeAbgebrochen } from "../ui/eingabe.js";
-import { bearbeiteFavorit, aktualisiereFavoritStatus } from "../editors/favoritBearbeitung.js";
+import { frageGanzzahl, frageText, leereKonsole, warteAufEnter, wurdeAbgebrochen } from "../oberflaeche/eingabe.js";
+import { bearbeiteFavorit, aktualisiereFavoritStatus } from "../bearbeitungen/favoritBearbeitung.js";
 
 export async function hauptMenue() {
     while (true) {
@@ -67,8 +67,8 @@ async function rezepteBearbeitenMenue() {
 }
 
 async function favoritenMenue() {
-    const { ladeRezepte, speichereRezepte } = await import("../data/rezeptSpeicher.js");
-    const { zeigeRezeptDetails } = await import("../ui/anzeige.js");
+    const { ladeRezepte, speichereRezepte } = await import("../daten/rezeptSpeicher.js");
+    const { zeigeRezeptDetails } = await import("../oberflaeche/anzeige.js");
 
     while (true) {
         leereKonsole();
@@ -136,11 +136,11 @@ async function kiBeratungMenue() {
 }
 
 async function kiVorschlaegeNachZutatenMenue() {
-    const { holeKiRezeptvorschlaegeAusZutaten } = await import("../data/kiBeratung.js");
-    const { zeigeRezeptDetails } = await import("../ui/anzeige.js");
-    const { ladeRezepte, speichereRezepte } = await import("../data/rezeptSpeicher.js");
+    const { holeKiRezeptvorschlaegeAusZutaten } = await import("../daten/kiBeratung.js");
+    const { zeigeRezeptDetails } = await import("../oberflaeche/anzeige.js");
+    const { ladeRezepte, speichereRezepte } = await import("../daten/rezeptSpeicher.js");
 
-    const eingabe = (await question("Gib Zutaten ein (kommagetrennt, oder 'abbrechen'): ")).trim();
+    const eingabe = (await frageText("Gib Zutaten ein (kommagetrennt, oder 'abbrechen'): ")).trim();
     if (await wurdeAbgebrochen(eingabe, "KI-Beratung abgebrochen.")) {
         return;
     }

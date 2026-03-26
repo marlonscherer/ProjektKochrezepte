@@ -19,7 +19,7 @@ await jest.unstable_mockModule('readline/promises', () => ({
 }));
 
 const {
-    question,
+    frageText,
     leereKonsole,
     warteAufEnter,
     wurdeAbgebrochen,
@@ -28,7 +28,7 @@ const {
     frageJaNein,
     schliesseEingabe,
     istInputGeschlossenFehler,
-} = await import('../ui/eingabe.js');
+} = await import('../oberflaeche/eingabe.js');
 
 describe('eingabe.js', () => {
     beforeEach(() => {
@@ -66,12 +66,12 @@ describe('eingabe.js', () => {
         });
     });
 
-    // ─── question ────────────────────────────────────────────────────────────
+    // ─── frageText ───────────────────────────────────────────────────────────
 
-    describe('question', () => {
+    describe('frageText', () => {
         test('gibt die Benutzereingabe zurück', async () => {
             mockRlQuestion.mockResolvedValue('Testantwort');
-            const result = await question('Prompt: ');
+            const result = await frageText('Prompt: ');
             expect(result).toBe('Testantwort');
             expect(mockRlQuestion).toHaveBeenCalledWith('Prompt: ');
         });
@@ -80,28 +80,28 @@ describe('eingabe.js', () => {
             mockRlQuestion
                 .mockResolvedValueOnce('Antwort 1')
                 .mockResolvedValueOnce('Antwort 2');
-            const r1 = await question('A: ');
-            const r2 = await question('B: ');
+            const r1 = await frageText('A: ');
+            const r2 = await frageText('B: ');
             expect(r1).toBe('Antwort 1');
             expect(r2).toBe('Antwort 2');
         });
 
         test('wirft Fehler wenn Interface bereits geschlossen', async () => {
             mockRl.closed = true;
-            await expect(question('Prompt: ')).rejects.toThrow('INPUT_GESCHLOSSEN');
+            await expect(frageText('Prompt: ')).rejects.toThrow('INPUT_GESCHLOSSEN');
         });
     });
 
     // ─── warteAufEnter ────────────────────────────────────────────────────────
 
     describe('warteAufEnter', () => {
-        test('ruft question mit Standard-Prompt auf', async () => {
+        test('ruft frageText mit Standard-Prompt auf', async () => {
             mockRlQuestion.mockResolvedValue('');
             await warteAufEnter();
             expect(mockRlQuestion).toHaveBeenCalledWith('\nDrücke Enter um fortzufahren');
         });
 
-        test('ruft question mit benutzerdefiniertem Prompt auf', async () => {
+        test('ruft frageText mit benutzerdefiniertem Prompt auf', async () => {
             mockRlQuestion.mockResolvedValue('');
             await warteAufEnter('Weiter mit Enter...');
             expect(mockRlQuestion).toHaveBeenCalledWith('Weiter mit Enter...');
@@ -289,14 +289,14 @@ describe('eingabe.js', () => {
     describe('schliesseEingabe', () => {
         test('schließt die readline-Schnittstelle', async () => {
             mockRlQuestion.mockResolvedValue('');
-            await question('test');
+            await frageText('test');
             schliesseEingabe();
             expect(mockRlClose).toHaveBeenCalledTimes(1);
         });
 
         test('macht nichts wenn Interface bereits geschlossen ist', async () => {
             mockRlQuestion.mockResolvedValue('');
-            await question('test');
+            await frageText('test');
             mockRl.closed = true;
             jest.clearAllMocks();
             schliesseEingabe();

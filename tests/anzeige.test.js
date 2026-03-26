@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { holeKategorien, zeigeZutatenListe, zeigeArbeitsschritteListe, zeigeRezeptDetails } from '../ui/anzeige.js';
+import { holeKategorien, zeigeZutatenListe, zeigeArbeitsschritteListe, zeigeRezeptDetails } from '../oberflaeche/anzeige.js';
 
 describe('anzeige', () => {
     function sammleLogAusgaben() {

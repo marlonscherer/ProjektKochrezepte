@@ -9,32 +9,32 @@ const fragePflichtfeldMock = jest.fn();
 const leereKonsoleMock = jest.fn();
 const warteAufEnterMock = jest.fn();
 
-await jest.unstable_mockModule('../data/rezeptSpeicher.js', () => ({
+await jest.unstable_mockModule('../daten/rezeptSpeicher.js', () => ({
     speichereRezepte: speichereRezepteMock
 }));
 
-await jest.unstable_mockModule('../editors/kategorienBearbeitung.js', () => ({
+await jest.unstable_mockModule('../bearbeitungen/kategorienBearbeitung.js', () => ({
     bearbeiteKategorien: bearbeiteKategorienMock
 }));
 
-await jest.unstable_mockModule('../editors/zutatenBearbeitung.js', () => ({
+await jest.unstable_mockModule('../bearbeitungen/zutatenBearbeitung.js', () => ({
     bearbeiteZutaten: bearbeiteZutatenMock
 }));
 
-await jest.unstable_mockModule('../editors/arbeitsschritteBearbeitung.js', () => ({
+await jest.unstable_mockModule('../bearbeitungen/arbeitsschritteBearbeitung.js', () => ({
     bearbeiteArbeitsschritte: bearbeiteArbeitsschritteMock
 }));
 
-await jest.unstable_mockModule('../ui/eingabe.js', () => ({
+await jest.unstable_mockModule('../oberflaeche/eingabe.js', () => ({
     frageGanzzahl: frageGanzzahlMock,
     fragePflichtfeld: fragePflichtfeldMock,
     leereKonsole: leereKonsoleMock,
     warteAufEnter: warteAufEnterMock
 }));
 
-const { rezeptEditierMenue } = await import('../editors/rezeptFelderBearbeitung.js');
+const { rezeptEditierMenue } = await import('../bearbeitungen/rezeptFelderBearbeitung.js');
 
-describe('editors/rezeptFelderBearbeitung', () => {
+describe('bearbeitungen/rezeptFelderBearbeitung', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         jest.spyOn(console, 'log').mockImplementation(() => {});
@@ -44,7 +44,7 @@ describe('editors/rezeptFelderBearbeitung', () => {
         jest.restoreAllMocks();
     });
 
-    test('renames recipe and saves', async () => {
+    test('benennt ein Rezept um und speichert', async () => {
         const rezept = { id: 1, name: 'Alt', schwierigkeitsgrad: 'Leicht', zeitaufwand: '10' };
         const rezepte = [rezept, { id: 2, name: 'Andere' }];
 
@@ -60,7 +60,7 @@ describe('editors/rezeptFelderBearbeitung', () => {
         expect(warteAufEnterMock).toHaveBeenCalled();
     });
 
-    test('rejects duplicate recipe names and retries until a unique name is entered', async () => {
+    test('lehnt doppelte Rezeptnamen ab und fragt bis zur eindeutigen Eingabe erneut', async () => {
         const rezept = { id: 1, name: 'Alt', schwierigkeitsgrad: 'Leicht', zeitaufwand: '10' };
         const rezepte = [rezept, { id: 2, name: 'Andere' }];
 
@@ -78,7 +78,7 @@ describe('editors/rezeptFelderBearbeitung', () => {
         expect(speichereRezepteMock).toHaveBeenCalledTimes(1);
     });
 
-    test('allows keeping the current recipe name because it is the same recipe', async () => {
+    test('erlaubt den aktuellen Rezeptnamen, weil es dasselbe Rezept ist', async () => {
         const rezept = { id: 1, name: 'Alt', schwierigkeitsgrad: 'Leicht', zeitaufwand: '10' };
         const rezepte = [rezept, { id: 2, name: 'Andere' }];
 
@@ -93,7 +93,7 @@ describe('editors/rezeptFelderBearbeitung', () => {
         expect(speichereRezepteMock).toHaveBeenCalledTimes(1);
     });
 
-    test('changes difficulty and saves', async () => {
+    test('aendert den Schwierigkeitsgrad und speichert', async () => {
         const rezept = { id: 1, name: 'Alt', schwierigkeitsgrad: 'Leicht', zeitaufwand: '10' };
         const rezepte = [rezept];
 
@@ -108,7 +108,7 @@ describe('editors/rezeptFelderBearbeitung', () => {
         expect(speichereRezepteMock).toHaveBeenCalled();
     });
 
-    test('does not save when difficulty change is canceled', async () => {
+    test('speichert nicht wenn die Schwierigkeitsaenderung abgebrochen wird', async () => {
         const rezept = { id: 1, name: 'Alt', schwierigkeitsgrad: 'Leicht', zeitaufwand: '10' };
         const rezepte = [rezept];
 
@@ -124,7 +124,7 @@ describe('editors/rezeptFelderBearbeitung', () => {
         expect(warteAufEnterMock).toHaveBeenCalledWith('\nDrücke Enter um fortzufahren');
     });
 
-    test('delegates to categories editor and saves returned recipe', async () => {
+    test('delegiert an den Kategorien-Editor und speichert das zurueckgegebene Rezept', async () => {
         const rezept = { id: 1, name: 'Alt', kategorien: ['A'] };
         const geaendert = { ...rezept, kategorien: ['A', 'B'] };
         const rezepte = [rezept];

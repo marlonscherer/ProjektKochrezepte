@@ -7,25 +7,25 @@ const frageGanzzahlMock = jest.fn();
 const fragePflichtfeldMock = jest.fn();
 const frageJaNeinMock = jest.fn();
 const leereKonsoleMock = jest.fn();
-const questionMock = jest.fn();
+const frageTextMock = jest.fn();
 const warteAufEnterMock = jest.fn();
 const wurdeAbgebrochenMock = jest.fn();
 
-await jest.unstable_mockModule('../data/rezeptSpeicher.js', () => ({
+await jest.unstable_mockModule('../daten/rezeptSpeicher.js', () => ({
     ladeRezepte: ladeRezepteMock,
     speichereRezepte: speichereRezepteMock
 }));
 
-await jest.unstable_mockModule('../editors/rezeptFelderBearbeitung.js', () => ({
+await jest.unstable_mockModule('../bearbeitungen/rezeptFelderBearbeitung.js', () => ({
     rezeptEditierMenue: rezeptEditierMenueMock
 }));
 
-await jest.unstable_mockModule('../ui/eingabe.js', () => ({
+await jest.unstable_mockModule('../oberflaeche/eingabe.js', () => ({
     frageGanzzahl: frageGanzzahlMock,
     fragePflichtfeld: fragePflichtfeldMock,
     frageJaNein: frageJaNeinMock,
     leereKonsole: leereKonsoleMock,
-    question: questionMock,
+    frageText: frageTextMock,
     warteAufEnter: warteAufEnterMock,
     wurdeAbgebrochen: wurdeAbgebrochenMock
 }));
@@ -34,7 +34,7 @@ const {
     rezeptLoeschenMenue,
     rezeptHinzufuegenMenue,
     rezeptVeraendernEinzelnMenue
-} = await import('../menus/rezeptVerwaltung.js');
+} = await import('../menues/rezeptVerwaltung.js');
 
 describe('rezeptVerwaltung', () => {
     beforeEach(() => {
@@ -46,7 +46,7 @@ describe('rezeptVerwaltung', () => {
         jest.restoreAllMocks();
     });
 
-    test('rezeptLoeschenMenue returns when no recipes exist', async () => {
+    test('rezeptLoeschenMenue kehrt zurueck wenn keine Rezepte vorhanden sind', async () => {
         ladeRezepteMock.mockReturnValue([]);
 
         await rezeptLoeschenMenue();
@@ -54,7 +54,7 @@ describe('rezeptVerwaltung', () => {
         expect(warteAufEnterMock).toHaveBeenCalledTimes(1);
     });
 
-    test('rezeptVeraendernEinzelnMenue returns when no recipes exist', async () => {
+    test('rezeptVeraendernEinzelnMenue kehrt zurueck wenn keine Rezepte vorhanden sind', async () => {
         ladeRezepteMock.mockReturnValue([]);
 
         await rezeptVeraendernEinzelnMenue();
@@ -62,7 +62,7 @@ describe('rezeptVerwaltung', () => {
         expect(warteAufEnterMock).toHaveBeenCalledTimes(1);
     });
 
-    test('rezeptHinzufuegenMenue cancels when first mandatory field is canceled', async () => {
+    test('rezeptHinzufuegenMenue bricht ab wenn das erste Pflichtfeld abgebrochen wird', async () => {
         ladeRezepteMock.mockReturnValue([]);
         fragePflichtfeldMock.mockResolvedValue(null);
 
@@ -72,7 +72,7 @@ describe('rezeptVerwaltung', () => {
         expect(speichereRezepteMock).not.toHaveBeenCalled();
     });
 
-    test('rezeptLoeschenMenue cancels when user answers n', async () => {
+    test('rezeptLoeschenMenue bricht ab wenn der Nutzer mit n antwortet', async () => {
         ladeRezepteMock.mockReturnValue([
             { id: 1, name: 'Pasta' },
             { id: 2, name: 'Suppe' }
@@ -86,7 +86,7 @@ describe('rezeptVerwaltung', () => {
         expect(warteAufEnterMock).toHaveBeenCalled();
     });
 
-    test('rezeptLoeschenMenue deletes recipe after confirmation j', async () => {
+    test('rezeptLoeschenMenue loescht ein Rezept nach Bestaetigung mit j', async () => {
         ladeRezepteMock.mockReturnValue([
             { id: 1, name: 'Pasta' },
             { id: 2, name: 'Suppe' }
@@ -102,7 +102,7 @@ describe('rezeptVerwaltung', () => {
         expect(gespeicherteRezepte[0].name).toBe('Suppe');
     });
 
-    test('rezeptHinzufuegenMenue creates and saves a complete recipe', async () => {
+    test('rezeptHinzufuegenMenue erstellt und speichert ein vollstaendiges Rezept', async () => {
         ladeRezepteMock.mockReturnValue([]);
 
         fragePflichtfeldMock
@@ -112,7 +112,7 @@ describe('rezeptVerwaltung', () => {
 
         frageGanzzahlMock.mockResolvedValue(1);
 
-        questionMock
+        frageTextMock
             .mockResolvedValueOnce('Pasta, Schnell')
             .mockResolvedValueOnce('Mehl')
             .mockResolvedValueOnce('fertig')
@@ -133,7 +133,7 @@ describe('rezeptVerwaltung', () => {
         expect(gespeicherteRezepte[0].arbeitsschritte).toEqual(['Mischen']);
     });
 
-    test('rezeptVeraendernEinzelnMenue opens editor for selected recipe', async () => {
+    test('rezeptVeraendernEinzelnMenue oeffnet den Editor fuer das ausgewaehlte Rezept', async () => {
         const rezepte = [{ id: 1, name: 'Pasta' }];
         ladeRezepteMock
             .mockReturnValueOnce(rezepte)

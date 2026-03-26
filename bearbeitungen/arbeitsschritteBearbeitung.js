@@ -2,13 +2,13 @@ import {
     fragePflichtfeld,
     frageGanzzahl,
     frageJaNein,
+    frageText,
     leereKonsole,
-    question,
     warteAufEnter,
     wurdeAbgebrochen
-} from "../ui/eingabe.js";
-import { zeigeArbeitsschritteListe } from "../ui/anzeige.js";
-import { bearbeiteListenMenue } from "../ui/listenMenue.js";
+} from "../oberflaeche/eingabe.js";
+import { zeigeArbeitsschritteListe } from "../oberflaeche/anzeige.js";
+import { bearbeiteListenMenue } from "../oberflaeche/listenMenue.js";
 
 export async function bearbeiteArbeitsschritte(rezept) {
     return bearbeiteListenMenue(rezept, "Arbeitsschritte ändern", zeigeArbeitsschritteListe, [
@@ -173,7 +173,7 @@ async function arbeitsschritteErsetzen(rezept) {
         while (true) {
             let schritt = "";
             while (schritt === "") {
-                schritt = (await question(`Schritt ${schrittIndex} (oder 'fertig'): `)).trim();
+                schritt = (await frageText(`Schritt ${schrittIndex} (oder 'fertig'): `)).trim();
                 if (await wurdeAbgebrochen(schritt, "Arbeitsschritte ersetzen abgebrochen.")) {
                     return null;
                 }

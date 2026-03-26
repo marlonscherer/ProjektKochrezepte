@@ -2,7 +2,7 @@ import { jest } from '@jest/globals';
 
 const frageGanzzahlMock = jest.fn();
 const leereKonsoleMock = jest.fn();
-const questionMock = jest.fn();
+const frageTextMock = jest.fn();
 const warteAufEnterMock = jest.fn();
 const wurdeAbgebrochenMock = jest.fn();
 const rezeptSucheMenueMock = jest.fn();
@@ -15,39 +15,39 @@ const speichereRezepteMock = jest.fn();
 const zeigeRezeptDetailsMock = jest.fn();
 const holeKiRezeptvorschlaegeAusZutatenMock = jest.fn();
 
-await jest.unstable_mockModule('../ui/eingabe.js', () => ({
+await jest.unstable_mockModule('../oberflaeche/eingabe.js', () => ({
     frageGanzzahl: frageGanzzahlMock,
     leereKonsole: leereKonsoleMock,
-    question: questionMock,
+    frageText: frageTextMock,
     warteAufEnter: warteAufEnterMock,
     wurdeAbgebrochen: wurdeAbgebrochenMock
 }));
 
-await jest.unstable_mockModule('../menus/auswahlMenues.js', () => ({
+await jest.unstable_mockModule('../menues/auswahlMenues.js', () => ({
     rezeptSucheMenue: rezeptSucheMenueMock,
     rezeptAuswahlMenue: rezeptAuswahlMenueMock
 }));
 
-await jest.unstable_mockModule('../menus/rezeptVerwaltung.js', () => ({
+await jest.unstable_mockModule('../menues/rezeptVerwaltung.js', () => ({
     rezeptHinzufuegenMenue: rezeptHinzufuegenMenueMock,
     rezeptLoeschenMenue: rezeptLoeschenMenueMock,
     rezeptVeraendernEinzelnMenue: rezeptVeraendernEinzelnMenueMock
 }));
 
-await jest.unstable_mockModule('../data/rezeptSpeicher.js', () => ({
+await jest.unstable_mockModule('../daten/rezeptSpeicher.js', () => ({
     ladeRezepte: ladeRezepteMock,
     speichereRezepte: speichereRezepteMock
 }));
 
-await jest.unstable_mockModule('../ui/anzeige.js', () => ({
+await jest.unstable_mockModule('../oberflaeche/anzeige.js', () => ({
     zeigeRezeptDetails: zeigeRezeptDetailsMock
 }));
 
-await jest.unstable_mockModule('../data/kiBeratung.js', () => ({
+await jest.unstable_mockModule('../daten/kiBeratung.js', () => ({
     holeKiRezeptvorschlaegeAusZutaten: holeKiRezeptvorschlaegeAusZutatenMock
 }));
 
-const { hauptMenue } = await import('../menus/hauptMenues.js');
+const { hauptMenue } = await import('../menues/hauptMenues.js');
 
 describe('hauptMenues', () => {
     beforeEach(() => {
@@ -59,7 +59,7 @@ describe('hauptMenues', () => {
         jest.restoreAllMocks();
     });
 
-    test('exits when selecting Beenden', async () => {
+    test('beendet das Programm bei Auswahl von Beenden', async () => {
         frageGanzzahlMock.mockResolvedValue(6);
 
         await hauptMenue();
@@ -72,7 +72,7 @@ describe('hauptMenues', () => {
         expect(console.log).toHaveBeenCalledWith('Das Programm wird beendet. Auf wiedersehen!');
     });
 
-    test('returns to the main menu after search and then exits', async () => {
+    test('kehrt nach der Suche zum Hauptmenue zurueck und beendet danach', async () => {
         frageGanzzahlMock
             .mockResolvedValueOnce(1)
             .mockResolvedValueOnce(6);
@@ -84,7 +84,7 @@ describe('hauptMenues', () => {
         expect(leereKonsoleMock).toHaveBeenCalledTimes(2);
     });
 
-    test('dispatches within recipe management menu and returns to main menu afterwards', async () => {
+    test('verzweigt im Rezeptverwaltungsmenue und kehrt danach ins Hauptmenue zurueck', async () => {
         frageGanzzahlMock
             .mockResolvedValueOnce(3)
             .mockResolvedValueOnce(1)
@@ -102,7 +102,7 @@ describe('hauptMenues', () => {
         expect(frageGanzzahlMock).toHaveBeenNthCalledWith(4, 1, 6, 'Was möchtest du tun?\n');
     });
 
-    test('opens recipe selection and then returns to the main menu before exit', async () => {
+    test('oeffnet die Rezeptauswahl und kehrt vor dem Beenden ins Hauptmenue zurueck', async () => {
         frageGanzzahlMock
             .mockResolvedValueOnce(2)
             .mockResolvedValueOnce(6);
@@ -113,7 +113,7 @@ describe('hauptMenues', () => {
         expect(frageGanzzahlMock).toHaveBeenCalledTimes(2);
     });
 
-    test('opens KI menu and returns to main menu via back option', async () => {
+    test('oeffnet das KI-Menue und kehrt ueber Zurueck ins Hauptmenue zurueck', async () => {
         frageGanzzahlMock
             .mockResolvedValueOnce(5)
             .mockResolvedValueOnce(2)
@@ -126,7 +126,7 @@ describe('hauptMenues', () => {
         expect(leereKonsoleMock).toHaveBeenCalledTimes(3);
     });
 
-    test('opens Favoriten menu and returns when no favorites exist', async () => {
+    test('oeffnet das Favoritenmenue und kehrt bei fehlenden Favoriten zurueck', async () => {
         ladeRezepteMock.mockReturnValue([]);
         frageGanzzahlMock
             .mockResolvedValueOnce(4)
@@ -138,7 +138,7 @@ describe('hauptMenues', () => {
         expect(zeigeRezeptDetailsMock).not.toHaveBeenCalled();
     });
 
-    test('removes a favorite from Favoriten menu and saves changes', async () => {
+    test('entfernt einen Favoriten im Favoritenmenue und speichert die Aenderung', async () => {
         const rezepte = [{ id: 1, name: 'Pasta', favorit: true }];
         ladeRezepteMock.mockImplementation(() => rezepte);
         frageGanzzahlMock
@@ -155,7 +155,7 @@ describe('hauptMenues', () => {
         expect(warteAufEnterMock).toHaveBeenCalledWith('Drücke Enter um fortzufahren');
     });
 
-    test('saves selected KI recipe suggestion after confirmation', async () => {
+    test('speichert den ausgewaehlten KI-Rezeptvorschlag nach Bestaetigung', async () => {
         const vorschlag = {
             id: 123,
             name: 'Tomaten Pasta',
@@ -167,7 +167,7 @@ describe('hauptMenues', () => {
             favorit: false
         };
 
-        questionMock.mockResolvedValue('Tomate, Pasta');
+        frageTextMock.mockResolvedValue('Tomate, Pasta');
         wurdeAbgebrochenMock.mockResolvedValue(false);
         holeKiRezeptvorschlaegeAusZutatenMock.mockResolvedValue([vorschlag]);
         ladeRezepteMock.mockReturnValue([]);
@@ -188,7 +188,7 @@ describe('hauptMenues', () => {
         expect(warteAufEnterMock).toHaveBeenCalledWith('Drücke Enter um zur KI-Beratung zurückzukehren');
     });
 
-    test('does not save KI recipe when recipe name already exists', async () => {
+    test('speichert kein KI-Rezept wenn der Rezeptname bereits existiert', async () => {
         const vorschlag = {
             id: 456,
             name: 'Tomaten Pasta',
@@ -200,7 +200,7 @@ describe('hauptMenues', () => {
             favorit: false
         };
 
-        questionMock.mockResolvedValue('Tomate, Pasta');
+        frageTextMock.mockResolvedValue('Tomate, Pasta');
         wurdeAbgebrochenMock.mockResolvedValue(false);
         holeKiRezeptvorschlaegeAusZutatenMock.mockResolvedValue([vorschlag]);
         ladeRezepteMock.mockReturnValue([{ id: 1, name: 'tomaten pasta' }]);
@@ -220,8 +220,8 @@ describe('hauptMenues', () => {
         expect(warteAufEnterMock).toHaveBeenCalledWith('Drücke Enter um zur KI-Beratung zurückzukehren');
     });
 
-    test('shows dedicated message when OPENAI_API_KEY is missing', async () => {
-        questionMock.mockResolvedValue('Tomate, Pasta');
+    test('zeigt eine klare Meldung wenn OPENAI_API_KEY fehlt', async () => {
+        frageTextMock.mockResolvedValue('Tomate, Pasta');
         wurdeAbgebrochenMock.mockResolvedValue(false);
         holeKiRezeptvorschlaegeAusZutatenMock.mockRejectedValue(new Error('OPENAI_API_KEY fehlt. Bitte als Umgebungsvariable setzen.'));
 
@@ -238,8 +238,8 @@ describe('hauptMenues', () => {
         expect(speichereRezepteMock).not.toHaveBeenCalled();
     });
 
-    test('shows generic KI error message for unexpected errors', async () => {
-        questionMock.mockResolvedValue('Tomate, Pasta');
+    test('zeigt bei unerwarteten Fehlern eine allgemeine KI-Fehlermeldung', async () => {
+        frageTextMock.mockResolvedValue('Tomate, Pasta');
         wurdeAbgebrochenMock.mockResolvedValue(false);
         holeKiRezeptvorschlaegeAusZutatenMock.mockRejectedValue(new Error('Netzwerkfehler'));
 
@@ -256,8 +256,8 @@ describe('hauptMenues', () => {
         expect(speichereRezepteMock).not.toHaveBeenCalled();
     });
 
-    test('shows message when KI returns no suggestions', async () => {
-        questionMock.mockResolvedValue('Tomate, Pasta');
+    test('zeigt eine Meldung wenn die KI keine Vorschlaege liefert', async () => {
+        frageTextMock.mockResolvedValue('Tomate, Pasta');
         wurdeAbgebrochenMock.mockResolvedValue(false);
         holeKiRezeptvorschlaegeAusZutatenMock.mockResolvedValue([]);
 
@@ -274,7 +274,7 @@ describe('hauptMenues', () => {
         expect(speichereRezepteMock).not.toHaveBeenCalled();
     });
 
-    test('logs save failure when KI recipe cannot be persisted', async () => {
+    test('protokolliert einen Speicherfehler wenn ein KI-Rezept nicht gespeichert werden kann', async () => {
         const vorschlag = {
             id: 777,
             name: 'Fehler Pasta',
@@ -286,7 +286,7 @@ describe('hauptMenues', () => {
             favorit: false
         };
 
-        questionMock.mockResolvedValue('Tomate, Pasta');
+        frageTextMock.mockResolvedValue('Tomate, Pasta');
         wurdeAbgebrochenMock.mockResolvedValue(false);
         holeKiRezeptvorschlaegeAusZutatenMock.mockResolvedValue([vorschlag]);
         ladeRezepteMock.mockReturnValue([]);

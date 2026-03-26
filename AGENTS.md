@@ -14,7 +14,7 @@ node main.js
 |---|---|
 | `main.js` | Einstiegspunkt der Anwendung. Startet das Hauptmenü und initialisiert die CLI. |
 | `rezepte.json` | Flat-file database — JSON array of recipe objects, read/written synchronously. |
-| `menus/`, `editors/`, `ui/`, `data/` | Aufgeteilte Module für Menüs, Bearbeitung, Anzeige/Eingabe und Speicherlogik. |
+| `menues/`, `bearbeitungen/`, `oberflaeche/`, `daten/` | Aufgeteilte Module für Menüs, Bearbeitung, Anzeige/Eingabe und Speicherlogik. |
 
 Menu hierarchy rooted at `hauptMenue()` with options:
 - `rezeptSucheMenue()` (Name-basierte Suche, case-insensitive Teilstring)

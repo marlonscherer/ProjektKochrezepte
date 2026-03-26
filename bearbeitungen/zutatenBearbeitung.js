@@ -2,13 +2,13 @@ import {
     fragePflichtfeld,
     frageGanzzahl,
     frageJaNein,
+    frageText,
     leereKonsole,
-    question,
     warteAufEnter,
     wurdeAbgebrochen
-} from "../ui/eingabe.js";
-import { zeigeZutatenListe } from "../ui/anzeige.js";
-import { bearbeiteListenMenue } from "../ui/listenMenue.js";
+} from "../oberflaeche/eingabe.js";
+import { zeigeZutatenListe } from "../oberflaeche/anzeige.js";
+import { bearbeiteListenMenue } from "../oberflaeche/listenMenue.js";
 
 export async function bearbeiteZutaten(rezept) {
     return bearbeiteListenMenue(rezept, "Zutaten ändern", zeigeZutatenListe, [
@@ -181,7 +181,7 @@ async function zutatenErsetzen(rezept) {
         zeigeZutatenListe(rezept);
 
         console.log("\nGib neue Zutaten ein (Format: 'Name Menge, Name Menge', z.B. 'Spaghetti 400g, Knoblauch 4 Zehen')");
-        const zutatenInput = (await question("Zutaten (oder 'abbrechen'): ")).trim();
+        const zutatenInput = (await frageText("Zutaten (oder 'abbrechen'): ")).trim();
 
         if (await wurdeAbgebrochen(zutatenInput, "Zutaten ersetzen abgebrochen.")) {
             return null;

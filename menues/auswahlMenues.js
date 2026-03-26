@@ -1,7 +1,7 @@
-import { ladeRezepte, speichereRezepte } from "../data/rezeptSpeicher.js";
-import { holeKategorien, zeigeRezeptDetails } from "../ui/anzeige.js";
-import { frageGanzzahl, fragePflichtfeld, leereKonsole, warteAufEnter } from "../ui/eingabe.js";
-import { bearbeiteFavorit, aktualisiereFavoritStatus } from "../editors/favoritBearbeitung.js";
+import { ladeRezepte, speichereRezepte } from "../daten/rezeptSpeicher.js";
+import { holeKategorien, zeigeRezeptDetails } from "../oberflaeche/anzeige.js";
+import { frageGanzzahl, fragePflichtfeld, leereKonsole, warteAufEnter } from "../oberflaeche/eingabe.js";
+import { bearbeiteFavorit, aktualisiereFavoritStatus } from "../bearbeitungen/favoritBearbeitung.js";
 
 export async function rezeptSucheMenue() {
     leereKonsole();

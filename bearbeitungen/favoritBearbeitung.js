@@ -1,4 +1,4 @@
-import { frageGanzzahl } from "../ui/eingabe.js";
+import { frageGanzzahl } from "../oberflaeche/eingabe.js";
 
 export async function bearbeiteFavorit(rezept) {
     const istFavorit = rezept.favorit === true;

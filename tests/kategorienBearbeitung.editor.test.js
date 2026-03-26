@@ -4,21 +4,21 @@ const frageGanzzahlMock = jest.fn();
 const fragePflichtfeldMock = jest.fn();
 const leereKonsoleMock = jest.fn();
 const warteAufEnterMock = jest.fn();
-const questionMock = jest.fn();
+const frageTextMock = jest.fn();
 const wurdeAbgebrochenMock = jest.fn();
 
-await jest.unstable_mockModule('../ui/eingabe.js', () => ({
+await jest.unstable_mockModule('../oberflaeche/eingabe.js', () => ({
     frageGanzzahl: frageGanzzahlMock,
     fragePflichtfeld: fragePflichtfeldMock,
     leereKonsole: leereKonsoleMock,
     warteAufEnter: warteAufEnterMock,
-    question: questionMock,
+    frageText: frageTextMock,
     wurdeAbgebrochen: wurdeAbgebrochenMock
 }));
 
-const { bearbeiteKategorien } = await import('../editors/kategorienBearbeitung.js');
+const { bearbeiteKategorien } = await import('../bearbeitungen/kategorienBearbeitung.js');
 
-describe('editors/kategorienBearbeitung', () => {
+describe('bearbeitungen/kategorienBearbeitung', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         jest.spyOn(console, 'log').mockImplementation(() => {});
@@ -28,7 +28,7 @@ describe('editors/kategorienBearbeitung', () => {
         jest.restoreAllMocks();
     });
 
-    test('adds a category', async () => {
+    test('fuegt eine Kategorie hinzu', async () => {
         const rezept = { kategorien: ['Pasta'] };
         frageGanzzahlMock.mockResolvedValue(1);
         fragePflichtfeldMock.mockResolvedValue('Vegan');
@@ -38,7 +38,7 @@ describe('editors/kategorienBearbeitung', () => {
         expect(result.kategorien).toEqual(['Pasta', 'Vegan']);
     });
 
-    test('rejects duplicate category and retries until unique input', async () => {
+    test('lehnt doppelte Kategorien ab und fragt bis zu einer eindeutigen Eingabe erneut', async () => {
         const rezept = { kategorien: ['Pasta'] };
         frageGanzzahlMock.mockResolvedValue(1);
         fragePflichtfeldMock
@@ -51,7 +51,7 @@ describe('editors/kategorienBearbeitung', () => {
         expect(console.log).toHaveBeenCalledWith('Die Kategorie "pasta" existiert bereits!');
     });
 
-    test('returns null on back', async () => {
+    test('gibt bei Zurueck null zurueck', async () => {
         const rezept = { kategorien: ['Pasta'] };
         frageGanzzahlMock.mockResolvedValue(5);
 
@@ -60,7 +60,7 @@ describe('editors/kategorienBearbeitung', () => {
         expect(result).toBeNull();
     });
 
-    test('renames a category', async () => {
+    test('benennt eine Kategorie um', async () => {
         const rezept = { kategorien: ['Pasta', 'Suppe'] };
         frageGanzzahlMock
             .mockResolvedValueOnce(3) // Kategorie umbenennen
@@ -72,7 +72,7 @@ describe('editors/kategorienBearbeitung', () => {
         expect(result.kategorien).toEqual(['Nudeln', 'Suppe']);
     });
 
-    test('prevents removing the last remaining category', async () => {
+    test('verhindert das Entfernen der letzten verbleibenden Kategorie', async () => {
         const rezept = { kategorien: ['Pasta'] };
         frageGanzzahlMock
             .mockResolvedValueOnce(2)
@@ -85,10 +85,10 @@ describe('editors/kategorienBearbeitung', () => {
         expect(rezept.kategorien).toEqual(['Pasta']);
     });
 
-    test('replaces all categories from comma-separated input', async () => {
+    test('ersetzt alle Kategorien aus einer komma-separierten Eingabe', async () => {
         const rezept = { kategorien: ['Alt'] };
         frageGanzzahlMock.mockResolvedValue(4);
-        questionMock.mockResolvedValue('Pasta, Vegetarisch');
+        frageTextMock.mockResolvedValue('Pasta, Vegetarisch');
         wurdeAbgebrochenMock.mockResolvedValue(false);
 
         const result = await bearbeiteKategorien(rezept);

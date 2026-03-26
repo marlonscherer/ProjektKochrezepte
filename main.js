@@ -1,5 +1,5 @@
-﻿import { hauptMenue } from "./menus/hauptMenues.js";
-import { istInputGeschlossenFehler, schliesseEingabe } from "./ui/eingabe.js";
+import { hauptMenue } from "./menues/hauptMenues.js";
+import { istInputGeschlossenFehler, schliesseEingabe } from "./oberflaeche/eingabe.js";
 
 // Zentrale App-Schleife: bei normalem Input-Ende sauber beenden,
 // bei echten Fehlern weiterhin crashen.

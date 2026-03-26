@@ -1,14 +1,14 @@
-import { ladeRezepte, speichereRezepte } from "../data/rezeptSpeicher.js";
-import { rezeptEditierMenue } from "../editors/rezeptFelderBearbeitung.js";
+import { ladeRezepte, speichereRezepte } from "../daten/rezeptSpeicher.js";
+import { rezeptEditierMenue } from "../bearbeitungen/rezeptFelderBearbeitung.js";
 import {
     frageGanzzahl,
     fragePflichtfeld,
     frageJaNein,
+    frageText,
     leereKonsole,
-    question,
     warteAufEnter,
     wurdeAbgebrochen
-} from "../ui/eingabe.js";
+} from "../oberflaeche/eingabe.js";
 
 export async function rezeptLoeschenMenue() {
     leereKonsole();
@@ -109,7 +109,7 @@ export async function rezeptHinzufuegenMenue() {
     }
 
     console.log("\nGib Kategorien ein (getrennt durch Kommas, z.B. 'Pasta, Italienisch, Vegetarisch')");
-    const kategorienInput = (await question("Kategorien: ")).trim();
+    const kategorienInput = (await frageText("Kategorien: ")).trim();
     if (await wurdeAbgebrochen(kategorienInput, "Rezepterstellung abgebrochen.")) {
         return;
     }
@@ -126,7 +126,7 @@ export async function rezeptHinzufuegenMenue() {
     while (true) {
         let zutatName = "";
         while (zutatName === "") {
-            zutatName = (await question(`\nZutat ${zutatIndex} Name (oder 'fertig'): `)).trim();
+            zutatName = (await frageText(`\nZutat ${zutatIndex} Name (oder 'fertig'): `)).trim();
             if (await wurdeAbgebrochen(zutatName, "Rezepterstellung abgebrochen.")) {
                 return;
             }
@@ -164,7 +164,7 @@ export async function rezeptHinzufuegenMenue() {
     while (true) {
         let schritt = "";
         while (schritt === "") {
-            schritt = (await question(`\nSchritt ${schrittIndex} (oder 'fertig'): `)).trim();
+            schritt = (await frageText(`\nSchritt ${schrittIndex} (oder 'fertig'): `)).trim();
             if (await wurdeAbgebrochen(schritt, "Rezepterstellung abgebrochen.")) {
                 return;
             }

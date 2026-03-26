@@ -5,10 +5,10 @@ export default {
         },
     testMatch: ['**/tests/**/*.test.js'],
     collectCoverageFrom: [
-        'data/**/*.js',
-        'ui/**/*.js',
-        'editors/**/*.js',
-        'menus/**/*.js',
+        'daten/**/*.js',
+        'oberflaeche/**/*.js',
+        'bearbeitungen/**/*.js',
+        'menues/**/*.js',
         '!**/*.test.js',
         '!main.js'
     ],
