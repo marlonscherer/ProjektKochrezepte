@@ -7,7 +7,7 @@ export async function bearbeiteFavorit(rezept) {
     console.log(`Aktueller Status: ${aktuellerStatus}\n`);
 
     if (istFavorit) {
-        console.log("[1] Aus Favoriten entfernen\n", "[2] Zurück (keine Änderung)\n");
+        console.log("[1] Aus Favoriten entfernen", "\n[2] Zurück (keine Änderung)\n");
         const wahl = await frageGanzzahl(1, 2, "Was möchtest du tun?\n");
         if (wahl === 1) {
             rezept.favorit = false;
@@ -16,7 +16,7 @@ export async function bearbeiteFavorit(rezept) {
         return null;
     }
 
-    console.log("[1] Zu Favoriten hinzufügen\n", "[2] Zurück (keine Änderung)\n");
+    console.log("[1] Zu Favoriten hinzufügen", "\n[2] Zurück (keine Änderung)\n");
     const wahl = await frageGanzzahl(1, 2, "Was möchtest du tun?\n");
     if (wahl === 1) {
         rezept.favorit = true;

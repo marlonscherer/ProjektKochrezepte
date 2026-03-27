@@ -506,5 +506,127 @@
       "Vor dem Servieren 10 Minuten ziehen lassen."
     ],
     "favorit": false
+  },
+  {
+    "id": 1774601929651,
+    "name": "Eierlikör",
+    "schwierigkeitsgrad": "Leicht",
+    "zeitaufwand": "30 Minuten",
+    "kategorien": [
+      "Getränk",
+      "alkoholisch"
+    ],
+    "zutaten": [
+      {
+        "name": "Eier",
+        "menge": "20"
+      },
+      {
+        "name": "Doppelkorn",
+        "menge": "1/2 Flasche"
+      },
+      {
+        "name": "Zucker",
+        "menge": "200g"
+      },
+      {
+        "name": "Sahne",
+        "menge": "ca.800ml"
+      },
+      {
+        "name": "Vanillzucker",
+        "menge": "3 Päckchen(ca.24g)"
+      }
+    ],
+    "arbeitsschritte": [
+      "Trenne die Eier und verwende nur das Eigelb, mache diese in eine Schüssel.",
+      "Gebe Zucker und Vanillzucker hinzu und alles ca 3 min. schaumig rühren.",
+      "Langsam die Sahne dazu geben.",
+      "den Doppelkorn langsam unter rühren dazu geben.",
+      "abfüllen in flaschen und über Nacht kühl stellen.",
+      "vor dem servieren gut aufschütteln und mit Sahne etwas strecken, falls es nicht flüssig genug ist.",
+      "zum Wohl"
+    ],
+    "favorit": true
+  },
+  {
+    "id": 1774604686419,
+    "name": "Feuerwehrkuchen",
+    "schwierigkeitsgrad": "Schwer",
+    "zeitaufwand": "45 Min Zeitaufwand und 60 Min Backzeit",
+    "kategorien": [
+      "Kuchen"
+    ],
+    "zutaten": [
+      {
+        "name": "Butter",
+        "menge": "75g"
+      },
+      {
+        "name": "Zucker",
+        "menge": "75g"
+      },
+      {
+        "name": "Backpulver",
+        "menge": "1 Päckchen"
+      },
+      {
+        "name": "Mehl",
+        "menge": "150g"
+      },
+      {
+        "name": "Ei",
+        "menge": "1"
+      },
+      {
+        "name": "Schattenmorellen",
+        "menge": "2 Gläser"
+      },
+      {
+        "name": "Vanillepudding",
+        "menge": "1 Päckchen"
+      },
+      {
+        "name": "Butter",
+        "menge": "90g"
+      },
+      {
+        "name": "Zucker",
+        "menge": "100g"
+      },
+      {
+        "name": "Mehl",
+        "menge": "100g"
+      },
+      {
+        "name": "geriebene Mandeln",
+        "menge": "100g"
+      },
+      {
+        "name": "Sahne",
+        "menge": "400g"
+      },
+      {
+        "name": "Sahnesteif",
+        "menge": "2Päckchen"
+      },
+      {
+        "name": "Schockostreusel",
+        "menge": "nach Bedarf"
+      }
+    ],
+    "arbeitsschritte": [
+      "Für den Boden",
+      "75g Butter, 75g Zucker, 1 Päckchen Backpulver, 150g Mehl und 1 Ei zu einem Teig verkneten.",
+      "den Teig in eine Kuchenform geben.",
+      "2 Gläser Schattenmorellen abtropfen lassen und auf den Boden verteilen.",
+      "1/2 Liter des Saftes mit dem Vanillepudding aufkochen und über die Kirschen geben.",
+      "für die Streusel",
+      "90g Butter, 100g Zucker, 100g Mehl, 100g Mandeln zu Streusel verrühren.",
+      "die Streusel auf die Kirschen verteilen und den Kuchen bei 160 Grad im Backofen ca. 60 Minuten backen.",
+      "den Kuchen abkühlen lassen.",
+      "Am nächsten Tag, vor dem servieren die 400g Sahne mit den 2 Päckchen Sahnesteif schlagen und auf dem Kuchen gleichmäßig verteilen.",
+      "Die Schokostreusel über die Sahne verteilen."
+    ]
   }
 ]
